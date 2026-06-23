@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Project2PersonalPortfolioTrackerApplication<project2_personal_portfolio_tracker>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.skillstorm.Project2PersonalPortfolioTrackerApplication",
+            "projectName": "project2_personal_portfolio_tracker",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
