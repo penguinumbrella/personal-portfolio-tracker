@@ -1,15 +1,20 @@
 package com.skillstorm.Models;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "user")
-public class UserModel {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +29,14 @@ public class UserModel {
     @Column(name = "password-hash", nullable = false)
     private String passwordHash;
 
-    public UserModel() {
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties(value = {"user"})
+    private List<InvestmentAccount> investmentAccounts;
+
+    public User() {
     }
 
-    public UserModel(int id, String username, String email, String passwordHash) {
+    public User(int id, String username, String email, String passwordHash) {
         this.id = id;
         this.username = username;
         this.email = email;
