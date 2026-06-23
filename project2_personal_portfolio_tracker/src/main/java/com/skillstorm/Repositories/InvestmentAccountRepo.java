@@ -8,6 +8,6 @@ import com.skillstorm.Models.InvestmentAccount;
 
 public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, Integer>{
 
-    Iterable<InvestmentAccount> findByUserId(Long userId);
+    Iterable<InvestmentAccount> findByUserId(int userId);
     
 }

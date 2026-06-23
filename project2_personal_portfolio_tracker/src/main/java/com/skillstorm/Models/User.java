@@ -38,7 +38,6 @@ public class User {
 
     public User(int id, String username, String email, String passwordHash,
             List<InvestmentAccount> investmentAccounts) {
-        this.id = id;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;

@@ -53,10 +53,11 @@ public class InvestmentAccountController {
     // PUT (EDIT ACCOUNT)
     @PutMapping("/{id}")
     public ResponseEntity<InvestmentAccount> updateUserAccount(
+        @RequestParam(required = true) int userId,
         @PathVariable int id,
         @RequestBody InvestmentAccountDto dto
     ) {
-        return service.editUserAccount(id, dto);
+        return service.editUserAccount(userId, id, dto);
     }
 
     // DELETE (DELETE ACCOUNT)

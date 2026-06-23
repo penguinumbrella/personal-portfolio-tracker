@@ -9,8 +9,7 @@ public record InvestmentAccountDto(
     String nickname,
     InvestmentType accountType,
     String institutionName,
-    Date dateOpened,
-    User user
+    Date dateOpened
     ) {
     
 }

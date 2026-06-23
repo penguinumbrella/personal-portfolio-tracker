@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +37,10 @@ public class InvestmentAccount {
     @Column(name = "account_type", nullable = false, unique = true)
     private InvestmentType accountType;
 
+    @Column(name = "institution_name", nullable = false)
+    @JsonProperty("institutionName") // for some reason this wouldn't show without
+    private String institutionName;
+
     @Column(name = "date_opened", nullable = false)
     private Date dateOpened;
 
@@ -50,10 +55,11 @@ public class InvestmentAccount {
     }
 
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
+        this.institutionName = institutionName;
         this.dateOpened = dateOpened;
         this.user = user;
     }

@@ -53,6 +53,13 @@ public class UserService {
         return ResponseEntity.notFound().build();
     }
 
+    // DELETE PROFILE
+
+    public ResponseEntity<Void> deleteProfile(int id) {
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // LOGIN (TODO)
     // LOGOUT (TODO)
     // DATA SCOPING?
