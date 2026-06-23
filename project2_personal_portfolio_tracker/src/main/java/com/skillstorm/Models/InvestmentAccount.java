@@ -2,8 +2,6 @@ package com.skillstorm.Models;
 
 import java.sql.Date;
 
-import org.apache.catalina.User;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -14,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import com.skillstorm.Models.User;
 
 @Entity
 @Table(name = "investment_account")

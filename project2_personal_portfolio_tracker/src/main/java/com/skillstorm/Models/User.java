@@ -36,11 +36,13 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String email, String passwordHash) {
+    public User(int id, String username, String email, String passwordHash,
+            List<InvestmentAccount> investmentAccounts) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
+        this.investmentAccounts = investmentAccounts;
     }
 
     public int getId() {
@@ -75,6 +77,15 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
+    public List<InvestmentAccount> getInvestmentAccounts() {
+        return investmentAccounts;
+    }
+
+    public void setInvestmentAccounts(List<InvestmentAccount> investmentAccounts) {
+        this.investmentAccounts = investmentAccounts;
+    }
+
+    
     
     
 }
