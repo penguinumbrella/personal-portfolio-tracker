@@ -1,0 +1,109 @@
+package com.skillstorm.Models;
+
+import java.sql.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "holding")
+public class Holding {
+
+    // composite keys must be sorted in public serialized class
+    @EmbeddedId
+    private HoldingPK id;
+
+    @Column(name = "num_shares", nullable = false)
+    private int shares;
+
+    @Column(name = "cost_per_shares", nullable = false)
+    private int costPerShare;
+
+    @Column(name = "purchase_date", nullable = false)
+    private Date purchaseDate;
+
+    // --- Mappings ---
+
+    // Many holdings per account
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "holdings" })
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private InvestmentAccount account;
+
+    // Many holdings per security
+    // Hiding holdings of securities to prevent recursion
+    @MapsId("securityId") // connects to securityId field in HoldingPK
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "holdings" })
+    @JoinColumn(name = "security_id", referencedColumnName = "id")
+    private Security security;
+
+    public Holding() {
+    }
+
+    public Holding(HoldingPK id, int shares, int costPerShare, Date purchaseDate, InvestmentAccount account,
+            Security security) {
+        this.id = id;
+        this.shares = shares;
+        this.costPerShare = costPerShare;
+        this.purchaseDate = purchaseDate;
+        this.account = account;
+        this.security = security;
+    }
+
+    public HoldingPK getId() {
+        return id;
+    }
+
+    public void setId(HoldingPK id) {
+        this.id = id;
+    }
+
+    public int getShares() {
+        return shares;
+    }
+
+    public void setShares(int shares) {
+        this.shares = shares;
+    }
+
+    public int getCostPerShare() {
+        return costPerShare;
+    }
+
+    public void setCostPerShare(int costPerShare) {
+        this.costPerShare = costPerShare;
+    }
+
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public InvestmentAccount getAccount() {
+        return account;
+    }
+
+    public void setAccount(InvestmentAccount account) {
+        this.account = account;
+    }
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(Security security) {
+        this.security = security;
+    }
+
+}
