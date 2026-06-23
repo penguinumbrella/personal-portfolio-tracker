@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: project2_personal_portfolio_tracker
