@@ -18,13 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/v1/users")
-@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
+//@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
 public class UserController {
 
     private final UserService service;
 
     public UserController(UserService service) {
         this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<Iterable<User>> getAll() {
+        return service.getAll();
     }
 
     // REGISTRATION

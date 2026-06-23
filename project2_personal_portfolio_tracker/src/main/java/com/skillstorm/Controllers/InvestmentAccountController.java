@@ -20,7 +20,7 @@ import io.micrometer.core.ipc.http.HttpSender.Response;
 
 @RestController
 @RequestMapping("/v1/investments")
-@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
+//@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
 public class InvestmentAccountController {
 
     private final InvestmentAccountService service;
