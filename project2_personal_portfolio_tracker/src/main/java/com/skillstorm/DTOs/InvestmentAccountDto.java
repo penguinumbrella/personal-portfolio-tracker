@@ -1,5 +1,16 @@
 package com.skillstorm.DTOs;
 
-public class InvestmentAccountDto {
+import java.sql.Date;
+
+import com.skillstorm.Models.InvestmentType;
+import com.skillstorm.Models.User;
+
+public record InvestmentAccountDto(
+    String nickname,
+    InvestmentType accountType,
+    String institutionName,
+    Date dateOpened,
+    User user
+    ) {
     
 }
