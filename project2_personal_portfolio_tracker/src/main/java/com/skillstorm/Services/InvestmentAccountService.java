@@ -22,6 +22,10 @@ public class InvestmentAccountService {
         this.userRepo = userRepo;
     }
 
+    public ResponseEntity<Iterable<InvestmentAccount>> getAll() {
+        return ResponseEntity.ok(investmentAccountRepo.findAll());
+    }
+
     public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(long userId) {
         return ResponseEntity.ok(investmentAccountRepo.findByUserId(userId));
     }

@@ -26,7 +26,7 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password-hash", nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @OneToMany(mappedBy = "user")

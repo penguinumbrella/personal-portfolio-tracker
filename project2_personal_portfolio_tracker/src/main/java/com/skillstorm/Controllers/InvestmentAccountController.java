@@ -19,7 +19,7 @@ import com.skillstorm.Services.InvestmentAccountService;
 import io.micrometer.core.ipc.http.HttpSender.Response;
 
 @RestController
-@RequestMapping("/v1/accounts")
+@RequestMapping("/v1/investments")
 @CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
 public class InvestmentAccountController {
 
@@ -29,19 +29,24 @@ public class InvestmentAccountController {
         this.service = service;
     }
 
-    // GET (VIEW USER ACCOUNTS)
     @GetMapping
+    public ResponseEntity<Iterable<InvestmentAccount>> getAllAccounts() {
+        return service.getAll();
+    }
+
+    // GET (VIEW USER ACCOUNTS)
+    @GetMapping("/{id}")
     public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(
-        @RequestParam(required = true) int user) {
-            return service.getUserAccounts(user);
+        @PathVariable int id) {
+            return service.getUserAccounts(id);
         }
 
     // POST (ADD ACCOUNT)
     @PostMapping
     public ResponseEntity<InvestmentAccount> addUserAccount(
-        @RequestParam(required = true) int user, 
+        @RequestParam(required = true) int userId, 
         @RequestBody InvestmentAccountDto dto) {
-            return service.addUserAccount(user, dto);
+            return service.addUserAccount(userId, dto);
         }
     
 
