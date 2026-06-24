@@ -27,11 +27,11 @@ public class InvestmentAccountService {
         return investmentAccountRepo.findAll();
     }
 
-    public Iterable<InvestmentAccount> getUserAccounts(long userId) {
+    public Iterable<InvestmentAccount> getAccounts(long userId) {
         return investmentAccountRepo.findByUserId(userId);
     }
 
-    public InvestmentAccount addUserAccount(int userId, InvestmentAccountDto dto) {
+    public InvestmentAccount addAccount(int userId, InvestmentAccountDto dto) {
         if (userRepo.existsById(userId)) {
             if (investmentAccountRepo.existsByNickname(dto.nickname())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
             return 
@@ -44,7 +44,7 @@ public class InvestmentAccountService {
 
     }
 
-    public InvestmentAccount editUserAccount(int id, InvestmentAccountDto dto) {
+    public InvestmentAccount updateAccount(int id, InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsById(id)) {
             InvestmentAccount investmentAccount = investmentAccountRepo.findById(id).get();
             if (!investmentAccount.getNickname().equals(dto.nickname()) && investmentAccountRepo.existsByNickname(dto.nickname())) {
@@ -60,7 +60,7 @@ public class InvestmentAccountService {
 
     }
 
-    public boolean deleteUserAccount(int id) {
+    public boolean deleteAccount(int id) {
         if (investmentAccountRepo.existsById(id)) {
             investmentAccountRepo.deleteById(id);
             return true;

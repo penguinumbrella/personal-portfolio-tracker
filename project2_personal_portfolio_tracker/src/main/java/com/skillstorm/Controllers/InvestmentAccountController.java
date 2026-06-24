@@ -34,16 +34,16 @@ public class InvestmentAccountController {
         @RequestParam(required=false) Integer userId
     ) {
         return (userId == null) ? ResponseEntity.ok(service.getAll())
-        : ResponseEntity.status(200).body(service.getUserAccounts(userId));
+        : ResponseEntity.status(200).body(service.getAccounts(userId));
     }
 
     // POST (ADD ACCOUNT)
     @PostMapping
-    public ResponseEntity<InvestmentAccount> addUserAccount(
+    public ResponseEntity<InvestmentAccount> addAccount(
             @RequestParam(required = true) int userId,
             @RequestBody InvestmentAccountDto dto) {
 
-        InvestmentAccount investmentAccount = service.addUserAccount(userId, dto);
+        InvestmentAccount investmentAccount = service.addAccount(userId, dto);
 
         return (investmentAccount == null) ? ResponseEntity.notFound().build()
         : ResponseEntity.status(201).body(investmentAccount);
@@ -52,11 +52,11 @@ public class InvestmentAccountController {
 
     // PUT (EDIT ACCOUNT)
     @PutMapping("/{id}")
-    public ResponseEntity<InvestmentAccount> updateUserAccount(
+    public ResponseEntity<InvestmentAccount> updateAccount(
             @PathVariable int id,
             @RequestBody InvestmentAccountDto dto) {
-                
-        InvestmentAccount investmentAccount = service.editUserAccount(id, dto);
+
+        InvestmentAccount investmentAccount = service.updateAccount(id, dto);
 
         return (investmentAccount == null) ? ResponseEntity.notFound().build()
         : ResponseEntity.status(200).body(investmentAccount);
@@ -64,10 +64,10 @@ public class InvestmentAccountController {
 
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserAccount(
+    public ResponseEntity<Void> deleteAccount(
             @PathVariable int id) {
         
-        return service.deleteUserAccount(id) ? ResponseEntity.noContent().build()
+        return service.deleteAccount(id) ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();
     }
 

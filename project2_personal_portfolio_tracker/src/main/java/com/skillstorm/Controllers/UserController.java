@@ -34,6 +34,14 @@ public class UserController {
     }
 
     // REGISTRATION
+    /**
+     * 
+     * @param dto:
+     *      - username
+     *      - email
+     *      - password
+     * @return
+     */
     @PostMapping
     public ResponseEntity<User> registerUser(
         @RequestBody UserDto dto) {

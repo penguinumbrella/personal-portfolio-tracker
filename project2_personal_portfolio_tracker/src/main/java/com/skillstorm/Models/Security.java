@@ -9,6 +9,8 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +18,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -48,6 +51,11 @@ public class Security {
     @Column(name = "general_notes")
     private String generalNotes;
 
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "securities" })
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     // --- Mappings ---
     /**
      * Security is many-to-many with Accounts
@@ -61,13 +69,14 @@ public class Security {
     }
 
     public Security(int id, String tickerSymbol, String name, SectorType sector, SecurityType type,
-            String generalNotes, List<Holding> holdings) {
+            String generalNotes, User user, List<Holding> holdings) {
         this.id = id;
         this.tickerSymbol = tickerSymbol;
         this.name = name;
         this.sector = sector;
         this.type = type;
         this.generalNotes = generalNotes;
+        this.user = user;
         this.holdings = holdings;
     }
 
