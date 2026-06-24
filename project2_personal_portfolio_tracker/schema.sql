@@ -57,7 +57,13 @@ CREATE TABLE IF NOT EXISTS portfolio.security (
 	security_name 	VARCHAR(64) 	NOT NULL,
 	sector 			portfolio.sector_type 	NOT NULL,
 	security_type 	portfolio.security_type_enum 	NOT NULL,
-	general_notes 	TEXT
+	general_notes 	TEXT,
+	user_id 			BIGINT 			NOT NULL,
+
+	CONSTRAINT fk_user
+		FOREIGN KEY(user_id)
+		REFERENCES portfolio.users(id)
+		ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS portfolio.holding;

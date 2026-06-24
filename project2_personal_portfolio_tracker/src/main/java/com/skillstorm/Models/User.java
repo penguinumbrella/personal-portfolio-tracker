@@ -1,5 +1,6 @@
 package com.skillstorm.Models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -33,16 +34,20 @@ public class User {
     @JsonIgnoreProperties(value = {"user"})
     private List<InvestmentAccount> investmentAccounts;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties(value = {"user"})
+    private List<Security> securities;
+
     public User() {
     }
 
-    public User(int id, String username, String email, String passwordHash,
-            List<InvestmentAccount> investmentAccounts) {
+    public User(int id, String username, String email, String passwordHash) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.investmentAccounts = investmentAccounts;
+        this.investmentAccounts = new ArrayList<>();
+        this.securities = new ArrayList<>();
     }
 
     public int getId() {
