@@ -13,7 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "portfolio")
 public class User {
 
     @Id
@@ -30,7 +30,7 @@ public class User {
     private String passwordHash;
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnoreProperties(value = {"user"})
+    @JsonIgnoreProperties(value = { "user" })
     private List<InvestmentAccount> investmentAccounts;
 
     public User() {
@@ -85,7 +85,4 @@ public class User {
         this.investmentAccounts = investmentAccounts;
     }
 
-    
-    
-    
 }

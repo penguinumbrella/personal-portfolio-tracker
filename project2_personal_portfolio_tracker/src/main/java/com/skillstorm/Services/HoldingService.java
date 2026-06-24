@@ -20,7 +20,7 @@ public class HoldingService {
 
     // ----- POST/CREATE METHODS -----
     public Holding addHolding(HoldingDto dto) {
-        if (repo.existsById(new HoldingPK())) {
+        if (repo.existsById(dto.id())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Holding already exists in the database.");
         }

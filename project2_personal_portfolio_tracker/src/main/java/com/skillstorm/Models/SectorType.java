@@ -3,10 +3,14 @@ package com.skillstorm.Models;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SectorType {
-    STOCK("Stock"),
-    ETF("ETF"),
-    MUTUAL_FUND("Mutual Fund"),
-    BOND("Bond");
+    TECHNOLOGY("Technology"),
+    HEALTHCARE("Healthcare"),
+    FINANCIALS("Financials"),
+    CONSUMER("Consumer"),
+    ENERGY("Energy"),
+    INDUSTRIALS("Industrials"),
+    UTILITIES("Utilities"),
+    REAL_ESTATE("Real Estate");
 
     private String name;
 
@@ -18,4 +22,5 @@ public enum SectorType {
     public String getName() {
         return name;
     }
+
 }
