@@ -2,6 +2,7 @@ package com.skillstorm.Controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,22 +30,32 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Iterable<User>> getAll() {
-        return service.getAll();
+        return ResponseEntity.ok(service.getAll());
     }
 
     // REGISTRATION
+    /**
+     * 
+     * @param dto:
+     *      - username
+     *      - email
+     *      - password
+     * @return
+     */
     @PostMapping
     public ResponseEntity<User> registerUser(
         @RequestBody UserDto dto) {
-            return service.registerUser(dto);
 
+            return ResponseEntity.status(201).body(service.registerUser(dto));
         }
     
     // VIEW PROFILE
     @GetMapping("/{id}")
     public ResponseEntity<User> viewProfile(
         @PathVariable int id) {
-        return service.viewProfile(id);
+        User user = service.viewProfile(id);
+        return (user == null) ? ResponseEntity.notFound().build() :
+        ResponseEntity.ok(user);
     }
     
     // EDIT PROFILE
@@ -53,10 +64,20 @@ public class UserController {
     public ResponseEntity<User> updateProfile(
         @PathVariable int id,
         @RequestBody UserDto dto) {
-            return service.editProfile(id, dto);
+            User user = service.updateProfile(id, dto);
+            return (user == null) ? ResponseEntity.notFound().build() :
+            ResponseEntity.status(200).build();
 
         }
     
+    // DELETE (DELETE ACCOUNT)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProfile(
+            @PathVariable int id) {
+        
+        return service.deleteUser(id) ? ResponseEntity.noContent().build()
+        : ResponseEntity.notFound().build();
+    }
 
     // USER LOGIN (TODO)
     // USER LOGOUT (TODO)

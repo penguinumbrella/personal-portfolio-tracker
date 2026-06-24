@@ -30,38 +30,45 @@ public class InvestmentAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<InvestmentAccount>> getAllAccounts() {
-        return service.getAll();
-    }
-
-    // GET (VIEW USER ACCOUNTS)
-    @GetMapping("/{id}")
-    public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(
-            @PathVariable int id) {
-        return service.getUserAccounts(id);
+    public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
+        @RequestParam(required=false) Integer userId
+    ) {
+        return (userId == null) ? ResponseEntity.ok(service.getAll())
+        : ResponseEntity.status(200).body(service.getAccounts(userId));
     }
 
     // POST (ADD ACCOUNT)
     @PostMapping
-    public ResponseEntity<InvestmentAccount> addUserAccount(
+    public ResponseEntity<InvestmentAccount> addAccount(
             @RequestParam(required = true) int userId,
             @RequestBody InvestmentAccountDto dto) {
-        return service.addUserAccount(userId, dto);
+
+        InvestmentAccount investmentAccount = service.addAccount(userId, dto);
+
+        return (investmentAccount == null) ? ResponseEntity.notFound().build()
+        : ResponseEntity.status(201).body(investmentAccount);
+        
     }
 
     // PUT (EDIT ACCOUNT)
     @PutMapping("/{id}")
-    public ResponseEntity<InvestmentAccount> updateUserAccount(
+    public ResponseEntity<InvestmentAccount> updateAccount(
             @PathVariable int id,
             @RequestBody InvestmentAccountDto dto) {
-        return service.editUserAccount(id, dto);
+
+        InvestmentAccount investmentAccount = service.updateAccount(id, dto);
+
+        return (investmentAccount == null) ? ResponseEntity.notFound().build()
+        : ResponseEntity.status(200).body(investmentAccount);
     }
 
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserAccount(
+    public ResponseEntity<Void> deleteAccount(
             @PathVariable int id) {
-        return service.deleteUserAccount(id);
+        
+        return service.deleteAccount(id) ? ResponseEntity.noContent().build()
+        : ResponseEntity.notFound().build();
     }
 
 }

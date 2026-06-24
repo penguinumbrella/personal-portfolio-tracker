@@ -1,10 +1,12 @@
 package com.skillstorm.Services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.User;
@@ -21,36 +23,54 @@ public class UserService {
         this.repo = repo;
     }
 
-    public ResponseEntity<Iterable<User>> getAll() {
-        return ResponseEntity.ok(repo.findAll());
+    public List<User> getAll() {
+        return repo.findAll();
     }
 
     // REGISTRATION
 
-    public ResponseEntity<User> registerUser(UserDto dto) {
-        return ResponseEntity.status(201).body(
-            repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash(), dto.investmentAccounts()))
-        );
+    public User registerUser(UserDto dto) {
+        if (repo.existsByUsername(dto.username())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username taken. Please use another username.");
+        return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash()));
+        
     }
 
     // VIEW PROFILE
-    public ResponseEntity<User> viewProfile(int id) {
+    public User viewProfile(int id) {
         Optional<User> userOptional = repo.findById(id);
         if (userOptional.isPresent()) {
-            return ResponseEntity.ok(userOptional.get());
+            return userOptional.get();
         }
-        return ResponseEntity.notFound().build();
+        return null;
     }
 
     // EDIT PROFILE
 
-    public ResponseEntity<User> editProfile(int id, UserDto dto) {
+    public User updateProfile(int id, UserDto dto) {
+
+        
         if (repo.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash(), dto.investmentAccounts()))
-            );
+            User user = repo.findById(id).get();
+            if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Username taken. Please select another username."
+                );
+            }
+            return 
+                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()))
+            ;
         }
-        return ResponseEntity.notFound().build();
+        return null;
+    }
+
+    public boolean deleteUser(int id) {
+        if (repo.existsById(id)) {
+            repo.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     // LOGIN (TODO)

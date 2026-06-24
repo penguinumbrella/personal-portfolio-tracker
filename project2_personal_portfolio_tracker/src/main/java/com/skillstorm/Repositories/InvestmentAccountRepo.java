@@ -10,4 +10,6 @@ public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, 
 
     Iterable<InvestmentAccount> findByUserId(Long userId);
 
+    boolean existsByNickname(String nickname);
+
 }
