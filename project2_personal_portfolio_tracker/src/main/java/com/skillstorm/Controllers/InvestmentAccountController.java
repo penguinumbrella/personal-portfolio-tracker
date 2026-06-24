@@ -30,15 +30,11 @@ public class InvestmentAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<InvestmentAccount>> getAllAccounts() {
-        return service.getAll();
-    }
-
-    // GET (VIEW USER ACCOUNTS)
-    @GetMapping("/{id}")
-    public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(
-            @PathVariable int id) {
-        return service.getUserAccounts(id);
+    public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
+        @RequestParam(required=false) Integer userId
+    ) {
+        return (userId == null) ? service.getAll()
+        : service.getUserAccounts(userId);
     }
 
     // POST (ADD ACCOUNT)
