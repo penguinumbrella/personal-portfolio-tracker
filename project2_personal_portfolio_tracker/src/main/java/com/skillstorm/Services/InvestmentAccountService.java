@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
@@ -22,39 +23,51 @@ public class InvestmentAccountService {
         this.userRepo = userRepo;
     }
 
-    public ResponseEntity<Iterable<InvestmentAccount>> getAll() {
-        return ResponseEntity.ok(investmentAccountRepo.findAll());
+    public Iterable<InvestmentAccount> getAll() {
+        return investmentAccountRepo.findAll();
     }
 
-    public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(long userId) {
-        return ResponseEntity.ok(investmentAccountRepo.findByUserId(userId));
+    public Iterable<InvestmentAccount> getUserAccounts(long userId) {
+        return investmentAccountRepo.findByUserId(userId);
     }
 
-    public ResponseEntity<InvestmentAccount> addUserAccount(int userId, InvestmentAccountDto dto) {
+    public InvestmentAccount addUserAccount(int userId, InvestmentAccountDto dto) {
         if (userRepo.existsById(userId)) {
-            return ResponseEntity.status(201).body(
+            if (investmentAccountRepo.existsByNickname(dto.nickname())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
+            return 
                     investmentAccountRepo.save(
                             new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), dto.user(),
-                                    dto.holdings())));
+                                    dto.holdings()));
         }
 
-        return ResponseEntity.notFound().build();
+        return null;
 
     }
 
-    public ResponseEntity<InvestmentAccount> editUserAccount(int id, InvestmentAccountDto dto) {
+    public InvestmentAccount editUserAccount(int id, InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.OK).body(
+            InvestmentAccount investmentAccount = investmentAccountRepo.findById(id).get();
+            if (!investmentAccount.getNickname().equals(dto.nickname()) && investmentAccountRepo.existsByNickname(dto.nickname())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Nickname is already in use."
+                );
+            }
+            return 
                     investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
-                            dto.dateOpened(), dto.user(), dto.holdings())));
+                            dto.dateOpened(), dto.user(), dto.holdings()));
         }
-        return ResponseEntity.notFound().build();
+        return null;
 
     }
 
-    public ResponseEntity<Void> deleteUserAccount(int id) {
-        investmentAccountRepo.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public boolean deleteUserAccount(int id) {
+        if (investmentAccountRepo.existsById(id)) {
+            investmentAccountRepo.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
 }

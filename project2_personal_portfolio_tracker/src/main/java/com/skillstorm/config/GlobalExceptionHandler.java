@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", 400);
-        response.put("reason", "Validation Errors");
+        response.put("reason", "Invalid input data provided.");
         response.put("errors", errors);
 
         return ResponseEntity.status(400).body(response);
@@ -62,6 +62,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(400).body(response);
     }
+
 
     // generic handler for any other exception
     // @ExceptionHandler(Exception.class)

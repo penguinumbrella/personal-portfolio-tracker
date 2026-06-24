@@ -33,8 +33,8 @@ public class InvestmentAccountController {
     public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
         @RequestParam(required=false) Integer userId
     ) {
-        return (userId == null) ? service.getAll()
-        : service.getUserAccounts(userId);
+        return (userId == null) ? ResponseEntity.ok(service.getAll())
+        : ResponseEntity.status(200).body(service.getUserAccounts(userId));
     }
 
     // POST (ADD ACCOUNT)
@@ -42,7 +42,12 @@ public class InvestmentAccountController {
     public ResponseEntity<InvestmentAccount> addUserAccount(
             @RequestParam(required = true) int userId,
             @RequestBody InvestmentAccountDto dto) {
-        return service.addUserAccount(userId, dto);
+
+        InvestmentAccount investmentAccount = service.addUserAccount(userId, dto);
+
+        return (investmentAccount == null) ? ResponseEntity.notFound().build()
+        : ResponseEntity.status(201).body(investmentAccount);
+        
     }
 
     // PUT (EDIT ACCOUNT)
@@ -50,14 +55,20 @@ public class InvestmentAccountController {
     public ResponseEntity<InvestmentAccount> updateUserAccount(
             @PathVariable int id,
             @RequestBody InvestmentAccountDto dto) {
-        return service.editUserAccount(id, dto);
+                
+        InvestmentAccount investmentAccount = service.editUserAccount(id, dto);
+
+        return (investmentAccount == null) ? ResponseEntity.notFound().build()
+        : ResponseEntity.status(200).body(investmentAccount);
     }
 
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserAccount(
             @PathVariable int id) {
-        return service.deleteUserAccount(id);
+        
+        return service.deleteUserAccount(id) ? ResponseEntity.noContent().build()
+        : ResponseEntity.notFound().build();
     }
 
 }
