@@ -32,7 +32,7 @@ public class Security {
     @Column(name = "ticker_symbol", nullable = false)
     private String tickerSymbol;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "security_name", nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -42,7 +42,7 @@ public class Security {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "type", nullable = false)
+    @Column(name = "security_type", nullable = false)
     private SecurityType type;
 
     @Column(name = "general_notes")

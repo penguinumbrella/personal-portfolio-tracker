@@ -43,8 +43,8 @@ CREATE TYPE portfolio.sector_type AS ENUM (
 	'REAL_ESTATE'
 );
 
-DROP TYPE IF EXISTS portfolio.security_type; 
-CREATE TYPE portfolio.security_type AS ENUM (
+DROP TYPE IF EXISTS portfolio.security_type_enum; 
+CREATE TYPE portfolio.security_type_enum AS ENUM (
 	'STOCK', 
 	'ETF', 
 	'MUTUAL_FUND', 
@@ -54,9 +54,9 @@ DROP TABLE IF EXISTS portfolio.security;
 CREATE TABLE IF NOT EXISTS portfolio.security (
 	id 				BIGSERIAL 		PRIMARY KEY,
 	ticker_symbol 	VARCHAR(10) 	NOT NULL,
-	name 			VARCHAR(64) 	NOT NULL,
+	security_name 	VARCHAR(64) 	NOT NULL,
 	sector 			portfolio.sector_type 	NOT NULL,
-	type 	 		portfolio.security_type 	NOT NULL,
+	security_type 	portfolio.security_type_enum 	NOT NULL,
 	general_notes 	TEXT
 );
 
