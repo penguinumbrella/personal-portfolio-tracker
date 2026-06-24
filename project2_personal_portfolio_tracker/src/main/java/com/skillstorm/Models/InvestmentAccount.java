@@ -44,7 +44,7 @@ public class InvestmentAccount {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "security")
+    @OneToMany(mappedBy = "account")
     private List<Holding> holdings;
 
     public InvestmentAccount() {
