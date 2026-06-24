@@ -30,15 +30,12 @@ public class Holding {
     private Date purchaseDate;
 
     // --- Mappings ---
-
-    // Many holdings per account
+    @MapsId("accountId") // connects to accountId field in HoldingPK
     @ManyToOne
     @JsonIgnoreProperties(value = { "holdings" })
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private InvestmentAccount account;
 
-    // Many holdings per security
-    // Hiding holdings of securities to prevent recursion
     @MapsId("securityId") // connects to securityId field in HoldingPK
     @ManyToOne
     @JsonIgnoreProperties(value = { "holdings" })

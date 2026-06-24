@@ -33,20 +33,20 @@ public class InvestmentAccountService {
     public ResponseEntity<InvestmentAccount> addUserAccount(int userId, InvestmentAccountDto dto) {
         if (userRepo.existsById(userId)) {
             return ResponseEntity.status(201).body(
-                investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), dto.user()
-            ))
-            );
+                    investmentAccountRepo.save(
+                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), dto.user(),
+                                    dto.holdings())));
         }
 
         return ResponseEntity.notFound().build();
-        
+
     }
 
     public ResponseEntity<InvestmentAccount> editUserAccount(int id, InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsById(id)) {
             return ResponseEntity.status(HttpStatus.OK).body(
-                investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(), dto.dateOpened(), dto.user()))
-            );
+                    investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
+                            dto.dateOpened(), dto.user(), dto.holdings())));
         }
         return ResponseEntity.notFound().build();
 
@@ -56,5 +56,5 @@ public class InvestmentAccountService {
         investmentAccountRepo.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    
+
 }

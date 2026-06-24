@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.skillstorm.Models.InvestmentAccount;
 
-public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, Integer>{
+public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, Integer> {
 
     Iterable<InvestmentAccount> findByUserId(Long userId);
-    
+
 }

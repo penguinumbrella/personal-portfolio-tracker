@@ -37,36 +37,31 @@ public class InvestmentAccountController {
     // GET (VIEW USER ACCOUNTS)
     @GetMapping("/{id}")
     public ResponseEntity<Iterable<InvestmentAccount>> getUserAccounts(
-        @PathVariable int id) {
-            return service.getUserAccounts(id);
-        }
+            @PathVariable int id) {
+        return service.getUserAccounts(id);
+    }
 
     // POST (ADD ACCOUNT)
     @PostMapping
     public ResponseEntity<InvestmentAccount> addUserAccount(
-        @RequestParam(required = true) int userId, 
-        @RequestBody InvestmentAccountDto dto) {
-            return service.addUserAccount(userId, dto);
-        }
-    
+            @RequestParam(required = true) int userId,
+            @RequestBody InvestmentAccountDto dto) {
+        return service.addUserAccount(userId, dto);
+    }
 
     // PUT (EDIT ACCOUNT)
     @PutMapping("/{id}")
     public ResponseEntity<InvestmentAccount> updateUserAccount(
-        @PathVariable int id,
-        @RequestBody InvestmentAccountDto dto
-    ) {
+            @PathVariable int id,
+            @RequestBody InvestmentAccountDto dto) {
         return service.editUserAccount(id, dto);
     }
 
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserAccount(
-        @PathVariable int id
-    ) {
+            @PathVariable int id) {
         return service.deleteUserAccount(id);
     }
-    
 
-    
 }
