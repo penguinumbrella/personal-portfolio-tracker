@@ -1,7 +1,6 @@
 package com.skillstorm.Services;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,44 +17,49 @@ public class SecurityService {
         this.repo = repo;
     }
 
-    // ----- CREATE METHODS -----
-    public ResponseEntity<Security> addSecurity(SecurityDto dto) {
+    // ----- POST/CREATE METHODS -----
+    public Security addSecurity(SecurityDto dto) {
         if (repo.existsById(dto.id())) {
-            return ResponseEntity.noContent().build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Security already exists in the database.");
         }
         Security created = repo.save(new Security(0, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
                 dto.generalNotes(), dto.holdings()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return created;
     }
 
-    // ----- READ METHODS -----
+    // ----- GET/READ METHODS -----
     // Read all
-    public ResponseEntity<Iterable<Security>> getAllSecurities() {
-        return ResponseEntity.ok(repo.findAll());
+    public Iterable<Security> getAllSecurities() {
+        return repo.findAll();
     }
 
     // Read one
-    public ResponseEntity<Security> getSecurity(int id) {
+    public Security getSecurity(int id) {
         if (repo.findById(id).isPresent())
-            return ResponseEntity.ok(repo.findById(id).get());
+            return repo.findById(id).get();
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Security with id " + id + " does not exist in the database.");
     }
 
-    // ----- UPDATE METHODS -----
-    public ResponseEntity<Security> updateSecurity(int id, SecurityDto dto) {
+    // ----- PUT/UPDATE METHODS -----
+    public Security updateSecurity(int id, SecurityDto dto) {
         if (repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Security with id " + id + " does not exist in the database.");
         }
-        Security created = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
+        Security updated = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
                 dto.generalNotes(), dto.holdings()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return updated;
     }
 
     // ----- DELETE METHODS -----
-    public ResponseEntity<Void> deleteSecurity(int id) {
+    public boolean deleteSecurity(int id) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Security with id " + id + " does not exist in the database.");
+        }
         repo.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return true;
     }
 }

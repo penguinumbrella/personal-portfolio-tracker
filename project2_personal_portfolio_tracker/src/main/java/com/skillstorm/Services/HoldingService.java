@@ -1,7 +1,6 @@
 package com.skillstorm.Services;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,49 +18,54 @@ public class HoldingService {
         this.repo = repo;
     }
 
-    // ----- CREATE METHODS -----
-    public ResponseEntity<Holding> addHolding(HoldingDto dto) {
+    // ----- POST/CREATE METHODS -----
+    public Holding addHolding(HoldingDto dto) {
         if (repo.existsById(new HoldingPK())) {
-            return ResponseEntity.noContent().build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Holding already exists in the database.");
         }
         Holding created = repo.save(new Holding(dto.id(), dto.shares(), dto.costPerShare(), dto.purchaseDate(),
                 dto.account(), dto.security()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return created;
     }
 
-    // ----- READ METHODS -----
+    // ----- GET/READ METHODS -----
     // Read all
-    public ResponseEntity<Iterable<Holding>> getAllHoldings() {
-        return ResponseEntity.ok(repo.findAll());
+    public Iterable<Holding> getAllHoldings() {
+        return repo.findAll();
     }
 
     // Read one
-    public ResponseEntity<Holding> getHolding(int accountId, int securityId) {
+    public Holding getHolding(int accountId, int securityId) {
         HoldingPK id = new HoldingPK(accountId, securityId);
         if (repo.findById(id).isPresent())
-            return ResponseEntity.ok(repo.findById(id).get());
+            return repo.findById(id).get();
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Holding with id " + id + " does not exist in the database.");
     }
 
-    // ----- UPDATE METHODS -----
-    public ResponseEntity<Holding> updateHolding(int accountId, int securityId, HoldingDto dto) {
+    // ----- PUT/UPDATE METHODS -----
+    public Holding updateHolding(int accountId, int securityId, HoldingDto dto) {
         HoldingPK id = new HoldingPK(accountId, securityId);
         if (repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Holding with id " + id + " does not exist in the database.");
         }
-        Holding created = repo.save(new Holding(dto.id(), dto.shares(), dto.costPerShare(), dto.purchaseDate(),
+        Holding updated = repo.save(new Holding(dto.id(), dto.shares(), dto.costPerShare(), dto.purchaseDate(),
                 dto.account(), dto.security()));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return updated;
     }
 
     // ----- DELETE METHODS -----
-    public ResponseEntity<Void> deleteHolding(int accountId, int securityId) {
+    public boolean deleteHolding(int accountId, int securityId) {
         HoldingPK id = new HoldingPK(accountId, securityId);
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Holding with id " + id + " does not exist in the database.");
+        }
         repo.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return true;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.skillstorm.Controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,37 +28,42 @@ public class SecurityController {
         this.service = service;
     }
 
-    // ----- CREATE METHODS -----
+    // ----- POST/CREATE METHODS -----
     @PostMapping
     public ResponseEntity<Security> addSecurity(@RequestBody SecurityDto dto) {
-        return service.addSecurity(dto);
+        Security newSec = service.addSecurity(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newSec);
     }
 
-    // ----- READ METHODS -----
+    // ----- GET/READ METHODS -----
     // Read all
     @GetMapping
     public ResponseEntity<Iterable<Security>> getAllSecurities() {
-        return service.getAllSecurities();
+        return ResponseEntity.ok(service.getAllSecurities());
     }
 
     // Read one
     @GetMapping("/{id}")
     public ResponseEntity<Security> getSecurity(@PathVariable int id) {
-        return service.getSecurity(id);
+        return ResponseEntity.ok(service.getSecurity(id));
     }
 
-    // ----- UPDATE METHODS -----
+    // ----- PUT/UPDATE METHODS -----
     @PutMapping("/{id}")
     public ResponseEntity<Security> updateSecurity(
             @PathVariable int id,
             @RequestBody SecurityDto dto) {
-        return service.updateSecurity(id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.updateSecurity(id, dto));
     }
 
     // ----- DELETE METHODS -----
     // Delete one
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSecurity(@PathVariable int id) {
-        return service.deleteSecurity(id);
+        boolean isDeleted = service.deleteSecurity(id);
+        if (isDeleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
