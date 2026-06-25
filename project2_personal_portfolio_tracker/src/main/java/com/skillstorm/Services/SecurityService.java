@@ -24,7 +24,7 @@ public class SecurityService {
                     "Security already exists in the database.");
         }
         Security created = repo.save(new Security(0, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.user()));
+                dto.generalNotes(), dto.userId()));
         return created;
     }
 
@@ -44,12 +44,12 @@ public class SecurityService {
 
     // ----- PUT/UPDATE METHODS -----
     public Security updateSecurity(int id, SecurityDto dto) {
-        if (repo.existsById(id)) {
+        if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Security with id " + id + " does not exist in the database.");
         }
         Security updated = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.user()));
+                dto.generalNotes(), dto.userId()));
         return updated;
     }
 
