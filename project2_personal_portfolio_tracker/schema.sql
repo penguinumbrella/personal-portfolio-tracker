@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS portfolio.users (
 
 DROP TYPE IF EXISTS portfolio.investment_type CASCADE;
 CREATE TYPE portfolio.investment_type AS ENUM (
-	'Brokerage',
-	'Traditional IRA',
-	'Roth IRA',
-	'401(k)',
+	'BROKERAGE',
+	'TRADITIONAL_IRA',
+	'ROTH_IRA',
+	'K401',
 	'HSA'
 );
 
@@ -40,14 +40,14 @@ CREATE TYPE portfolio.sector_type AS ENUM (
 	'ENERGY',
 	'INDUSTRIALS',
 	'UTILITIES',
-	'REAL ESTATE'
+	'REAL_ESTATE'
 );
 
 DROP TYPE IF EXISTS portfolio.security_type_enum; 
 CREATE TYPE portfolio.security_type_enum AS ENUM (
 	'STOCK', 
 	'ETF', 
-	'MUTUAL FUND', 
+	'MUTUAL_FUND', 
 	'BOND');
 
 DROP TABLE IF EXISTS portfolio.security;

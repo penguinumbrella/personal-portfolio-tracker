@@ -3,14 +3,10 @@ package com.skillstorm.Models;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SecurityType {
-    TECHNOLOGY("Technology"),
-    HEALTHCARE("Healthcare"),
-    FINANCIALS("Financials"),
-    CONSUMER("Consumer"),
-    ENERGY("Energy"),
-    INDUSTRIALS("Industrials"),
-    UTILITIES("Utilities"),
-    REAL_ESTATE("Real Estate");
+    STOCK("Stock"),
+    ETF("ETF"),
+    MUTUAL_FUND("Mutual Fund"),
+    BOND("Bond");
 
     private String name;
 
@@ -22,5 +18,4 @@ public enum SecurityType {
     public String getName() {
         return name;
     }
-
 }

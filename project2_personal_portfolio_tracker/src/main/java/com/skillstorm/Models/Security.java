@@ -24,7 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "security")
+@Table(name = "security", schema = "portfolio")
 public class Security {
 
     @Id
@@ -63,6 +63,7 @@ public class Security {
      * One Security has many Holdings
      */
     @OneToMany(mappedBy = "security")
+    @JsonIgnoreProperties(value = { "security" })
     private List<Holding> holdings;
 
     public Security() {
@@ -134,6 +135,14 @@ public class Security {
 
     public void setHoldings(List<Holding> holdings) {
         this.holdings = holdings;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
 }

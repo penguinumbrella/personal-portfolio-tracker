@@ -13,7 +13,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "holding")
+@Table(name = "holding", schema = "portfolio")
 public class Holding {
 
     // composite keys must be sorted in public serialized class
@@ -23,7 +23,7 @@ public class Holding {
     @Column(name = "num_shares", nullable = false)
     private int shares;
 
-    @Column(name = "cost_per_shares", nullable = false)
+    @Column(name = "cost_per_share", nullable = false)
     private int costPerShare;
 
     @Column(name = "purchase_date", nullable = false)
@@ -38,8 +38,8 @@ public class Holding {
 
     @MapsId("securityId") // connects to securityId field in HoldingPK
     @ManyToOne
-    @JsonIgnoreProperties(value = { "holdings" })
     @JoinColumn(name = "security_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = { "holdings" })
     private Security security;
 
     public Holding() {
