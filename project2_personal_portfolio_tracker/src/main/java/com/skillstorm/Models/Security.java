@@ -53,15 +53,10 @@ public class Security {
     @Column(name = "general_notes")
     private String generalNotes;
 
-    // // OPTION 1
-    // @ManyToOne
-    // @JsonIgnoreProperties(value = { "securities" })
-    // @JoinColumn(name = "user_id", referencedColumnName = "id")
-    // private User user;
-
-    // OPTION 2
-    @Column(name = "user_id")
-    private int userId;
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "securities" })
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     // --- Mappings ---
     /**
@@ -77,14 +72,14 @@ public class Security {
     }
 
     public Security(int id, String tickerSymbol, String name, SectorType sector, SecurityType type,
-            String generalNotes, int userId) {
+            String generalNotes, User user) {
         this.id = id;
         this.tickerSymbol = tickerSymbol;
         this.name = name;
         this.sector = sector;
         this.type = type;
         this.generalNotes = generalNotes;
-        this.userId = userId;
+        this.user = user;
         this.holdings = new ArrayList<Holding>();
     }
 
@@ -144,12 +139,12 @@ public class Security {
         this.holdings = holdings;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUserId(User user) {
+        this.user = user;
     }
 
 }

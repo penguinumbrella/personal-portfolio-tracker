@@ -5,15 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
-
-import io.micrometer.core.ipc.http.HttpSender.Response;
 
 @Service
 public class UserService {
@@ -31,9 +28,10 @@ public class UserService {
     // REGISTRATION
 
     public User registerUser(UserDto dto) {
-        if (repo.existsByUsername(dto.username())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username taken. Please use another username.");
+        if (repo.existsByUsername(dto.username()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username taken. Please use another username.");
         return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash()));
-        
+
     }
 
     // VIEW PROFILE
@@ -43,29 +41,25 @@ public class UserService {
             return userOptional.get();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "User with id " + id + " does not exist in the database.");
+                "User with id " + id + " does not exist in the database.");
     }
 
     // EDIT PROFILE
 
     public User updateProfile(int id, UserDto dto) {
 
-        
         if (repo.existsById(id)) {
             User user = repo.findById(id).get();
             if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Username taken. Please use another username."
-                );
+                        "Username taken. Please use another username.");
             }
-            return 
-                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()))
-            ;
+            return repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()));
         }
         //return null;
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "User with id " + id + " does not exist in the database.");
+                "User with id " + id + " does not exist in the database.");
     }
 
     public boolean deleteUser(int id) {
@@ -75,12 +69,12 @@ public class UserService {
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "User with id " + id + " does not exist in the database.");
-        
+                "User with id " + id + " does not exist in the database.");
+
     }
 
     // LOGIN (TODO)
     // LOGOUT (TODO)
     // DATA SCOPING?
-    
+
 }

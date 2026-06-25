@@ -1,9 +1,6 @@
 package com.skillstorm.Services;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,10 +25,11 @@ public class InvestmentAccountService {
     public Iterable<InvestmentAccount> getAll() {
         return investmentAccountRepo.findAll();
     }
-
+    
     */
     public Iterable<InvestmentAccount> getAccounts(Long userId) {
-        if (userId == null) return investmentAccountRepo.findAll();
+        if (userId == null)
+            return investmentAccountRepo.findAll();
         return investmentAccountRepo.findByUserId(userId);
     }
 
@@ -42,31 +40,30 @@ public class InvestmentAccountService {
             }
             System.out.println(userRepo.findById(dto.userId()));
             User user = userRepo.findById(userId).get();
-            return 
-                    investmentAccountRepo.save(
-                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user
-                                    ));
+            return investmentAccountRepo.save(
+                    new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(),
+                            user));
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "User with id " + userId + " does not exist in the database.");
+                "User with id " + userId + " does not exist in the database.");
 
     }
 
     public InvestmentAccount updateAccount(int id, InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsById(id)) {
             InvestmentAccount investmentAccount = investmentAccountRepo.findById(id).get();
-            if (!investmentAccount.getNickname().equals(dto.nickname()) && investmentAccountRepo.existsByNickname(dto.nickname())) {
+            if (!investmentAccount.getNickname().equals(dto.nickname())
+                    && investmentAccountRepo.existsByNickname(dto.nickname())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Nickname is already in use."
-                );
+                        "Nickname is already in use.");
             }
             User user = userRepo.findById(dto.userId()).get();
-            return 
-                    investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user));
+            return investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(),
+                    dto.institutionName(), dto.dateOpened(), user));
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Investment account with id " + id + " does not exist in the database.");
+                "Investment account with id " + id + " does not exist in the database.");
 
     }
 
@@ -77,8 +74,8 @@ public class InvestmentAccountService {
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Investment account with id " + id + " does not exist in the database.");
-        
+                "Investment account with id " + id + " does not exist in the database.");
+
     }
 
 }

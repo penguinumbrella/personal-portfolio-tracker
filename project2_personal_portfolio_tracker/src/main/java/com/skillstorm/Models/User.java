@@ -35,7 +35,7 @@ public class User {
     @JsonIgnoreProperties(value = { "user" })
     private List<InvestmentAccount> investmentAccounts;
 
-    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "user" })
     private List<Security> securities;
 
