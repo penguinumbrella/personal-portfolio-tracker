@@ -41,13 +41,13 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String email, String passwordHash) {
+    public User(int id, String username, String email, String passwordHash, List<InvestmentAccount> investmentAccounts, List<Security> securities) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.investmentAccounts = new ArrayList<>();
-        this.securities = new ArrayList<>();
+        this.investmentAccounts = investmentAccounts;
+        this.securities = securities;
     }
 
     public int getId() {

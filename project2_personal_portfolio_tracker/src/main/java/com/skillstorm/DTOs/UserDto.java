@@ -8,7 +8,9 @@ import com.skillstorm.Models.Security;
 public record UserDto(
     String username, 
     String email, 
-    String passwordHash) {
+    String passwordHash,
+    List<InvestmentAccount> investmentAccounts,
+    List<Security> securities) {
 
     
 }

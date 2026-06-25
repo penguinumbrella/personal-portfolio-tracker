@@ -41,7 +41,7 @@ public class InvestmentAccount {
     private Date dateOpened;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "investmentAccounts" })
+    @JsonIgnoreProperties(value = { "investmentAccounts", "user" })
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -51,13 +51,13 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user, List<Holding> holdings) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
         this.dateOpened = dateOpened;
         this.user = user;
-        this.holdings = new ArrayList<>();
+        this.holdings = holdings;
     }
 
     public int getId() {

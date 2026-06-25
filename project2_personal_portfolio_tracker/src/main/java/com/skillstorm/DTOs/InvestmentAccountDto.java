@@ -12,6 +12,7 @@ public record InvestmentAccountDto(
         InvestmentType accountType,
         String institutionName,
         Date dateOpened,
-        int userId) {
+        int userId,
+        List<Holding> holdings) {
 
 }

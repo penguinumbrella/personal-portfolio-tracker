@@ -1,5 +1,6 @@
 package com.skillstorm.Services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class UserService {
 
     public User registerUser(UserDto dto) {
         if (repo.existsByUsername(dto.username())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username taken. Please use another username.");
-        return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash()));
+        return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash(), new ArrayList<>(), new ArrayList<>()));
         
     }
 
@@ -58,7 +59,7 @@ public class UserService {
                 );
             }
             return 
-                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()))
+                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash(), dto.investmentAccounts(), dto.securities()))
             ;
         }
         //return null;
