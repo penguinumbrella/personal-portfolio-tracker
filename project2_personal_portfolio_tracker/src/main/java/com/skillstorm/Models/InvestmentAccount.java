@@ -1,6 +1,7 @@
 package com.skillstorm.Models;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -50,14 +51,13 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user,
-            List<Holding> holdings) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
         this.dateOpened = dateOpened;
         this.user = user;
-        this.holdings = holdings;
+        this.holdings = new ArrayList<>();
     }
 
     public int getId() {

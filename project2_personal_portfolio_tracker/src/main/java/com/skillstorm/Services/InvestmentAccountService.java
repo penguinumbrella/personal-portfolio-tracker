@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
+import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.UserRepo;
 
@@ -34,10 +35,12 @@ public class InvestmentAccountService {
     public InvestmentAccount addAccount(int userId, InvestmentAccountDto dto) {
         if (userRepo.existsById(userId)) {
             if (investmentAccountRepo.existsByNickname(dto.nickname())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
+            User user = userRepo.findById(dto.userId()).get();
             return 
+            
                     investmentAccountRepo.save(
-                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), dto.user(),
-                                    dto.holdings()));
+                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), user
+                                    ));
         }
 
         return null;
@@ -52,9 +55,10 @@ public class InvestmentAccountService {
                     "Nickname is already in use."
                 );
             }
+            User user = userRepo.findById(dto.userId()).get();
             return 
                     investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
-                            dto.dateOpened(), dto.user(), dto.holdings()));
+                            dto.dateOpened(), user));
         }
         return null;
 
