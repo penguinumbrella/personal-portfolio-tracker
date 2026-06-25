@@ -63,11 +63,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(response);
     }
 
-
     // generic handler for any other exception
-    // @ExceptionHandler(Exception.class)
-    // public ResponseEntity<Void> handleGeneralException(Exception e) {
-    //     return ResponseEntity.status(405).body(null);
-    // }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralException(Exception e) {
+        return ResponseEntity.status(405).body("Uh oh! Unknown error");
+    }
 
 }
