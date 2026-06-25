@@ -41,7 +41,8 @@ public class UserService {
         if (userOptional.isPresent()) {
             return userOptional.get();
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "User with id " + id + " does not exist in the database.");
     }
 
     // EDIT PROFILE
@@ -60,16 +61,20 @@ public class UserService {
                 repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()))
             ;
         }
-        return null;
+        //return null;
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "User with id " + id + " does not exist in the database.");
     }
 
     public boolean deleteUser(int id) {
         if (repo.existsById(id)) {
             repo.deleteById(id);
             return true;
-        } else {
-            return false;
         }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "User with id " + id + " does not exist in the database.");
         
     }
 

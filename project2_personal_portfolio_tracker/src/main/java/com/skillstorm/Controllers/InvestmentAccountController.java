@@ -33,8 +33,7 @@ public class InvestmentAccountController {
     public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
         @RequestParam(required=false) Integer userId
     ) {
-        return (userId == null) ? ResponseEntity.ok(service.getAll())
-        : ResponseEntity.status(200).body(service.getAccounts(userId));
+        return  ResponseEntity.status(200).body(service.getAccounts(userId));
     }
 
     // POST (ADD ACCOUNT)
@@ -45,8 +44,7 @@ public class InvestmentAccountController {
 
         InvestmentAccount investmentAccount = service.addAccount(userId, dto);
 
-        return (investmentAccount == null) ? ResponseEntity.notFound().build()
-        : ResponseEntity.status(201).body(investmentAccount);
+        return ResponseEntity.status(201).body(investmentAccount);
         
     }
 
@@ -58,8 +56,7 @@ public class InvestmentAccountController {
 
         InvestmentAccount investmentAccount = service.updateAccount(id, dto);
 
-        return (investmentAccount == null) ? ResponseEntity.notFound().build()
-        : ResponseEntity.status(200).body(investmentAccount);
+        return ResponseEntity.status(200).body(investmentAccount);
     }
 
     // DELETE (DELETE ACCOUNT)
@@ -67,8 +64,7 @@ public class InvestmentAccountController {
     public ResponseEntity<Void> deleteAccount(
             @PathVariable int id) {
         
-        return service.deleteAccount(id) ? ResponseEntity.noContent().build()
-        : ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

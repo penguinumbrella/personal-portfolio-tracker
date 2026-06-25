@@ -54,8 +54,7 @@ public class UserController {
     public ResponseEntity<User> viewProfile(
         @PathVariable int id) {
         User user = service.viewProfile(id);
-        return (user == null) ? ResponseEntity.notFound().build() :
-        ResponseEntity.ok(user);
+        return ResponseEntity.ok(user);
     }
     
     // EDIT PROFILE
@@ -65,8 +64,7 @@ public class UserController {
         @PathVariable int id,
         @RequestBody UserDto dto) {
             User user = service.updateProfile(id, dto);
-            return (user == null) ? ResponseEntity.notFound().build() :
-            ResponseEntity.status(200).build();
+            return ResponseEntity.status(200).build();
 
         }
     
@@ -75,8 +73,7 @@ public class UserController {
     public ResponseEntity<Void> deleteProfile(
             @PathVariable int id) {
         
-        return service.deleteUser(id) ? ResponseEntity.noContent().build()
-        : ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     // USER LOGIN (TODO)
