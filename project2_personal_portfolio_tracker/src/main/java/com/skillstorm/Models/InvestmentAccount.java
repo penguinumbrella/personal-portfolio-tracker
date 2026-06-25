@@ -32,6 +32,9 @@ public class InvestmentAccount {
     @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
+    @Column(name = "institution_name", nullable = false, unique = true)
+    private String institutionName;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "account_type", nullable = false, unique = true)
@@ -41,7 +44,7 @@ public class InvestmentAccount {
     private Date dateOpened;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "investmentAccounts" })
+    @JsonIgnoreProperties(value = { "investmentAccounts", "user" })
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -51,11 +54,12 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
         this.dateOpened = dateOpened;
+        this.institutionName = institutionName;
         this.user = user;
         this.holdings = new ArrayList<>();
     }

@@ -64,7 +64,7 @@ public class UserController {
         @PathVariable int id,
         @RequestBody UserDto dto) {
             User user = service.updateProfile(id, dto);
-            return ResponseEntity.status(200).build();
+            return ResponseEntity.status(200).body(user);
 
         }
     
