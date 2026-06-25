@@ -44,7 +44,7 @@ public class InvestmentAccountService {
             User user = userRepo.findById(userId).get();
             return 
                     investmentAccountRepo.save(
-                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user, dto.holdings()
+                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user
                                     ));
         }
 
@@ -63,7 +63,7 @@ public class InvestmentAccountService {
             }
             User user = userRepo.findById(dto.userId()).get();
             return 
-                    investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user, dto.holdings()));
+                    investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user));
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Investment account with id " + id + " does not exist in the database.");

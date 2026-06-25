@@ -54,14 +54,14 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user, List<Holding> holdings) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
         this.dateOpened = dateOpened;
         this.institutionName = institutionName;
         this.user = user;
-        this.holdings = holdings;
+        this.holdings = new ArrayList<>();
     }
 
     public int getId() {

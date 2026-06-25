@@ -32,7 +32,7 @@ public class UserService {
 
     public User registerUser(UserDto dto) {
         if (repo.existsByUsername(dto.username())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username taken. Please use another username.");
-        return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash(), new ArrayList<>(), new ArrayList<>()));
+        return repo.save(new User(0, dto.username(), dto.email(), dto.passwordHash()));
         
     }
 
@@ -59,7 +59,7 @@ public class UserService {
                 );
             }
             return 
-                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash(), dto.investmentAccounts(), dto.securities()))
+                repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()))
             ;
         }
         //return null;
