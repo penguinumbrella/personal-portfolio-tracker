@@ -24,7 +24,7 @@ public class SecurityService {
                     "Security already exists in the database.");
         }
         Security created = repo.save(new Security(0, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.user(), dto.holdings()));
+                dto.generalNotes(), dto.user()));
         return created;
     }
 
@@ -49,7 +49,7 @@ public class SecurityService {
                     "Security with id " + id + " does not exist in the database.");
         }
         Security updated = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.user(), dto.holdings()));
+                dto.generalNotes(), dto.user()));
         return updated;
     }
 

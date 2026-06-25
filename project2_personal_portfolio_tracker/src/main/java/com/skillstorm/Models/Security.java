@@ -4,6 +4,7 @@
 
 package com.skillstorm.Models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -70,7 +71,7 @@ public class Security {
     }
 
     public Security(int id, String tickerSymbol, String name, SectorType sector, SecurityType type,
-            String generalNotes, User user, List<Holding> holdings) {
+            String generalNotes, User user) {
         this.id = id;
         this.tickerSymbol = tickerSymbol;
         this.name = name;
@@ -78,7 +79,7 @@ public class Security {
         this.type = type;
         this.generalNotes = generalNotes;
         this.user = user;
-        this.holdings = holdings;
+        this.holdings = new ArrayList<Holding>();
     }
 
     public int getId() {
