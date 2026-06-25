@@ -70,7 +70,7 @@ public class HoldingService {
     // ----- PUT/UPDATE METHODS -----
     public Holding updateHolding(int accountId, int securityId, HoldingDto dto) {
         HoldingPK id = new HoldingPK(accountId, securityId);
-        if (repo.existsById(id)) {
+        if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Holding with id " + id + " does not exist in the database.");
         }
@@ -119,7 +119,7 @@ public class HoldingService {
         InvestmentAccount linkedAccount = accountRepo.getReferenceById(a_id);
         Security linkedSecurity = securityRepo.getReferenceById(s_id);
 
-        if (!(linkedAccount.getUser().getId() == linkedSecurity.getUser().getId())) {
+        if (!(linkedAccount.getUser().getId() == linkedSecurity.getUserId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Holding requires an account and security belonging to same user.");
         }

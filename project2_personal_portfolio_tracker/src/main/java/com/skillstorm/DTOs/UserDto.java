@@ -12,5 +12,4 @@ public record UserDto(
     List<InvestmentAccount> investmentAccounts,
     List<Security> securities) {
 
-    
 }

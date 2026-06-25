@@ -8,5 +8,5 @@ import com.skillstorm.Models.SecurityType;
 import com.skillstorm.Models.User;
 
 public record SecurityDto(int id, String tickerSymbol, String name, SectorType sector, SecurityType type,
-                String generalNotes, User user, List<Holding> holdings) {
+        String generalNotes, int userId) {
 }

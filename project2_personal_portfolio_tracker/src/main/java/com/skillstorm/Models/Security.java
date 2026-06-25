@@ -16,6 +16,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,10 +53,15 @@ public class Security {
     @Column(name = "general_notes")
     private String generalNotes;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "securities" })
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    // // OPTION 1
+    // @ManyToOne
+    // @JsonIgnoreProperties(value = { "securities" })
+    // @JoinColumn(name = "user_id", referencedColumnName = "id")
+    // private User user;
+
+    // OPTION 2
+    @Column(name = "user_id")
+    private int userId;
 
     // --- Mappings ---
     /**
@@ -63,7 +69,7 @@ public class Security {
      * Join table via Holding
      * One Security has many Holdings
      */
-    @OneToMany(mappedBy = "security")
+    @OneToMany(mappedBy = "security", fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "security" })
     private List<Holding> holdings;
 
@@ -71,14 +77,14 @@ public class Security {
     }
 
     public Security(int id, String tickerSymbol, String name, SectorType sector, SecurityType type,
-            String generalNotes, User user) {
+            String generalNotes, int userId) {
         this.id = id;
         this.tickerSymbol = tickerSymbol;
         this.name = name;
         this.sector = sector;
         this.type = type;
         this.generalNotes = generalNotes;
-        this.user = user;
+        this.userId = userId;
         this.holdings = new ArrayList<Holding>();
     }
 
@@ -138,12 +144,12 @@ public class Security {
         this.holdings = holdings;
     }
 
-    public User getUser() {
-        return user;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
 }
