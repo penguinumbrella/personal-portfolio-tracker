@@ -107,11 +107,16 @@ public class UserServiceTest {
         }
 
         @Test
-        @DisplayName("return user when they don't exist")
-        void returnUserWhenNotExists() {
+        @DisplayName("thrown exception when user doesn't exist")
+        void throwExceptionWhenUserDoesntExist() {
             when(repo.findById(99)).thenReturn(Optional.empty());
-            assertNull(service.viewProfile(99));
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.viewProfile(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("User with id 99 does not exist in the database.", result.getReason());
             verify(repo).findById(99);
+            
         }
 
 
@@ -172,11 +177,13 @@ public class UserServiceTest {
 
         @Test
         @DisplayName("user id doesn't exist")
-        void returnNullWhenNoSuchUserIdExists() {
+        void throwExceptionWhenNoSuchUserIdExists() {
             when(repo.existsById(99)).thenReturn(false);
 
-            User result = service.updateProfile(99, testDto);
-            assertNull(result);
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(99, testDto));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("User with id 99 does not exist in the database.", result.getReason());
 
             verify(repo, never()).save(any(User.class));
         }
@@ -199,9 +206,11 @@ public class UserServiceTest {
         @DisplayName("deletion: no user found")
         void deleteUserFailNotFound() {
             when(repo.existsById(99)).thenReturn(false);
-            boolean result = service.deleteUser(99);
 
-            assertFalse(result);
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.deleteUser(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("User with id 99 does not exist in the database.", result.getReason());
             verify(repo, never()).deleteById(anyInt());
         }
     }
