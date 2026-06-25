@@ -139,11 +139,45 @@ public class UserServiceTest {
         @Test
         @DisplayName("throw exception when username is taken")
         void throwExceptionWhenUsernameTaken() {
+            when(repo.existsById(1)).thenReturn(true);
+            when(repo.findById(1)).thenReturn(Optional.of(testUser));
             when(repo.existsByUsername(anyString())).thenReturn(true);
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(1, testDto));
 
             assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
             assertEquals("Username taken. Please use another username.", result.getReason());
+            verify(repo, never()).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("update success when username unchanged")
+        void updateSuccessfulWhenUsernameChanged() {
+
+            User existingUser = new User(1, "testuser", "oldtest@test.com", "hash");
+
+            when(repo.existsById(1)).thenReturn(true);
+            when(repo.findById(1)).thenReturn(Optional.of(existingUser));
+            when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+            User result = service.updateProfile(1, testDto);
+
+            assertEquals("testuser", result.getUsername());
+            assertEquals("test@test.com", result.getEmail());
+            assertEquals("hash", result.getPasswordHash());
+
+            verify(repo).save(any(User.class));
+            verify(repo, never()).existsByUsername(anyString());
+        }
+
+
+        @Test
+        @DisplayName("user id doesn't exist")
+        void returnNullWhenNoSuchUserIdExists() {
+            when(repo.existsById(99)).thenReturn(false);
+
+            User result = service.updateProfile(99, testDto);
+            assertNull(result);
+
             verify(repo, never()).save(any(User.class));
         }
     }

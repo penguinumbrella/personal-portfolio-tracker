@@ -53,7 +53,7 @@ public class UserService {
             User user = repo.findById(id).get();
             if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Username taken. Please select another username."
+                    "Username taken. Please use another username."
                 );
             }
             return 
