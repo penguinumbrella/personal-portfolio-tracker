@@ -46,14 +46,14 @@ public class HoldingController {
     }
 
     // Read one
-    @GetMapping("/{accountId}/{securityId}")
+    @GetMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> getHolding(@PathVariable int accountId,
             @PathVariable int securityId) {
         return ResponseEntity.ok(service.getHolding(accountId, securityId));
     }
 
     // ----- PUT/UPDATE METHODS -----
-    @PutMapping("/{accountId}/{securityId}")
+    @PutMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> updateHolding(
             @PathVariable int accountId,
             @PathVariable int securityId,
@@ -63,7 +63,7 @@ public class HoldingController {
 
     // ----- DELETE METHODS -----
     // Delete one
-    @DeleteMapping("/{accountId}/{securityId}")
+    @DeleteMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Void> deleteHolding(@PathVariable int accountId,
             @PathVariable int securityId) {
         boolean isDeleted = service.deleteHolding(accountId, securityId);
