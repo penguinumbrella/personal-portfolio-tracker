@@ -1,5 +1,6 @@
 package com.skillstorm.Controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 @WebMvcTest(UserController.class)
-class MyControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,6 +38,7 @@ class MyControllerTest {
     private User testUser;
     private UserDto testDto;
 
+    @BeforeEach
     void dataInit() {
         testUser = new User(1, "plswork", "plswork@test.com", "hash");
         testDto = new UserDto("testuser", "test@test.com", "hash");
@@ -58,4 +60,12 @@ class MyControllerTest {
 
         }
     }
+
+    @Nested
+    @DisplayName("GET /v1/users/{id}")
+    class viewProfile {
+
+    }
+
+
 }
