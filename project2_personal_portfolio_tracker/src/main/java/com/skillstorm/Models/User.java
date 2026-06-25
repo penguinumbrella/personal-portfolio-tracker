@@ -34,7 +34,7 @@ public class User {
     @JsonIgnoreProperties(value = { "user" })
     private List<InvestmentAccount> investmentAccounts;
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties(value = { "user" })
     private List<Security> securities;
 

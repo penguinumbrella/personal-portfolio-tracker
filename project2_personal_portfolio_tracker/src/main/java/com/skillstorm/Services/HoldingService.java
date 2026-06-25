@@ -119,7 +119,7 @@ public class HoldingService {
         InvestmentAccount linkedAccount = accountRepo.getReferenceById(a_id);
         Security linkedSecurity = securityRepo.getReferenceById(s_id);
 
-        if (!(linkedAccount.getUser().getId() == linkedSecurity.getUserId())) {
+        if (!(linkedAccount.getUser().getId() == linkedSecurity.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Holding requires an account and security belonging to same user.");
         }

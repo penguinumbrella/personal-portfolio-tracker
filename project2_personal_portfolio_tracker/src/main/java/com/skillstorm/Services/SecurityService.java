@@ -6,15 +6,19 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
 import com.skillstorm.Models.Security;
+import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
+import com.skillstorm.Repositories.UserRepo;
 
 @Service
 public class SecurityService {
 
     private final SecurityRepo repo;
+    private final UserRepo userRepo;
 
-    public SecurityService(SecurityRepo repo) {
+    public SecurityService(SecurityRepo repo, UserRepo userRepo) {
         this.repo = repo;
+        this.userRepo = userRepo;
     }
 
     // ----- POST/CREATE METHODS -----
@@ -23,8 +27,10 @@ public class SecurityService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Security already exists in the database.");
         }
+        User linkedUser = userRepo.getReferenceById(dto.userId());
+
         Security created = repo.save(new Security(0, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.userId()));
+                dto.generalNotes(), linkedUser));
         return created;
     }
 
@@ -48,8 +54,10 @@ public class SecurityService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Security with id " + id + " does not exist in the database.");
         }
+
+        User linkedUser = userRepo.getReferenceById(dto.userId());
         Security updated = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
-                dto.generalNotes(), dto.userId()));
+                dto.generalNotes(), linkedUser));
         return updated;
     }
 

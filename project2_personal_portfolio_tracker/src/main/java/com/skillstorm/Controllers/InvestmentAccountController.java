@@ -16,8 +16,6 @@ import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Services.InvestmentAccountService;
 
-import io.micrometer.core.ipc.http.HttpSender.Response;
-
 @RestController
 @RequestMapping("/v1/investments")
 //@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
@@ -31,9 +29,8 @@ public class InvestmentAccountController {
 
     @GetMapping
     public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
-        @RequestParam(required=false) Integer userId
-    ) {
-        return  ResponseEntity.status(200).body(service.getAccounts(userId));
+            @RequestParam(required = false) Integer userId) {
+        return ResponseEntity.status(200).body(service.getAccounts(userId));
     }
 
     // POST (ADD ACCOUNT)
@@ -45,7 +42,7 @@ public class InvestmentAccountController {
         InvestmentAccount investmentAccount = service.addAccount(userId, dto);
 
         return ResponseEntity.status(201).body(investmentAccount);
-        
+
     }
 
     // PUT (EDIT ACCOUNT)
@@ -63,7 +60,7 @@ public class InvestmentAccountController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(
             @PathVariable int id) {
-        
+
         return ResponseEntity.noContent().build();
     }
 
