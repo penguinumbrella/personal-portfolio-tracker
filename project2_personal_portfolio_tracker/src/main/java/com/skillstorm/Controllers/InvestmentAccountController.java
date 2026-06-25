@@ -31,7 +31,7 @@ public class InvestmentAccountController {
 
     @GetMapping
     public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
-        @RequestParam(required=false) Integer userId
+        @RequestParam(required=false) Long userId
     ) {
         return  ResponseEntity.status(200).body(service.getAccounts(userId));
     }

@@ -24,21 +24,27 @@ public class InvestmentAccountService {
         this.userRepo = userRepo;
     }
 
+    /*
     public Iterable<InvestmentAccount> getAll() {
         return investmentAccountRepo.findAll();
     }
 
-    public Iterable<InvestmentAccount> getAccounts(long userId) {
+    */
+    public Iterable<InvestmentAccount> getAccounts(Long userId) {
+        if (userId == null) return investmentAccountRepo.findAll();
         return investmentAccountRepo.findByUserId(userId);
     }
 
     public InvestmentAccount addAccount(int userId, InvestmentAccountDto dto) {
         if (userRepo.existsById(userId)) {
-            if (investmentAccountRepo.existsByNickname(dto.nickname())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
-            User user = userRepo.findById(dto.userId()).get();
+            if (investmentAccountRepo.existsByNickname(dto.nickname())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
+            }
+            System.out.println(userRepo.findById(dto.userId()));
+            User user = userRepo.findById(userId).get();
             return 
                     investmentAccountRepo.save(
-                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.dateOpened(), user, dto.holdings()
+                            new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user, dto.holdings()
                                     ));
         }
 
@@ -57,8 +63,7 @@ public class InvestmentAccountService {
             }
             User user = userRepo.findById(dto.userId()).get();
             return 
-                    investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
-                            dto.dateOpened(), user, dto.holdings()));
+                    investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user, dto.holdings()));
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "Investment account with id " + id + " does not exist in the database.");

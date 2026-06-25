@@ -32,6 +32,9 @@ public class InvestmentAccount {
     @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
+    @Column(name = "institution_name", nullable = false, unique = true)
+    private String institutionName;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "account_type", nullable = false, unique = true)
@@ -51,11 +54,12 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, Date dateOpened, User user, List<Holding> holdings) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user, List<Holding> holdings) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
         this.dateOpened = dateOpened;
+        this.institutionName = institutionName;
         this.user = user;
         this.holdings = holdings;
     }
