@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -21,7 +22,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class, 
+    property = "id"
+)
 @Table(name = "investment_account", schema = "portfolio")
 public class InvestmentAccount {
 
@@ -45,6 +53,7 @@ public class InvestmentAccount {
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "investmentAccounts", "user" })
+    @JsonBackReference
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -84,6 +93,8 @@ public class InvestmentAccount {
         return accountType;
     }
 
+    
+
     public void setAccountType(InvestmentType accountType) {
         this.accountType = accountType;
     }
@@ -110,6 +121,14 @@ public class InvestmentAccount {
 
     public void setHoldings(List<Holding> holdings) {
         this.holdings = holdings;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
     }
 
 }
