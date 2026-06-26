@@ -2,6 +2,7 @@ package com.skillstorm.Models;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -12,7 +13,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class, 
+    property = "id"
+)
 @Table(name = "holding", schema = "portfolio")
 public class Holding {
 
@@ -34,12 +42,14 @@ public class Holding {
     @ManyToOne
     @JsonIgnoreProperties(value = { "holdings" })
     @JoinColumn(name = "account_id", referencedColumnName = "id")
+    @JsonIgnore
     private InvestmentAccount account;
 
     @MapsId("securityId") // connects to securityId field in HoldingPK
     @ManyToOne
     @JoinColumn(name = "security_id", referencedColumnName = "id")
     @JsonIgnoreProperties(value = { "holdings" })
+    @JsonIgnore
     private Security security;
 
     public Holding() {

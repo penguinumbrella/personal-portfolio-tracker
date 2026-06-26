@@ -1,5 +1,7 @@
 package com.skillstorm.Services;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,9 +29,10 @@ public class InvestmentAccountService {
     }
     
     */
-    public Iterable<InvestmentAccount> getAccounts(Long userId) {
-        if (userId == null)
+    public List<InvestmentAccount> getAccounts(Long userId) {
+        if (userId == null) {
             return investmentAccountRepo.findAll();
+        }
         return investmentAccountRepo.findByUserId(userId);
     }
 
@@ -38,7 +41,7 @@ public class InvestmentAccountService {
             if (investmentAccountRepo.existsByNickname(dto.nickname())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
             }
-            System.out.println(userRepo.findById(dto.userId()));
+            //System.out.println(userRepo.findById(dto.userId()));
             User user = userRepo.findById(userId).get();
             return investmentAccountRepo.save(
                     new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(),

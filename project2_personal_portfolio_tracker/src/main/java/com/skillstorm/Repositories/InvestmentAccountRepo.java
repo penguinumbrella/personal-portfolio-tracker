@@ -8,7 +8,7 @@ import com.skillstorm.Models.InvestmentAccount;
 
 public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, Integer> {
 
-    Iterable<InvestmentAccount> findByUserId(Long userId);
+    List<InvestmentAccount> findByUserId(Long userId);
 
     boolean existsByNickname(String nickname);
 
