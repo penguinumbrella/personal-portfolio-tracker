@@ -45,7 +45,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "user" })
-    @JsonManagedReference
     private List<Security> securities;
 
     public User() {

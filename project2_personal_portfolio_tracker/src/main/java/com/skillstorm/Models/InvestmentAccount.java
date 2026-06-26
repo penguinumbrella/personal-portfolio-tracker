@@ -53,7 +53,6 @@ public class InvestmentAccount {
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "investmentAccounts", "user" })
-    @JsonBackReference
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

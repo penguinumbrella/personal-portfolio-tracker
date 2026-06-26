@@ -36,10 +36,11 @@ public class InvestmentAccountController {
     // POST (ADD ACCOUNT)
     @PostMapping
     public ResponseEntity<InvestmentAccount> addAccount(
-            @RequestParam(required = true) int userId,
             @RequestBody InvestmentAccountDto dto) {
 
-        InvestmentAccount investmentAccount = service.addAccount(userId, dto);
+        InvestmentAccount investmentAccount = service.addAccount(dto);
+
+        System.out.println(investmentAccount);
 
         return ResponseEntity.status(201).body(investmentAccount);
 
@@ -52,6 +53,7 @@ public class InvestmentAccountController {
             @RequestBody InvestmentAccountDto dto) {
 
         InvestmentAccount investmentAccount = service.updateAccount(id, dto);
+
 
         return ResponseEntity.status(200).body(investmentAccount);
     }

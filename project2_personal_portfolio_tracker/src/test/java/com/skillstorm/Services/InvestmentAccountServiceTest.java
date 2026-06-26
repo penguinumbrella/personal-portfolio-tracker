@@ -1,11 +1,16 @@
 package com.skillstorm.Services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.sql.Date;
 import java.util.List;
@@ -19,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.DTOs.UserDto;
@@ -47,9 +54,11 @@ public class InvestmentAccountServiceTest {
 
     private InvestmentAccount testInvestmentAccount1;
     private InvestmentAccount testInvestmentAccount2;
-    private InvestmentAccount testInvestmentAccount3;
+    //private InvestmentAccount testInvestmentAccount3;
 
-    private InvestmentAccountDto testInvestmentAccountDto;
+    private InvestmentAccountDto testInvestmentAccountDto1;
+    private InvestmentAccountDto testInvestmentAccountDto2;
+    private InvestmentAccountDto testInvestmentAccountDto3;
 
     @BeforeEach
     void dataInit() {
@@ -60,7 +69,9 @@ public class InvestmentAccountServiceTest {
         testInvestmentAccount1 = new InvestmentAccount(1, "test1", InvestmentType.BROKERAGE, "test1", Date.valueOf("2026-06-25"), testUser1);
         testInvestmentAccount2 = new InvestmentAccount(2, "test2", InvestmentType.ROTH_IRA, "test2", Date.valueOf("2026-06-26"), testUser2);
         //testInvestmentAccount3 = new InvestmentAccount(2, "test3", InvestmentType.K401, "test3", Date.valueOf("2026-06-26"), testUser1);
-        testInvestmentAccountDto = new InvestmentAccountDto("test3", InvestmentType.K401, "test3", Date.valueOf("2026-06-27"), 1);
+        testInvestmentAccountDto1 = new InvestmentAccountDto(testInvestmentAccount1.getNickname(), testInvestmentAccount1.getAccountType(), testInvestmentAccount1.getInstitutionName(), testInvestmentAccount1.getDateOpened(), testUser1.getId());
+        testInvestmentAccountDto2 = new InvestmentAccountDto(testInvestmentAccount2.getNickname(), testInvestmentAccount2.getAccountType(), testInvestmentAccount2.getInstitutionName(), testInvestmentAccount2.getDateOpened(), testUser2.getId());
+        testInvestmentAccountDto3 = new InvestmentAccountDto(testInvestmentAccount2.getNickname(), testInvestmentAccount2.getAccountType(), testInvestmentAccount2.getInstitutionName(), testInvestmentAccount2.getDateOpened(), testUser1.getId());
     }
 
     @Nested
@@ -81,8 +92,8 @@ public class InvestmentAccountServiceTest {
         @Test
         @DisplayName("return accounts with user")
         void returnAccountsWithUser() {
-            when(investmentAccountRepo.findByUserId(new Long(1))).thenReturn(List.of(testInvestmentAccount1));
-            List<InvestmentAccount> results = service.getAccounts(new Long(1));
+            when(investmentAccountRepo.findByUserId(new Long(testUser1.getId()))).thenReturn(List.of(testInvestmentAccount1));
+            List<InvestmentAccount> results = service.getAccounts(new Long(testUser1.getId()));
             assertEquals(1, results.size());
             verify(investmentAccountRepo).findByUserId(anyLong());
             verify(investmentAccountRepo, never()).findAll();
@@ -91,26 +102,195 @@ public class InvestmentAccountServiceTest {
     }
 
     @Nested
-    @DisplayName("addAccounts()")
-    class addAccounts {
+    @DisplayName("addAccount()")
+    class addAccount {
         
         @Test
         @DisplayName("add account success")
         void addAccountSuccess() {
-            when(userRepo.existsById(1)).thenReturn(true);
-            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto.nickname())).thenReturn(false);
-            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            //when(userRepo.existsById(1)).thenReturn(true);
+            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(false);
+            when(userRepo.findById(testInvestmentAccountDto1.userId())).thenReturn(Optional.of(testUser1));
 
             when(investmentAccountRepo.save(any(InvestmentAccount.class))).thenAnswer(i -> i.getArgument(0));
 
-            InvestmentAccount result = service.addAccount(1, testInvestmentAccountDto);
+            InvestmentAccount result = service.addAccount(testInvestmentAccountDto1);
 
             //assertEquals(1, result.getId());
-            assertEquals("test3", result.getNickname());
-            assertEquals(InvestmentType.K401, result.getAccountType());
-            assertEquals("test3", result.getInstitutionName());
-            assertEquals(Date.valueOf("2026-06-27"), result.getDateOpened());
+            assertEquals(testInvestmentAccount1.getNickname(), result.getNickname());
+            assertEquals(testInvestmentAccount1.getAccountType(), result.getAccountType());
+            assertEquals(testInvestmentAccount1.getInstitutionName(), result.getInstitutionName());
+            assertEquals(testInvestmentAccount1.getDateOpened(), result.getDateOpened());
             assertEquals(testUser1, result.getUser());
+
+            verify(investmentAccountRepo).save(any(InvestmentAccount.class));
+        }
+
+        @Test
+        @DisplayName("throw exception when adding account: nickname already in use")
+        void throwExceptionWhenAddingAccountNicknameAlreadyInUse() {
+            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(true);
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.addAccount(testInvestmentAccountDto1));
+            
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+            assertEquals("Nickname is already in use.", result.getReason());
+
+            verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+        }
+
+        @Test
+        @DisplayName("throw exception when adding account: user doesn't exist")
+        void throwExceptionWhenAddingAccountUserDoesntExists() {
+
+            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(false);
+            when(userRepo.findById(testInvestmentAccountDto1.userId())).thenReturn(Optional.empty());
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.addAccount(testInvestmentAccountDto1));
+            
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("User not found.", result.getReason());
+
+            verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+            
+        }
+    }
+
+    @Nested
+    @DisplayName("updateAccount()")
+    class updateAccount {
+        
+        
+        
+        @Test
+        @DisplayName("update account successful")
+        void updateAccountSuccess() {
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId())).thenReturn(Optional.of(testInvestmentAccount1));
+            //when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(false);
+            when(userRepo.findById(testInvestmentAccountDto2.userId())).thenReturn(Optional.of(testUser1));
+
+            when(investmentAccountRepo.save(any(InvestmentAccount.class))).thenAnswer(i -> i.getArgument(0));
+
+
+            InvestmentAccount result = service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2);
+
+            assertEquals(testInvestmentAccount2.getNickname(), result.getNickname());
+            assertEquals(testInvestmentAccount2.getAccountType(), result.getAccountType());
+            assertEquals(testInvestmentAccount2.getInstitutionName(), result.getInstitutionName());
+            assertEquals(testInvestmentAccount2.getDateOpened(), result.getDateOpened());
+            assertEquals(testUser1, result.getUser());
+
+            verify(investmentAccountRepo).save(any(InvestmentAccount.class));
+        }
+
+        
+
+        @Test
+        @DisplayName("update account successful: nickname not in use")
+        void updateAccountSuccessNicknameNotUsed() {
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId())).thenReturn(Optional.of(testInvestmentAccount1));
+            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto3.nickname())).thenReturn(false);
+            when(userRepo.findById(testInvestmentAccountDto2.userId())).thenReturn(Optional.of(testUser1));
+
+            //ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto3));
+            when(investmentAccountRepo.save(any(InvestmentAccount.class))).thenAnswer(i -> i.getArgument(0));
+
+
+            InvestmentAccount result = service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2);
+
+            assertEquals(testInvestmentAccount2.getNickname(), result.getNickname());
+            assertEquals(testInvestmentAccount2.getAccountType(), result.getAccountType());
+            assertEquals(testInvestmentAccount2.getInstitutionName(), result.getInstitutionName());
+            assertEquals(testInvestmentAccount2.getDateOpened(), result.getDateOpened());
+            assertEquals(testUser1, result.getUser());
+
+            verify(investmentAccountRepo).save(any(InvestmentAccount.class));
+
+
+            //assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+            //assertEquals("Nickname is already in use.", result.getReason());
+
+            //verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+        }
+
+        
+        @Test
+        @DisplayName("throw exception when updating account: nickname already in use")
+        void throwExceptionWhenUpdatingAccountNicknameAlreadyUsed() {
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId())).thenReturn(Optional.of(testInvestmentAccount1));
+            when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto3.nickname())).thenReturn(true);
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto3));
+            
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+            assertEquals("Nickname is already in use.", result.getReason());
+
+            verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+        }
+
+        
+            
+            
+            
+
+        
+        @Test
+        @DisplayName("throw exception when updating account: user doesn't exist")
+        void throwExceptionWhenUpdatingAccountUserDoesntExists() {
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId())).thenReturn(Optional.of(testInvestmentAccount1));
+            //when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(false);
+            when(userRepo.findById(testInvestmentAccountDto2.userId())).thenReturn(Optional.empty());
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2));
+            
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("User not found.", result.getReason());
+
+            verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+            
+        }
+
+        @Test
+        @DisplayName("throw exception when updating account: investment doesn't exist")
+        void throwExceptionWhenUpdatingAccountInvestmentDoesntExists() {
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId())).thenReturn(Optional.empty());
+            //when(investmentAccountRepo.existsByNickname(testInvestmentAccountDto1.nickname())).thenReturn(false);
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2));
+            
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("Investment account with id " + testInvestmentAccount1.getId() + " does not exist in the database.", result.getReason());
+
+            verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
+            
+        }
+            
+            
+    }
+
+    @Nested
+    @DisplayName("deleteAccount()")
+    class deleteUser {
+        @Test
+        @DisplayName("successfully delete an investment")
+        void deleteUserSuccess() {
+            when(investmentAccountRepo.existsById(1)).thenReturn(true);
+            boolean result = service.deleteAccount(testInvestmentAccount1.getId());
+            assertTrue(result);
+            verify(investmentAccountRepo).deleteById(testInvestmentAccount1.getId());
+
+        }
+
+        @Test
+        @DisplayName("deletion: no investment found")
+        void deleteUserFailNotFound() {
+            when(investmentAccountRepo.existsById(99)).thenReturn(false);
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.deleteAccount(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            assertEquals("Investment account with id 99 does not exist in the database.", result.getReason());
+            verify(investmentAccountRepo, never()).deleteById(anyInt());
         }
     }
 
