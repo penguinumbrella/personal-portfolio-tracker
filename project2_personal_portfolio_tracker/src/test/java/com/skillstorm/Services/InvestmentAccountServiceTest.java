@@ -1,6 +1,7 @@
 package com.skillstorm.Services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -205,12 +206,6 @@ public class InvestmentAccountServiceTest {
             assertEquals(testUser1, result.getUser());
 
             verify(investmentAccountRepo).save(any(InvestmentAccount.class));
-
-
-            //assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
-            //assertEquals("Nickname is already in use.", result.getReason());
-
-            //verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
         }
 
         
