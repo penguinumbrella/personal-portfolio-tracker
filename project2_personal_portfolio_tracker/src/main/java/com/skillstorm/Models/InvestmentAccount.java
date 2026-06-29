@@ -26,10 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class, 
-    property = "id"
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "investment_account", schema = "portfolio")
 public class InvestmentAccount {
 
@@ -63,7 +60,8 @@ public class InvestmentAccount {
     public InvestmentAccount() {
     }
 
-    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName, Date dateOpened, User user) {
+    public InvestmentAccount(int id, String nickname, InvestmentType accountType, String institutionName,
+            Date dateOpened, User user) {
         this.id = id;
         this.nickname = nickname;
         this.accountType = accountType;
@@ -92,8 +90,6 @@ public class InvestmentAccount {
     public InvestmentType getAccountType() {
         return accountType;
     }
-
-    
 
     public void setAccountType(InvestmentType accountType) {
         this.accountType = accountType;
