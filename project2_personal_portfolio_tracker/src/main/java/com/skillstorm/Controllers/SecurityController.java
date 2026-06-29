@@ -58,12 +58,10 @@ public class SecurityController {
 
     // ----- DELETE METHODS -----
     // Delete one
+    // Service either returns true or throws, so no need to check bool returned
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSecurity(@PathVariable int id) {
-        boolean isDeleted = service.deleteSecurity(id);
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return ResponseEntity.notFound().build();
+        service.deleteSecurity(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

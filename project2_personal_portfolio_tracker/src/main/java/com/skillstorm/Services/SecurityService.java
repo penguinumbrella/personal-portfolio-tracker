@@ -23,11 +23,11 @@ public class SecurityService {
 
     // ----- POST/CREATE METHODS -----
     public Security addSecurity(SecurityDto dto) {
-        if (repo.existsById(dto.id())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Security already exists in the database.");
-        }
-        User linkedUser = userRepo.getReferenceById(dto.userId());
+        // TODO what makes a security unique that could be checked for?
+        User linkedUser = userRepo.findById(dto.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Must assign security to a valid user"));
+        ;
 
         Security created = repo.save(new Security(0, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
                 dto.generalNotes(), linkedUser));
@@ -42,10 +42,8 @@ public class SecurityService {
 
     // Read one
     public Security getSecurity(int id) {
-        if (repo.findById(id).isPresent())
-            return repo.findById(id).get();
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Security with id " + id + " does not exist in the database.");
+        return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Security with id " + id + " does not exist in the database."));
     }
 
     // ----- PUT/UPDATE METHODS -----
@@ -55,13 +53,16 @@ public class SecurityService {
                     "Security with id " + id + " does not exist in the database.");
         }
 
-        User linkedUser = userRepo.getReferenceById(dto.userId());
+        User linkedUser = userRepo.findById(dto.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Must assign security to a valid user"));
+        ;
         Security updated = repo.save(new Security(id, dto.tickerSymbol(), dto.name(), dto.sector(), dto.type(),
                 dto.generalNotes(), linkedUser));
         return updated;
     }
 
-    // ----- DELETE METHODS -----
+    // ---- DELETE METHODS -----
     public boolean deleteSecurity(int id) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,

@@ -63,13 +63,11 @@ public class HoldingController {
 
     // ----- DELETE METHODS -----
     // Delete one
+    // Service either returns true or throws, so no need to check bool returned
     @DeleteMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Void> deleteHolding(@PathVariable int accountId,
             @PathVariable int securityId) {
-        boolean isDeleted = service.deleteHolding(accountId, securityId);
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return ResponseEntity.notFound().build();
+        service.deleteHolding(accountId, securityId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

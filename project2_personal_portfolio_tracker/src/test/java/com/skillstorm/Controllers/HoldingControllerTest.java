@@ -69,18 +69,6 @@ class HoldingControllerTest {
 
     @BeforeEach
     void dataInit() {
-        // Test Holding obj with equiv DTO
-        testPk1 = new HoldingPK(1, 1);
-        testHolding1 = new Holding(testPk1, 9, 99, Date.valueOf("2067-01-01"),
-                testAccount1, testSecurity1);
-        testHDto1 = new HoldingDto(1, 1, 9, 99, Date.valueOf("2067-01-01"));
-
-        // Other Holding obj with equiv DTO
-        testPk2 = new HoldingPK(2, 2);
-        testHolding2 = new Holding(testPk2, 55, 55, Date.valueOf("2009-12-12"),
-                testAccount2, testSecurity2);
-        testHDto2 = new HoldingDto(2, 2, 55, 55, Date.valueOf("2009-12-12"));
-
         // User with an account and security
         testUser1 = new User(1, "plswork", "plswork@test.com", "hash");
         testAccount1 = new InvestmentAccount(1, "account One", InvestmentType.BROKERAGE, "test1",
@@ -95,68 +83,150 @@ class HoldingControllerTest {
         testSecurity2 = new Security(2, "xyz", "Security Two", SectorType.ENERGY, SecurityType.ETF,
                 "two", testUser2);
 
+        // Test Holding obj with equiv DTO
+        testPk1 = new HoldingPK(1, 1);
+        testHolding1 = new Holding(testPk1, 9, 99, Date.valueOf("2067-01-01"),
+                testAccount1, testSecurity1);
+        testHDto1 = new HoldingDto(1, 1, 9, 99, Date.valueOf("2067-01-01"));
+
+        // Other Holding obj with equiv DTO
+        testPk2 = new HoldingPK(2, 2);
+        testHolding2 = new Holding(testPk2, 55, 55, Date.valueOf("2009-12-12"),
+                testAccount2, testSecurity2);
+        testHDto2 = new HoldingDto(2, 2, 55, 55, Date.valueOf("2009-12-12"));
+
     }
 
+    // ----- POST/CREATE TESTS -----
     @Nested
     @DisplayName("POST /v1/holdings")
     class addHolding {
 
         @Test
         @DisplayName("201 OK holding created")
-        void addHolding() throws Exception {
+        void addHoldingSuccess201() throws Exception {
             when(service.addHolding(any(HoldingDto.class))).thenReturn(testHolding1);
 
             mockMvc.perform(post("/v1/holdings")
                     .contentType(APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(testHDto1)))
                     .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.id.accountId").value(1))
+                    .andExpect(jsonPath("$.id.securityId").value(1))
                     .andExpect(jsonPath("$.shares").value(9))
                     .andExpect(jsonPath("$.costPerShare").value(99))
-                    .andExpect(jsonPath("$.purchaseDate").value("2067-01-01"))
-                    .andExpect(jsonPath("$.account.id").value(1))
-                    .andExpect(jsonPath("$.security.id").value(1));
+                    .andExpect(jsonPath("$.purchaseDate").value("2067-01-01"));
         }
     }
 
-    @Test
-    void getAllHoldings_Returns200() throws Exception {
-        when(service.getAllHoldings()).thenReturn(List.of(testHolding1));
+    // ----- GET/READ TESTS -----
+    @Nested
+    @DisplayName("GET /v1/holdings")
+    class getAllHoldings {
 
-        mockMvc.perform(get("/v1/holdings"))
-                .andExpect(status().isOk());
+        @Test
+        @DisplayName("200 OK all holdings returned")
+        void getAllHoldingsSuccess200() throws Exception {
+            when(service.getAllHoldings()).thenReturn(List.of(testHolding1, testHolding2));
+
+            mockMvc.perform(get("/v1/holdings"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id.accountId").value(1))
+                    .andExpect(jsonPath("$[0].id.securityId").value(1))
+                    .andExpect(jsonPath("$[0].shares").value(9))
+                    .andExpect(jsonPath("$[0].costPerShare").value(99))
+                    .andExpect(jsonPath("$[1].id.accountId").value(2))
+                    .andExpect(jsonPath("$[1].id.securityId").value(2))
+                    .andExpect(jsonPath("$[1].shares").value(55))
+                    .andExpect(jsonPath("$[1].costPerShare").value(55));
+        }
     }
 
-    @Test
-    void getHolding_Returns200() throws Exception {
-        when(service.getHolding(1, 2)).thenReturn(testHolding1);
+    @Nested
+    @DisplayName("GET /v1/holdings/a/{accountId}/s/{securityId}")
+    class getHolding {
 
-        mockMvc.perform(get("/v1/holdings/a/1/s/2"))
-                .andExpect(status().isOk());
+        @Test
+        @DisplayName("200 OK holding returned")
+        void getHoldingSuccess200() throws Exception {
+            when(service.getHolding(1, 1)).thenReturn(testHolding1);
+
+            mockMvc.perform(get("/v1/holdings/a/1/s/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id.accountId").value(1))
+                    .andExpect(jsonPath("$.id.securityId").value(1))
+                    .andExpect(jsonPath("$.shares").value(9))
+                    .andExpect(jsonPath("$.costPerShare").value(99))
+                    .andExpect(jsonPath("$.purchaseDate").value("2067-01-01"));
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND holding not found")
+        void getHoldingNotFound404() throws Exception {
+            when(service.getHolding(1, 1))
+                    .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Holding not found"));
+
+            mockMvc.perform(get("/v1/holdings/a/1/s/1"))
+                    .andExpect(status().isNotFound());
+        }
     }
 
-    @Test
-    void getHolding_NotFound_Returns404() throws Exception {
-        when(service.getHolding(1, 2))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+    // ----- PUT/UPDATE TESTS -----
+    @Nested
+    @DisplayName("PUT /v1/holdings/a/{accountId}/s/{securityId}")
+    class updateHolding {
 
-        mockMvc.perform(get("/v1/holdings/a/1/s/2"))
-                .andExpect(status().isNotFound());
+        @Test
+        @DisplayName("201 OK holding updated")
+        void updateHoldingSuccess201() throws Exception {
+            when(service.updateHolding(anyInt(), anyInt(), any(HoldingDto.class))).thenReturn(testHolding2);
+
+            mockMvc.perform(put("/v1/holdings/a/1/s/1")
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(testHDto2)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.id.accountId").value(2))
+                    .andExpect(jsonPath("$.id.securityId").value(2))
+                    .andExpect(jsonPath("$.shares").value(55))
+                    .andExpect(jsonPath("$.costPerShare").value(55))
+                    .andExpect(jsonPath("$.purchaseDate").value("2009-12-12"));
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND holding not found")
+        void updateHoldingNotFound404() throws Exception {
+            when(service.updateHolding(anyInt(), anyInt(), any(HoldingDto.class)))
+                    .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Holding not found"));
+
+            mockMvc.perform(put("/v1/holdings/a/1/s/1")
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(testHDto1)))
+                    .andExpect(status().isNotFound());
+        }
     }
 
-    @Test
-    void deleteHolding_Returns204() throws Exception {
-        when(service.deleteHolding(1, 2)).thenReturn(true);
+    // ---- DELETE TESTS -----
+    @Nested
+    @DisplayName("DELETE /v1/holdings/a/{accountId}/s/{securityId}")
+    class deleteHolding {
 
-        mockMvc.perform(delete("/v1/holdings/a/1/s/2"))
-                .andExpect(status().isNoContent());
-    }
+        @Test
+        @DisplayName("204 NO CONTENT holding deleted")
+        void deleteHoldingSuccess204() throws Exception {
+            when(service.deleteHolding(1, 1)).thenReturn(true);
 
-    @Test
-    void deleteHolding_NotFound_Returns404() throws Exception {
-        when(service.deleteHolding(1, 2))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+            mockMvc.perform(delete("/v1/holdings/a/1/s/1"))
+                    .andExpect(status().isNoContent());
+        }
 
-        mockMvc.perform(delete("/v1/holdings/a/1/s/2"))
-                .andExpect(status().isNotFound());
+        @Test
+        @DisplayName("404 NOT FOUND holding not found")
+        void deleteHoldingNotFound404() throws Exception {
+            when(service.deleteHolding(9, 9))
+                    .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Holding not found"));
+
+            mockMvc.perform(delete("/v1/holdings/a/9/s/9"))
+                    .andExpect(status().isNotFound());
+        }
     }
 }
