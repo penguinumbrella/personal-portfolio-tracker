@@ -40,7 +40,7 @@ export class Dashboard {
     // todo: add the other totals
     this.investmentAccountService.getUserInvestmentAccountTotal(1).subscribe({
       next: (data) => {
-        console.log(data);
+        //console.log(data);
         this.totalAccounts.set(data);
       },
       error: (err) => {
@@ -52,7 +52,7 @@ export class Dashboard {
   loadRecentAccounts(): void {
     this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
       next: (data) => {
-        console.log(data);
+        //console.log(data);
         this.recentAccounts.set(data);
       },
       error: (err) => {
