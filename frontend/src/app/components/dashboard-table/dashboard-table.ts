@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 
@@ -10,5 +10,5 @@ import { TableModule } from 'primeng/table';
 })
 export class DashboardTable {
   @Input() title: string = '';
-  @Input() data: any[] = [];
+  data = input<any[]>([]);
 }

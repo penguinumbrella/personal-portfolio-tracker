@@ -1,5 +1,5 @@
 <p-card [header]="title">
-  <p-table [value]="data">
+  <p-table [value]="data()">
     <ng-template pTemplate="header">
       <tr>
         <th>Name</th>
@@ -9,8 +9,8 @@
     </ng-template>
     <ng-template pTemplate="body" let-row>
       <tr>
-        <td>{{ row.name }}</td>
-        <td>{{ row.date }}</td>
+        <td>{{ row.nickname }}</td>
+        <td>{{ row.dateOpened }}</td>
         <td>{{ row.totalAmount }}</td>
       </tr>
     </ng-template>
