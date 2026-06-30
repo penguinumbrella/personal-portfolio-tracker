@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.DTOs.HoldingDto;
@@ -69,5 +70,10 @@ public class HoldingController {
             @PathVariable int securityId) {
         service.deleteHolding(accountId, securityId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("total")
+    public ResponseEntity<Long> UserHoldingTotal(@RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.UserHoldingTotal(userId));
     }
 }

@@ -16,6 +16,8 @@ import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Services.InvestmentAccountService;
 
+import io.micrometer.core.ipc.http.HttpSender.Response;
+
 @RestController
 @RequestMapping("/v1/investments")
 //@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
@@ -65,5 +67,11 @@ public class InvestmentAccountController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("total")
+    public ResponseEntity<Long> UserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
+        return ResponseEntity.status(200).body(service.UserInvestmentAccountTotal(userId));
+    }
+    
 
 }

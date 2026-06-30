@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.skillstorm.Models.InvestmentAccount;
+import com.skillstorm.Models.User;
 
 public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, Integer> {
 
     List<InvestmentAccount> findByUserId(Long userId);
 
     boolean existsByNickname(String nickname);
+
+    long countByUser(User user);
 
 }

@@ -71,4 +71,11 @@ public class SecurityService {
         repo.deleteById(id);
         return true;
     }
+
+    public Long UserSecurityAccountTotal(int userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return repo.countByUser(user);
+        
+    }
 }
