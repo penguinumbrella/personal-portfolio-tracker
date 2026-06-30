@@ -76,4 +76,9 @@ public class HoldingController {
     public ResponseEntity<Long> UserHoldingTotal(@RequestParam(required = true) Long userId) {
         return ResponseEntity.status(200).body(service.UserHoldingTotal(userId));
     }
+
+    @GetMapping("totalInvestedCost")
+    public ResponseEntity<Long> totalInvestedCost(@RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.totalInvestedCost(userId));
+    }
 }
