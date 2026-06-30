@@ -79,4 +79,17 @@ public class InvestmentAccountService {
 
     }
 
+    public Long UserInvestmentAccountTotal(int userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return investmentAccountRepo.countByUser(user);
+        
+    }
+
+    public List<InvestmentAccount> getRecentAccounts(Long userId) {
+        return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
+    }
+
+
+
 }

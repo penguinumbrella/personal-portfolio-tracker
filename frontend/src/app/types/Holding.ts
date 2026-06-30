@@ -1,7 +1,10 @@
+import { HoldingId } from "./HoldingId";
+
 export interface Holding {
-    accountId: number;
-    securityId: number;
-    shares: number;
+    id: HoldingId;
+
+    numShares: number;
     costPerShare: number;
-    purchaseDate: Date;
+    purchaseDate: number;    
+    
 }

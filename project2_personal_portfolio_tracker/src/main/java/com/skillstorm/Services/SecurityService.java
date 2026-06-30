@@ -1,10 +1,13 @@
 package com.skillstorm.Services;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
@@ -70,5 +73,16 @@ public class SecurityService {
         }
         repo.deleteById(id);
         return true;
+    }
+
+    public Long UserSecurityAccountTotal(int userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return repo.countByUser(user);
+        
+    }
+
+    public List<Security> getRecentAccounts(Long userId) {
+        return repo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
     }
 }

@@ -122,4 +122,20 @@ public class HoldingService {
         return links;
     }
 
+    public Long UserHoldingTotal(Long userId) {
+        //User user = userRepo.findById(userId)
+        //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        return repo.countByAccountUserId(userId);
+        
+    }
+
+    public Long totalInvestedCost(Long userId) {
+        //User user = userRepo.findById(userId)
+        //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        return repo.totalInvestedCost(userId);
+        
+    }
+
 }

@@ -1,3 +1,5 @@
+@if (currentUser(); as user) {
+
 <div class="flex align-items-center gap-3">
     <p-avatar 
         image="path/to/profile.jpg" 
@@ -6,7 +8,10 @@
     </p-avatar>
 
     <div class="flex flex-column">
-        <span class="font-bold text-900">John Doe</span>
-        <span class="text-sm text-500">@johndoe</span>
+        <span class="font-bold text-900">{{user.username}}</span>
+        <span class="text-sm text-500">@{{user.username}}</span>
     </div>
 </div>
+} @else {
+    <p>Loading user profile...</p>
+}

@@ -1,32 +1,12 @@
 <div class="dashboard flx flex-row">
 
-    <app-user-handle>
-        
-    </app-user-handle>
+
     <!-- 4 cards -->
     <div class="grid flex flex-col">
 
         <app-metric-card 
             title="Total Accounts" 
-            value="1,250" 
-            icon="pi pi-user">
-        </app-metric-card>
-
-        <app-metric-card 
-            title="Total Accounts" 
-            value="1,250" 
-            icon="pi pi-user">
-        </app-metric-card>
-
-        <app-metric-card 
-            title="Total Accounts" 
-            value="1,250" 
-            icon="pi pi-user">
-        </app-metric-card>
-
-        <app-metric-card 
-            title="Total Accounts" 
-            value="1,250" 
+            [data]="totalAccounts()" 
             icon="pi pi-user">
         </app-metric-card>
         
@@ -35,11 +15,7 @@
     <div class = "grid flex flex-col">
         <app-dashboard-table 
         title="Recent Accounts"
-        [data]="recentAccounts">
-    </app-dashboard-table>
-        <app-dashboard-table 
-        title="Recent Securities"
-        [data]="recentAccounts">
+        [data]="recentAccounts()">
     </app-dashboard-table>
     </div>
 
