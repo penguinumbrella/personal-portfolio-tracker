@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.DTOs.SecurityDto;
 import com.skillstorm.Services.SecurityService;
+import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.Security;
 
 //TODO cross will need to change
@@ -69,5 +70,11 @@ public class SecurityController {
     @GetMapping("total")
     public ResponseEntity<Long> UserSecurityAccountTotal(@RequestParam(required = true) int userId) {
         return ResponseEntity.status(200).body(service.UserSecurityAccountTotal(userId));
+    }
+
+    @GetMapping("recent")
+    public ResponseEntity<Iterable<Security>> getRecentAccounts(
+            @RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.getRecentAccounts(userId));
     }
 }

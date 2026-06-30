@@ -72,6 +72,12 @@ public class InvestmentAccountController {
     public ResponseEntity<Long> UserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
         return ResponseEntity.status(200).body(service.UserInvestmentAccountTotal(userId));
     }
+
+    @GetMapping("recent")
+    public ResponseEntity<Iterable<InvestmentAccount>> getRecentAccounts(
+            @RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.getRecentAccounts(userId));
+    }
     
 
 }

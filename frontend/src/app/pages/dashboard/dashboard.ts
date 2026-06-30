@@ -50,7 +50,7 @@ export class Dashboard {
   }
 
   loadRecentAccounts(): void {
-    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+    this.investmentAccountService.getRecentAccounts(1).subscribe({
       next: (data) => {
         //console.log(data);
         this.recentAccounts.set(data);

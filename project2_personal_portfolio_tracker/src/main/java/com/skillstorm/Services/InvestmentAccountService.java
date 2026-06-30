@@ -86,4 +86,10 @@ public class InvestmentAccountService {
         
     }
 
+    public List<InvestmentAccount> getRecentAccounts(Long userId) {
+        return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
+    }
+
+
+
 }

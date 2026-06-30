@@ -77,14 +77,9 @@ export class InvestmentAccountService {
             );
     }
 
-    getUserInvestmentAccountTotal(userId?: number): Observable<number> {
+    getUserInvestmentAccountTotal(userId: number): Observable<number> {
         let params = new HttpParams();
-
-        // set the rating param if a value was given
-        if(userId != null) {
-            params = params.set("userId", userId);
-        }
-
+        params = params.set("userId", userId);
         return this.http.get<number>(this.URL + `/total`, {params})
             
 
@@ -93,6 +88,22 @@ export class InvestmentAccountService {
                 catchError(
                     () => throwError(
                         () => new Error("Failed to load total count of a user's investment accounts.")
+                    )
+                )
+            );
+    }
+
+    getRecentAccounts(userId: number): Observable<InvestmentAccount[]> {
+        let params = new HttpParams();
+        params = params.set("userId", userId);
+        return this.http.get<InvestmentAccount[]>(this.URL + `/recent`, {params})
+            
+
+            .pipe(
+
+                catchError(
+                    () => throwError(
+                        () => new Error("Failed to load user's recent investment accounts.")
                     )
                 )
             );

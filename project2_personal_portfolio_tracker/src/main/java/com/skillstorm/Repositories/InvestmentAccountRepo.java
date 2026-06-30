@@ -15,4 +15,6 @@ public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, 
 
     long countByUser(User user);
 
+    List<InvestmentAccount> findTop5ByUserIdOrderByDateOpenedDesc(Long userId);
+
 }
