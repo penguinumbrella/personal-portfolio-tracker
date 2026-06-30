@@ -3,5 +3,5 @@ export enum InvestmentType {
     TRADITIONAL_IRA = "Traditional IRA",
     ROTH_IRA = "Roth IRA",
     K401 = "401(k)",
-    HSA = "ThrHSAiller",
+    HSA = "HSA",
 }
