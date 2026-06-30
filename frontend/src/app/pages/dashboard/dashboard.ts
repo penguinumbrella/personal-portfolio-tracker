@@ -13,6 +13,7 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 export class Dashboard {
 
   recentAccounts = signal<InvestmentAccount[]>([]);
+  totalAccounts = signal<number>(0);
   // need securities observer set up
   //rSecurities = signal<Security[]>([]);
 
@@ -30,8 +31,22 @@ export class Dashboard {
   ) {}
 
   ngOnInit(): void {
+    this.loadTotals();
     this.loadRecentAccounts();
     //this.loadRecentServices();
+  }
+
+  loadTotals(): void{ 
+    // todo: add the other totals
+    this.investmentAccountService.getUserInvestmentAccountTotal(1).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.totalAccounts.set(data);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 
   loadRecentAccounts(): void {

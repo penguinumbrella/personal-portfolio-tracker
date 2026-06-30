@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import { CardModule } from 'primeng/card';
 
 @Component({
@@ -9,8 +9,10 @@ import { CardModule } from 'primeng/card';
 })
 export class MetricCard {
   @Input() title: string ='';
-  @Input() value: string = '';
+  //@Input() value: string = '';
   @Input() icon: string = '';
+
+  data = input<number>(0);
 
 
 }
