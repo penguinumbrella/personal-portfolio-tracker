@@ -1,5 +1,5 @@
 <!--https://v17.primeng.org/table#stateful-->
-<p-table #dt [value]="holdings()"
+<p-table #dt1 [value]="holdings()"
     [globalFilterFields]="['security.tickerSymbol', 'security.name', 'security.sector', 'security.type']" [rows]="10"
     [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
 
