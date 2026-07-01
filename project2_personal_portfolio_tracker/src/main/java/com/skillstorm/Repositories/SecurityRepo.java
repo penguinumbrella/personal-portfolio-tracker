@@ -13,7 +13,9 @@ public interface SecurityRepo extends JpaRepository<Security, Integer> {
 
     long countByUser(User user);
 
-    List<Security> findTop5ByUserIdOrderByDateOpenedDesc(Long userId);
+    List<Security> findTop5ByUserIdDesc(Long userId);
+
+    //List<Security> findTop5ByUserIdOrderByDateOpenedDesc(Long userId); // maybe change this?
 
     Iterable<Security> findById_UserId(int userId);
 

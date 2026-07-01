@@ -68,4 +68,27 @@ export class HoldingService {
                 )
             );
     }
+
+    getUserHoldingTotal(userId: number): Observable<number> {
+            let params = new HttpParams();
+    
+            params = params.set("userId", userId);
+        
+        
+            return this.http.get<number>(this.URL + '/total', {params})   
+                .pipe(
+                    catchError(() => throwError(() => new Error("Failed to load total user holdings.")))
+                );
+        }
+    
+        totalInvestedCost(userId: number): Observable<number> {
+            let params = new HttpParams();
+    
+            params = params.set("userId", userId);
+        
+            return this.http.get<number>(this.URL + '/totalInvestedCost', {params})   
+                .pipe(
+                    catchError(() => throwError(() => new Error("Failed to load total invested cost for specified User.")))
+                );
+        }
 }

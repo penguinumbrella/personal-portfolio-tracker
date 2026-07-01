@@ -13,7 +13,7 @@ export class SecurityService {
 
     getAllSecuritiesByUser(userId?: number): Observable<Security[]> {
         let params = new HttpParams();
-    
+
         if(userId != null) {
             params = params.set("userId", userId);
         }
@@ -42,6 +42,29 @@ export class SecurityService {
         return this.http.delete<void>(this.URL  + `/${id}`)
             .pipe(
                 catchError(() => throwError(() => new Error("Failed to delete Security.")))
+            );
+    }
+
+    getUserSecurityTotal(userId: number): Observable<number> {
+        let params = new HttpParams();
+
+        params = params.set("userId", userId);
+    
+    
+        return this.http.get<number>(this.URL + '/total', {params})   
+            .pipe(
+                catchError(() => throwError(() => new Error("Failed to load total user securities.")))
+            );
+    }
+
+    getRecentSecurities(userId: number): Observable<Security[]> {
+        let params = new HttpParams();
+
+        params = params.set("userId", userId);
+    
+        return this.http.get<Security[]>(this.URL + '/recent', {params})   
+            .pipe(
+                catchError(() => throwError(() => new Error("Failed to load recent Securities for specified User.")))
             );
     }
 }
