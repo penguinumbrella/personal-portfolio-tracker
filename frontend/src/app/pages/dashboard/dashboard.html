@@ -1,12 +1,30 @@
-<div class="dashboard flx flex-row">
+<div class="dashboard flex flex-col">
 
 
     <!-- 4 cards -->
-    <div class="grid flex flex-col">
+    <div class="grid flex flex-row">
 
         <app-metric-card 
             title="Total Accounts" 
             [data]="totalAccounts()" 
+            icon="pi pi-user">
+        </app-metric-card>
+
+        <app-metric-card 
+            title="Total Securities" 
+            [data]="totalSecurities()" 
+            icon="pi pi-user">
+        </app-metric-card>
+
+        <app-metric-card 
+            title="Total Holdings" 
+            [data]="totalHoldings()" 
+            icon="pi pi-user">
+        </app-metric-card>
+
+        <app-metric-card 
+            title="Total Invested Cost" 
+            [data]="totalInvestedCost()" 
             icon="pi pi-user">
         </app-metric-card>
         

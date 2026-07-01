@@ -91,6 +91,6 @@ public class SecurityService {
     }
 
     public List<Security> getRecentAccounts(Long userId) {
-        return repo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
+        return repo.findTop5ByUserIdDesc(userId);
     }
 }

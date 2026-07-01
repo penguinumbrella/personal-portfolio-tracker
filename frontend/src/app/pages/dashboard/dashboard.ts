@@ -3,6 +3,8 @@ import { MetricCard } from '../../components/metric-card/metric-card';
 import { DashboardTable } from '../../components/dashboard-table/dashboard-table';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
+import { HoldingService } from '../../services/HoldingService';
+import { SecurityService } from '../../services/SecurityService';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,6 +16,9 @@ export class Dashboard {
 
   recentAccounts = signal<InvestmentAccount[]>([]);
   totalAccounts = signal<number>(0);
+  totalSecurities = signal<number>(0);
+  totalHoldings = signal<number>(0);
+  totalInvestedCost = signal<number>(0);
   // need securities observer set up
   //rSecurities = signal<Security[]>([]);
 
@@ -27,7 +32,9 @@ export class Dashboard {
    */
 
   constructor(
-    private investmentAccountService: InvestmentAccountService
+    private investmentAccountService: InvestmentAccountService,
+    private holdingService: HoldingService,
+    private securityService: SecurityService
   ) {}
 
   ngOnInit(): void {
@@ -40,13 +47,46 @@ export class Dashboard {
     // todo: add the other totals
     this.investmentAccountService.getUserInvestmentAccountTotal(1).subscribe({
       next: (data) => {
-        //console.log(data);
+
         this.totalAccounts.set(data);
       },
       error: (err) => {
         console.log(err);
       }
     })
+
+    this.securityService.getUserSecurityTotal(1).subscribe({
+      next: (data) => {
+
+        this.totalSecurities.set(data);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+
+    this.holdingService.getUserHoldingTotal(1).subscribe({
+      next: (data) => {
+
+        this.totalHoldings.set(data);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+
+    this.holdingService.totalInvestedCost(1).subscribe({
+      next: (data) => {
+
+        this.totalInvestedCost.set(data);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+
+    
+
   }
 
   loadRecentAccounts(): void {
