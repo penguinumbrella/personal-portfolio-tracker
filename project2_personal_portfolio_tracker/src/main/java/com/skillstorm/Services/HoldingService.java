@@ -1,7 +1,9 @@
 package com.skillstorm.Services;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.HoldingDto;
@@ -56,6 +58,16 @@ public class HoldingService {
     // Read all
     public Iterable<Holding> getAllHoldings() {
         return repo.findAll();
+    }
+
+    // Read all for one account
+    public Iterable<Holding> getAllHoldingsPerAccount(int accountId) {
+        return repo.findById_AccountId(accountId);
+    }
+
+    // Read all for one security
+    public Iterable<Holding> getAllHoldingsPerSecurity(int securityId) {
+        return repo.findById_SecurityId(securityId);
     }
 
     // Read one
@@ -127,7 +139,7 @@ public class HoldingService {
         //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
         return repo.countByAccountUserId(userId);
-        
+
     }
 
     public Long totalInvestedCost(Long userId) {
@@ -135,7 +147,7 @@ public class HoldingService {
         //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
         return repo.totalInvestedCost(userId);
-        
+
     }
 
 }

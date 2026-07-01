@@ -44,6 +44,12 @@ public class SecurityController {
         return ResponseEntity.ok(service.getAllSecurities());
     }
 
+    // Read all per User
+    @GetMapping("/u/{userId}")
+    public ResponseEntity<Iterable<Security>> getAllSecuritiesPerUser(@PathVariable int userId) {
+        return ResponseEntity.ok(service.getAllSecuritiesPerUser(userId));
+    }
+
     // Read one
     @GetMapping("/{id}")
     public ResponseEntity<Security> getSecurity(@PathVariable int id) {

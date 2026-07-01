@@ -78,8 +78,8 @@ class HoldingControllerTest {
 
         // Different User + account + security
         testUser2 = new User(2, "diff", "diff@test.com", "diff");
-        testAccount2 = new InvestmentAccount(2, "Account Two", InvestmentType.HSA, "test2", Date.valueOf("2035-06-25"),
-                testUser2);
+                testAccount2 = new InvestmentAccount(2, "Account Two", InvestmentType.HSA, "test2",
+                                Date.valueOf("2035-06-25"), testUser2);
         testSecurity2 = new Security(2, "xyz", "Security Two", SectorType.ENERGY, SecurityType.ETF,
                 "two", testUser2);
 

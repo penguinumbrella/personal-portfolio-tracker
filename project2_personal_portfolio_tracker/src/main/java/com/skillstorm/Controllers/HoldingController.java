@@ -46,6 +46,18 @@ public class HoldingController {
         return ResponseEntity.ok(service.getAllHoldings());
     }
 
+    // Read all for one account
+    @GetMapping("/a/{accountId}")
+    public ResponseEntity<Iterable<Holding>> getAllHoldingsPerAccount(@PathVariable int accountId) {
+        return ResponseEntity.ok(service.getAllHoldingsPerAccount(accountId));
+    }
+
+    // Read all for one security
+    @GetMapping("/s/{securityId}")
+    public ResponseEntity<Iterable<Holding>> getAllHoldingsPerSecurity(@PathVariable int securityId) {
+        return ResponseEntity.ok(service.getAllHoldingsPerSecurity(securityId));
+    }
+
     // Read one
     @GetMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> getHolding(@PathVariable int accountId,

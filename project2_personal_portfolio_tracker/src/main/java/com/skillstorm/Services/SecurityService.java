@@ -3,7 +3,10 @@ package com.skillstorm.Services;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
@@ -43,6 +46,11 @@ public class SecurityService {
         return repo.findAll();
     }
 
+    // Read all per User
+    public Iterable<Security> getAllSecuritiesPerUser(int userId) {
+        return repo.findById_UserId(userId);
+    }
+
     // Read one
     public Security getSecurity(int id) {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -77,9 +85,9 @@ public class SecurityService {
 
     public Long UserSecurityAccountTotal(int userId) {
         User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
         return repo.countByUser(user);
-        
+
     }
 
     public List<Security> getRecentAccounts(Long userId) {
