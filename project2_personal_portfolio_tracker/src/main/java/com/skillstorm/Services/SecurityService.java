@@ -1,16 +1,10 @@
 package com.skillstorm.Services;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
-import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
@@ -48,7 +42,7 @@ public class SecurityService {
 
     // Read all per User
     public Iterable<Security> getAllSecuritiesPerUser(int userId) {
-        return repo.findById_UserId(userId);
+        return repo.findByUser_Id(userId);
     }
 
     // Read one
@@ -90,7 +84,7 @@ public class SecurityService {
 
     }
 
-    public List<Security> getRecentAccounts(Long userId) {
-        return repo.findTop5ByUserIdDesc(userId);
-    }
+    // public List<Security> getRecentAccounts(Long userId) {
+    //     return repo.findTop5ByUserIdDesc(userId);
+    // }
 }
