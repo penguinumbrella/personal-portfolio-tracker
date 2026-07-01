@@ -1,86 +1,72 @@
 <!--https://v17.primeng.org/table#stateful-->
-<p-table #dt1 [value]="holdings()"
-    [globalFilterFields]="['security.tickerSymbol', 'security.name', 'security.sector', 'security.type']" [rows]="10"
-    [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
+<!---<p-table #dt1 [value]="holdings()"
+    [globalFilterFields]="['security.tickerSymbol', 'security.name', 'security.sector', 'security.type', 'holding.shares', 'holding.costPerShare', 'holding.purchaseDate']"
+    [rows]="5" [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
 
     <ng-template pTemplate="caption">
-        <p-iconField iconPosition="left">
-            <p-inputIcon>
-                <i class="pi pi-search"></i>
-            </p-inputIcon>
-            <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
-                placeholder="Global Search" />
-        </p-iconField>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <p-iconField iconPosition="left">
+                <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Search holdings..." />
+            </p-iconField>
+            <p-button label="Add holding" icon="pi pi-plus" (onClick)="onAdd.emit()" />
+        </div>
     </ng-template>
+
     <ng-template pTemplate="header">
         <tr>
-            <th pSortableColumn="name" style="width:25%">
-                Name <p-sortIcon field="name" />
+            <th pSortableColumn="security.tickerSymbol">
+                Ticker <p-sortIcon field="security.tickerSymbol" />
             </th>
-            <th pSortableColumn="country.name" style="width:25%">
-                Country <p-sortIcon field="country.name" />
+            <th pSortableColumn="security.name">
+                Name <p-sortIcon field="security.name" />
             </th>
-            <th pSortableColumn="representative.name" style="width:25%">
-                Representative <p-sortIcon field="representative.name" />
+            <th pSortableColumn="security.type">
+                Type <p-sortIcon field="security.type" />
             </th>
-            <th pSortableColumn="status" style="width:25%">
-                Status <p-sortIcon field="status" />
+            <th pSortableColumn="security.sector">
+                Sector <p-sortIcon field="security.sector" />
             </th>
+            <th pSortableColumn="shares">
+                Shares <p-sortIcon field="shares" />
+            </th>
+            <th pSortableColumn="costPerShare">
+                Cost/share <p-sortIcon field="costPerShare" />
+            </th>
+            <th pSortableColumn="purchaseDate">
+                Purchase date <p-sortIcon field="purchaseDate" />
+            </th>
+            <th style="width: 80px"></th>
         </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-customer>
-        <tr [pSelectableRow]="customer">
+
+    <ng-template pTemplate="body" let-holding>
+        <tr>
+            <td><strong>{{ holding.security.tickerSymbol }}</strong></td>
+            <td>{{ holding.security.name }}</td>
             <td>
-                <span class="p-column-title">Name</span>
-                {{ customer.name }}
+                <app-type-pill [type]="holding.security.type" />
             </td>
+            <td>{{ holding.security.sector }}</td>
+            <td>{{ holding.numShares }}</td>
+            <td>{{ holding.costPerShare | currency }}</td>
+            <td>{{ holding.purchaseDate | date:'mediumDate' }}</td>
             <td>
-                <span class="p-column-title">Country</span>
-                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png"
-                    [class]="'flag flag-' + customer.country.code" style="width: 20px" />
-                <span class="ml-1 vertical-align-middle">{{ customer.country.name }}</span>
-            </td>
-            <td>
-                <span class="p-column-title">Representative</span>
-                <img [alt]="customer.representative.name"
-                    src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}"
-                    width="32" style="vertical-align: middle" />
-                <span class="ml-1 vertical-align-middle">{{ customer.representative.name }}</span>
-            </td>
-            <td>
-                <span class="p-column-title">Status</span>
-                <p-tag [value]="customer.status" [severity]="getSeverity(customer.status)" />
-            </td>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-customer>
-        <tr [pSelectableRow]="customer">
-            <td>
-                <span class="p-column-title">Name</span>
-                {{ customer.name }}
-            </td>
-            <td>
-                <span class="p-column-title">Country</span>
-                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png"
-                    [class]="'flag flag-' + customer.country.code" style="width: 20px" />
-                <span class="ml-1 vertical-align-middle">{{ customer.country.name }}</span>
-            </td>
-            <td>
-                <span class="p-column-title">Representative</span>
-                <img [alt]="customer.representative.name"
-                    src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}"
-                    width="32" style="vertical-align: middle" />
-                <span class="ml-1 vertical-align-middle">{{ customer.representative.name }}</span>
-            </td>
-            <td>
-                <span class="p-column-title">Status</span>
-                <p-tag [value]="customer.status" [severity]="getSeverity(customer.status)" />
+                <div style="display: flex; gap: 4px;">
+                    <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="onEdit.emit(holding)" />
+                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="onDelete.emit(holding)" />
+                </div>
             </td>
         </tr>
     </ng-template>
+
     <ng-template pTemplate="emptymessage">
         <tr>
-            <td colspan="4">No customers found.</td>
+            <td colspan="8">No holdings found.</td>
         </tr>
     </ng-template>
-</p-table>
+
+</p-table>-->

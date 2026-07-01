@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TableModule } from 'primeng/table';
 
 import { HoldingTable } from './holding-table';
 
