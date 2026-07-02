@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DetailSidebar } from './detail-sidebar';
+import { UserModal } from './user-modal';
 
-describe('DetailSidebar', () => {
-  let component: DetailSidebar;
-  let fixture: ComponentFixture<DetailSidebar>;
+describe('UserModal', () => {
+  let component: UserModal;
+  let fixture: ComponentFixture<UserModal>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DetailSidebar],
+      imports: [UserModal],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DetailSidebar);
+    fixture = TestBed.createComponent(UserModal);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

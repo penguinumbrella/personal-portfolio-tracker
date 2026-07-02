@@ -1,0 +1,26 @@
+<p-dialog
+    header="Edit User Profile"
+    [modal]="true"
+    [visible]="visible()"
+    [appendTo]="'body'"
+>
+
+    <ng-template #footer>
+
+        <!-- fire off events when buttons are clicked -->
+        <p-button 
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cancelled.emit()"
+        />
+
+        <p-button 
+            label="Update"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="confirmed.emit()"
+        />
+
+    </ng-template>
+</p-dialog>
