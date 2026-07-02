@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { environment } from "../environments/environment";
+import { environment } from "../../environments/environments";
 import { catchError, Observable, throwError } from "rxjs";
 import { Holding } from "../types/Holding";
 import { HoldingId } from "../types/HoldingId";
