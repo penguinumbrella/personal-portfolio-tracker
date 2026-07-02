@@ -9,6 +9,7 @@ import { DrawerModule } from 'primeng/drawer';
 })
 export class Sidebar {
   visible: boolean = false;
+  isExpanded: boolean = false;
 
   onClose() {
     this.visible = false;
@@ -16,5 +17,6 @@ export class Sidebar {
 
   toggleSidebar() {
     this.visible = !this.visible;
+    this.isExpanded = this.visible;
   }
 }
