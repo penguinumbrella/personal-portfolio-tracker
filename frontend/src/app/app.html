@@ -1,15 +1,46 @@
-<div class="flex flex-col">
+<mat-sidenav-container class="app-container">
+  <mat-sidenav #sidenav mode="side" opened>
+    <!-- nav links here -->
+    <div class="p-4">
+        <ul class="list-none">
+            <li class="mb-2">
+                <a 
+                routerLink="/dashboard" 
+                class="flex items-center p-2 rounded-lg cursor-pointer"
+                >
+                    <i class="pi pi-home mr-2"></i> 
+                    Dashboard
+                </a>
+            </li>
+            <li class="mb-2">
+                <a 
+                routerLink="/projects" routerLinkActive="font-bold text-primary" 
+                class="flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="pi pi-user mr-2"></i> Accounts
+                </a>
+            </li>
+            <li class="mb-2">
+                <a routerLink="/settings" routerLinkActive="font-bold text-primary" 
+                class="flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="pi pi-lock mr-2"></i> Securities
+                </a>
+            </li>
+        </ul>
+    </div>
+  </mat-sidenav>
 
 
-    <app-user-handle>
+  <mat-sidenav-content>
+    <div class="flex flex-col">
+        <div class="flex flex-row justify-between p-5">
+            <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
+                <i class="pi pi-bars"></i>
+            </button>
+            <app-user-handle></app-user-handle>
             
-    </app-user-handle>
-</div>
-
-
-<!-- 
-    Based on whatever path your URL is currently at in the browser, 
-    Angular Router will input the corresponding component at router-outlet 
-    in your app
--->
-<router-outlet />
+            
+      </div>
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

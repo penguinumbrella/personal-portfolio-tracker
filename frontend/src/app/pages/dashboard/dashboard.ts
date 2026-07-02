@@ -6,6 +6,8 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
 
+
+
 @Component({
   selector: 'app-dashboard',
   imports: [MetricCard, DashboardTable],

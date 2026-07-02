@@ -1,11 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Sidebar } from './components/sidebar/sidebar';
 import { UserHandle } from './components/user-handle/user-handle';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, UserHandle],
+  imports: [RouterOutlet, UserHandle, MatSidenavModule, MatButtonModule, MatIconModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
