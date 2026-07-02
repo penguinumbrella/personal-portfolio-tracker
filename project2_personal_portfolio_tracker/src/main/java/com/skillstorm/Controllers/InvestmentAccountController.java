@@ -16,11 +16,10 @@ import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Services.InvestmentAccountService;
 
-import io.micrometer.core.ipc.http.HttpSender.Response;
-
 @RestController
 @RequestMapping("/v1/investments")
-//@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
+@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
+        "http://localhost:4200" })
 public class InvestmentAccountController {
 
     private final InvestmentAccountService service;
@@ -56,7 +55,6 @@ public class InvestmentAccountController {
 
         InvestmentAccount investmentAccount = service.updateAccount(id, dto);
 
-
         return ResponseEntity.status(200).body(investmentAccount);
     }
 
@@ -78,6 +76,5 @@ public class InvestmentAccountController {
             @RequestParam(required = true) Long userId) {
         return ResponseEntity.status(200).body(service.getRecentAccounts(userId));
     }
-    
 
 }

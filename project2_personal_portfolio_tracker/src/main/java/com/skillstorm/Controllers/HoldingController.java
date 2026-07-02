@@ -25,7 +25,8 @@ import com.skillstorm.Services.HoldingService;
 //TODO cross will need to change
 @RestController
 @RequestMapping("/v1/holdings")
-@CrossOrigin({ "http://127.0.0.1:5500", "http://localhost:4200" })
+@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
+        "http://localhost:4200" })
 public class HoldingController {
     private final HoldingService service;
 

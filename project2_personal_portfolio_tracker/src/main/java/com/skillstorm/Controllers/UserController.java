@@ -14,12 +14,11 @@ import com.skillstorm.Models.User;
 import com.skillstorm.Services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/v1/users")
-//@CrossOrigin(origins = "http://127.0.0.1:5500") // TODO: CHANGE THIS
+@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
+        "http://localhost:4200" })
 public class UserController {
 
     private final UserService service;
@@ -44,41 +43,40 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<User> registerUser(
-        @RequestBody UserDto dto) {
+            @RequestBody UserDto dto) {
 
-            return ResponseEntity.status(201).body(service.registerUser(dto));
-        }
-    
+        return ResponseEntity.status(201).body(service.registerUser(dto));
+    }
+
     // VIEW PROFILE
     @GetMapping("/{id}")
     public ResponseEntity<User> viewProfile(
-        @PathVariable int id) {
+            @PathVariable int id) {
         User user = service.viewProfile(id);
         return ResponseEntity.ok(user);
     }
-    
+
     // EDIT PROFILE
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateProfile(
-        @PathVariable int id,
-        @RequestBody UserDto dto) {
-            User user = service.updateProfile(id, dto);
-            return ResponseEntity.status(200).body(user);
+            @PathVariable int id,
+            @RequestBody UserDto dto) {
+        User user = service.updateProfile(id, dto);
+        return ResponseEntity.status(200).body(user);
 
-        }
-    
+    }
+
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(
             @PathVariable int id) {
-        
+
         return ResponseEntity.noContent().build();
     }
 
     // USER LOGIN (TODO)
     // USER LOGOUT (TODO)
     // DATA SCOPING?
-
 
 }
