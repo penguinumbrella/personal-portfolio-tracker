@@ -1,5 +1,13 @@
-<!--<app-account-detail [items]="accounts" (selected)="onAccountSelect($event)" />
-<app-topbar [title]="account.nickname" [badge]="account.accountType" />
-<app-metric-card [metrics]="accountMetrics" />
-<app-detail-card [fields]="accountFields" (onEdit)="editAccount()" (onDelete)="deleteAccount()" />
-<app-holding-table [holdings]="holdings" (onAdd)="addHolding()" />-->
+<div class="page-layout">
+
+    <!--add total holdings metric card-->>
+    <!--add metric cards-->>
+    <!--add metric cards-->>
+
+    <!--add account detail card-->
+
+
+    <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
+        (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
+
+</div>
