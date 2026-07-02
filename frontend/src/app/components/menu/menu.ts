@@ -11,7 +11,7 @@ import { MenuItem } from 'primeng/api';
 export class Menu {
   items: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', routerLink: '/dashboard' },
-    { label: 'Accounts', icon: 'pi pi-user', routerLink: '/projects' },
-    { label: 'Securities', icon: 'pi pi-lock', routerLink: '/settings' }
+    { label: 'Accounts', icon: 'pi pi-user', routerLink: '/accounts' },
+    { label: 'Securities', icon: 'pi pi-lock', routerLink: '/securities' }
   ];
 }

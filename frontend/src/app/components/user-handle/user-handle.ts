@@ -2,17 +2,19 @@ import { Component, signal } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
 import { User } from '../../types/User';
 import { UserService } from '../../services/UserService';
+import { UserModal } from '../user-modal/user-modal';
 
 
 @Component({
   selector: 'app-user-handle',
-  imports: [AvatarModule],
+  imports: [AvatarModule, UserModal],
   templateUrl: './user-handle.html',
   styleUrl: './user-handle.css',
 })
 export class UserHandle {
 
   currentUser = signal<User | null>(null); 
+  isModalVisible = signal<boolean>(false);
 
   constructor(
     private userService: UserService
@@ -36,5 +38,17 @@ export class UserHandle {
     })
   }
 
+  openModal(): void {
+    this.isModalVisible.set(true);
+  }
+
+  closeModal(): void {
+    this.isModalVisible.set(false);
+  }
+
+  handleConfirm(): void {
+    console.log('handle confirmed called');
+    this.closeModal();
+  }
   
 }
