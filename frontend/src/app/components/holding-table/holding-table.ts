@@ -1,47 +1,33 @@
-import { Component, signal } from '@angular/core';
-import { TableLazyLoadEvent, TableModule } from "primeng/table";
+import { Component, Input, Output, EventEmitter, input, output } from '@angular/core';
+import { TableModule } from 'primeng/table';
+import { Button } from 'primeng/button';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
 import { Holding } from '../../types/Holding';
-import { HoldingService } from '../../services/HoldingService';
-import { Button } from "primeng/button";
 
 @Component({
   selector: 'app-holding-table',
-  imports: [TableModule, Button],
+  imports: [
+    TableModule,
+    Button,
+    CurrencyPipe,
+    DatePipe,
+    IconFieldModule,
+    InputIconModule,
+    InputTextModule,
+  ],
   templateUrl: './holding-table.html',
   styleUrl: './holding-table.css',
 })
 export class HoldingTable {
+  holdings = input<Holding[]>([]);
+  tableMode = input<'byAccount' | 'bySecurity'>('byAccount');
 
-  holdings = signal<Holding[]>([]);
-  loading = signal<boolean>(false);
+  onAdd = output<void>();
+  onEdit = output<Holding>();
+  onDelete = output<Holding>();
 
-  constructor(
-    private holdingService: HoldingService
-  ){}
-
-
-  ngOnInit() {
-    this.loadHoldings();
-  }
-
-  loadHoldings(event? : TableLazyLoadEvent) {
-    
-    const page = event ? event?.first! / event?.rows! : 0;
-    const size = event ? event?.rows! : 2;
-
-    // show loading spinner while request to backend is being made
-    this.loading.set(true);
-
-    // this.holdingService.getHoldingsPage(page, size).subscribe({
-    //   next: (data) => {
-    //     this.holdings.set(data.content);
-    //     this.loading.set(false);
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //   }
-    // })
-
-  }
-
+  // Used by two pages to load different data, so they handle loading
 }

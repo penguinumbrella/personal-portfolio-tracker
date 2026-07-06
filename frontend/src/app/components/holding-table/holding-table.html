@@ -1,37 +1,28 @@
 <!--https://v17.primeng.org/table#stateful-->
-<!---<p-table #dt1 [value]="holdings()"
-    [globalFilterFields]="['security.tickerSymbol', 'security.name', 'security.sector', 'security.type', 'holding.shares', 'holding.costPerShare', 'holding.purchaseDate']"
-    [rows]="5" [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
+<p-table #dt [value]="holdings()"
+    [globalFilterFields]="['security.name', 'account.nickname', 'numShares', 'costPerShare', 'purchaseDate']" [rows]="5"
+    [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
 
+    <!--Table top, has add new and search features-->
     <ng-template pTemplate="caption">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <p-iconField iconPosition="left">
                 <p-inputIcon>
                     <i class="pi pi-search"></i>
                 </p-inputIcon>
-                <input pInputText type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')"
+                <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
                     placeholder="Search holdings..." />
             </p-iconField>
             <p-button label="Add holding" icon="pi pi-plus" (onClick)="onAdd.emit()" />
         </div>
     </ng-template>
 
+    <!--Table Data column headers-->
     <ng-template pTemplate="header">
         <tr>
-            <th pSortableColumn="security.tickerSymbol">
-                Ticker <p-sortIcon field="security.tickerSymbol" />
-            </th>
-            <th pSortableColumn="security.name">
-                Name <p-sortIcon field="security.name" />
-            </th>
-            <th pSortableColumn="security.type">
-                Type <p-sortIcon field="security.type" />
-            </th>
-            <th pSortableColumn="security.sector">
-                Sector <p-sortIcon field="security.sector" />
-            </th>
-            <th pSortableColumn="shares">
-                Shares <p-sortIcon field="shares" />
+            <th>{{ tableMode() === 'byAccount' ? 'Security' : 'Account' }}</th>
+            <th pSortableColumn="numShares">
+                Shares <p-sortIcon field="numShares" />
             </th>
             <th pSortableColumn="costPerShare">
                 Cost/share <p-sortIcon field="costPerShare" />
@@ -43,15 +34,18 @@
         </tr>
     </ng-template>
 
+    <!--Table body-->
     <ng-template pTemplate="body" let-holding>
         <tr>
-            <td><strong>{{ holding.security.tickerSymbol }}</strong></td>
-            <td>{{ holding.security.name }}</td>
             <td>
-                <app-type-pill [type]="holding.security.type" />
+                @if (tableMode() === 'byAccount') {
+                {{ holding.security?.name }}
+                } @else {
+                {{ holding.account?.nickname }}
+                }
             </td>
-            <td>{{ holding.security.sector }}</td>
             <td>{{ holding.numShares }}</td>
+            <!-- Build in primeng pipes i found to format-->
             <td>{{ holding.costPerShare | currency }}</td>
             <td>{{ holding.purchaseDate | date:'mediumDate' }}</td>
             <td>
@@ -65,8 +59,8 @@
 
     <ng-template pTemplate="emptymessage">
         <tr>
-            <td colspan="8">No holdings found.</td>
+            <td colspan="5">No holdings found.</td>
         </tr>
     </ng-template>
 
-</p-table>-->
+</p-table>
