@@ -8,6 +8,7 @@ import { HoldingService } from '../../services/HoldingService';
 import { Holding } from '../../types/Holding';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { TableLazyLoadEvent } from 'primeng/types/table';
+import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 
 @Component({
   selector: 'app-account-detail',
@@ -19,6 +20,7 @@ export class AccountDetail {
   holdings = signal<Holding[]>([]);
   account = signal<InvestmentAccount | null>(null);
   loading = signal<boolean>(false);
+  accountFields = signal<{ label: string; value: any }[]>([]);
 
   constructor(
     private route: ActivatedRoute,
@@ -26,7 +28,7 @@ export class AccountDetail {
   ) {}
 
   ngOnInit() {
-    // Use ActivatedRoute to get the accountId from url params
+    //Use ActivatedRoute to get the accountId from url params
     const accountId = Number(this.route.snapshot.params['accountId']);
     this.loadHoldings(accountId);
   }
@@ -41,8 +43,11 @@ export class AccountDetail {
     //TODO make this paginated??
     this.holdingService.getAllHoldingsPerAccount(accountId).subscribe({
       next: (data) => {
+        console.log('data:', data);
         this.holdings.set(data);
         this.loading.set(false);
+        this.account.set(this.holdings()[0].account);
+        this.buildAccountFields();
       },
       error: (error) => {
         console.error('Error loading holdings:', error);
@@ -50,13 +55,24 @@ export class AccountDetail {
     });
   }
 
-  accounts: any;
+  // build the fields for the detail card
+  buildAccountFields(): void {
+    const a = this.account();
+    console.log('Account:', a);
+    if (!a) return;
+    this.accountFields.set([
+      { label: 'Institution', value: a.institutionName },
+      { label: 'Account type', value: a.accountType },
+      { label: 'Nickname', value: a.nickname },
+      { label: 'Opened', value: a.dateOpened },
+    ]);
+  }
+
   onAccountSelect($event: Event) {
+    // TODO load new account when selected
     throw new Error('Method not implemented.');
   }
 
-  accountMetrics: any;
-  accountFields: any;
   editAccount() {
     throw new Error('Method not implemented.');
   }
@@ -74,7 +90,20 @@ export class AccountDetail {
   }
 
   deleteHolding(holding: Holding): void {
-    throw new Error('Method not implemented.');
-    // remember to also reload metrics
+    // TODO reload metrics
+    // TODO add modal to confirm deletion
+
+    this.holdingService.deleteHolding(holding.id).subscribe({
+      next: () => {
+        this.holdings.update((current) =>
+          current.filter(
+            (h) =>
+              h.id?.accountId !== holding.id?.accountId ||
+              h.id?.securityId !== holding.id?.securityId,
+          ),
+        );
+      },
+      error: (err) => console.error(err),
+    });
   }
 }

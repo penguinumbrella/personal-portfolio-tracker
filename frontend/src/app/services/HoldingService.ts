@@ -19,7 +19,7 @@ export class HoldingService {
     }
 
     return this.http
-      .get<Holding[]>(this.URL + `/a`, { params })
+      .get<Holding[]>(this.URL + `/a` + `/${accountId}`, { params })
       .pipe(
         catchError(() =>
           throwError(() => new Error('Failed to load Holdings for specified Holding Account.')),
@@ -35,7 +35,7 @@ export class HoldingService {
     }
 
     return this.http
-      .get<Holding[]>(this.URL + `/s`, { params })
+      .get<Holding[]>(this.URL + `/s` + `/${securityId}`, { params })
       .pipe(
         catchError(() =>
           throwError(() => new Error('Failed to load Holdings for specified Security.')),

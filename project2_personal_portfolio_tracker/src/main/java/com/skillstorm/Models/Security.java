@@ -29,10 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class, 
-    property = "id"
-)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "security", schema = "portfolio")
 public class Security {
 
@@ -61,7 +58,7 @@ public class Security {
     private String generalNotes;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "securities" })
+    @JsonIgnoreProperties(value = { "securities", "investmentAccounts", "holdings" })
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

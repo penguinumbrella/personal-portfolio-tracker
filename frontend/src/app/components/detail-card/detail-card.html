@@ -1,1 +1,22 @@
-<p>detail-card works!</p>
+<p-card>
+    <ng-template pTemplate="header">
+        <div class="card-header">
+            <span class="card-title">{{ title }}</span>
+            <div class="card-actions">
+                <p-button icon="pi pi-pencil" label="Edit" [text]="true" severity="secondary"
+                    (onClick)="onEdit.emit()" />
+                <p-button icon="pi pi-trash" label="Delete" [text]="true" severity="danger"
+                    (onClick)="onDelete.emit()" />
+            </div>
+        </div>
+    </ng-template>
+
+    <div class="fields-grid">
+        @for (field of fields(); track field.label) {
+        <div class="field-row">
+            <span class="field-label">{{ field.label }}</span>
+            <span class="field-value">{{ field.value }}</span>
+        </div>
+        }
+    </div>
+</p-card>

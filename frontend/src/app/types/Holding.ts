@@ -1,10 +1,10 @@
-import { HoldingId } from "./HoldingId";
+import { HoldingId } from './HoldingId';
+import { InvestmentAccount } from './InvestmentAccounts';
 
 export interface Holding {
-    id: HoldingId;
-
-    numShares: number;
-    costPerShare: number;
-    purchaseDate: number;    
-    
+  account: InvestmentAccount;
+  id: HoldingId;
+  shares: number;
+  costPerShare: number;
+  purchaseDate: number;
 }
