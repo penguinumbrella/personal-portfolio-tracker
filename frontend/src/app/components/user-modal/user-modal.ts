@@ -2,9 +2,12 @@ import { Component, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
+import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+
+
 @Component({
   selector: 'app-user-modal',
-  imports: [DialogModule, ButtonModule],
+  imports: [DialogModule, ButtonModule, ReactiveFormsModule],
   templateUrl: './user-modal.html',
   styleUrl: './user-modal.css',
 })
@@ -25,6 +28,7 @@ export class UserModal {
   // creating values that need to be passed in by the parent
   visible = input.required<boolean>();
   recordName = input.required<string>();
+  form = input.required<FormGroup>();
   
 
   // creating events for when the deletion is confirmed or cancelled - needs to be handled by parent

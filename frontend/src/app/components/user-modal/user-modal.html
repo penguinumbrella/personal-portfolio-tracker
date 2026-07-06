@@ -5,6 +5,14 @@
     [appendTo]="'body'"
 >
 
+<form [formGroup]="form()">
+    <!-- Example form field -->
+    <input formControlName="username" pInputText />
+    <!-- ... other fields ... -->
+  </form>
+
+
+
     <ng-template #footer>
 
         <!-- fire off events when buttons are clicked -->
@@ -20,6 +28,7 @@
             severity="primary"
             [outlined]="true"
             (onClick)="confirmed.emit()"
+            
         />
 
     </ng-template>
