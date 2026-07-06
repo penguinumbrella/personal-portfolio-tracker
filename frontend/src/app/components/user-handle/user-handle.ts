@@ -3,6 +3,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { User } from '../../types/User';
 import { UserService } from '../../services/UserService';
 import { UserModal } from '../user-modal/user-modal';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
@@ -16,12 +17,19 @@ export class UserHandle {
   currentUser = signal<User | null>(null); 
   isModalVisible = signal<boolean>(false);
 
+  form! : FormGroup;
+
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private formBuilder: FormBuilder
   ){}
 
   ngOnInit(): void {
     this.loadUser();
+
+    this.form = this.formBuilder.group({
+      username: ["", [Validators.required, Validators.minLength(2)]]
+    });
   }
 
   loadUser(): void {
