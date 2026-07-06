@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 
-import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
 import { MetricCard } from '../../components/metric-card/metric-card';
@@ -8,7 +8,6 @@ import { HoldingService } from '../../services/HoldingService';
 import { Holding } from '../../types/Holding';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { TableLazyLoadEvent } from 'primeng/types/table';
-import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 
 @Component({
   selector: 'app-account-detail',
@@ -58,11 +57,10 @@ export class AccountDetail {
   // build the fields for the detail card
   buildAccountFields(): void {
     const a = this.account();
-    console.log('Account:', a);
     if (!a) return;
     this.accountFields.set([
       { label: 'Institution', value: a.institutionName },
-      { label: 'Account type', value: a.accountType },
+      { label: 'Account Type', value: a.accountType },
       { label: 'Nickname', value: a.nickname },
       { label: 'Opened', value: a.dateOpened },
     ]);

@@ -7,7 +7,7 @@
     </app-metric-card>-->
 
     <!--add account detail card-->
-    <app-detail-card title="Account details" [fields]="accountFields()" (onEdit)="editAccount()"
+    <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
         (onDelete)="deleteAccount()" />
 
     <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"

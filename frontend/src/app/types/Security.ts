@@ -8,6 +8,6 @@ export interface Security {
   tickerSymbol: string;
   name: string;
   sector: Sector;
-  securityType: SecurityType;
+  type: SecurityType;
   generalNotes: string;
 }

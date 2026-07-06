@@ -1,1 +1,16 @@
-<p>security-detail works!</p>
+<div class="page-layout">
+
+    <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy">
+    </app-metric-card>
+
+    <!-- TODO neeed to create this method. In securitys? <app-metric-card title="Total Invested Cost" [data]="totalInvestedCostSecurity()" icon="pi pi-dollar">
+    </app-metric-card>-->
+
+    <!--add security detail card-->
+    <app-detail-card title="Security Details" [fields]="securityFields()" (onEdit)="editSecurity()"
+        (onDelete)="deleteSecurity()" />
+
+    <app-holding-table [holdings]="holdings()" [tableMode]="'bySecurity'" (onAdd)="addHolding()"
+        (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
+
+</div>
