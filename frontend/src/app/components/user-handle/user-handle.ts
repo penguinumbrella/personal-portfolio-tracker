@@ -28,7 +28,9 @@ export class UserHandle {
     this.loadUser();
 
     this.form = this.formBuilder.group({
-      username: ["", [Validators.required, Validators.minLength(2)]]
+      username: ["", [Validators.required, Validators.minLength(2)]],
+      password: ["", [Validators.required, Validators.minLength(6)]],
+      email: ["", [Validators.required, Validators.email]],
     });
   }
 
@@ -54,9 +56,19 @@ export class UserHandle {
     this.isModalVisible.set(false);
   }
 
-  handleConfirm(): void {
-    console.log('handle confirmed called');
-    this.closeModal();
+  async saveUser(formData: any) {
+    console.log(this.currentUser());
+    const updatedUser: User = { ...this.currentUser(), ...formData };
+
+    this.userService.updateUser(updatedUser.id!, updatedUser).subscribe({
+      next: (response) => {
+        console.log('User updated successfully', response);
+        this.isModalVisible.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
   }
   
 }

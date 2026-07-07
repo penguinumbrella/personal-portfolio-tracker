@@ -1,10 +1,13 @@
 package com.skillstorm.Services;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
@@ -84,7 +87,9 @@ public class SecurityService {
 
     }
 
-    // public List<Security> getRecentAccounts(Long userId) {
-    //     return repo.findTop5ByUserIdDesc(userId);
-    // }
+    public List<Security> getRecentSecurities(Long userId) {
+        System.out.println("Getting recent securities for userId: " + userId);
+        return repo.findTop5ByUser_IdOrderByIdDesc(userId);
+    }
+
 }

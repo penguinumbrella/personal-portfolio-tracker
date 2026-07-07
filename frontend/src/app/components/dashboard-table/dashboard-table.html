@@ -1,4 +1,6 @@
-<p-card [header]="title">
+<a routerLink="/your-target-path" class="block cursor-pointer hover:shadow-lg transition-shadow duration-200">
+<p-card 
+  [header]="title">
   <p-table [value]="data()">
     <ng-template pTemplate="header">
       <tr>
@@ -16,3 +18,4 @@
     </ng-template>
   </p-table>
 </p-card>
+</a>

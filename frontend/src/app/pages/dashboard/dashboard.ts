@@ -5,6 +5,7 @@ import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
+import { Security } from '../../types/Security';
 
 
 
@@ -17,6 +18,7 @@ import { SecurityService } from '../../services/SecurityService';
 export class Dashboard {
 
   recentAccounts = signal<InvestmentAccount[]>([]);
+  recentSecurities = signal<Security[]>([]);
   totalAccounts = signal<number>(0);
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
@@ -42,6 +44,7 @@ export class Dashboard {
   ngOnInit(): void {
     this.loadTotals();
     this.loadRecentAccounts();
+    this.loadRecentSecurities();
     //this.loadRecentServices();
   }
 
@@ -102,14 +105,21 @@ export class Dashboard {
       }
     })
   }
+
+  loadRecentSecurities(): void {
+    this.securityService.getRecentSecurities(1).subscribe({
+      next: (data) => {
+        //console.log(data);
+        this.recentSecurities.set(data);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
   
   // recentAccounts = [
   //   { name: "Brokerage", date: "10-21-26", totalAmount: "$24,000" },
   //   { name: "IRA", date: "10-21-26", totalAmount: "$28,000" }
   // ];
-  
-  recentSecurities = [
-    { name: 'AAPL' },
-    { name: 'TSLA' }
-  ];
 }

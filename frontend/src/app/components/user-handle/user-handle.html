@@ -13,9 +13,9 @@
     </div>
 
     <app-user-modal
-        [visible]="isModalVisible()"
+        [(visible)]="isModalVisible"
         [recordName]="user.username"
-        (confirmed)="handleConfirm()"
+        (confirmed)="saveUser($event)"
         (cancelled)="closeModal()"
         [form]="form"
         >

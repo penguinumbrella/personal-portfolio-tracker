@@ -11,4 +11,6 @@ import { TableModule } from 'primeng/table';
 export class DashboardTable {
   @Input() title: string = '';
   data = input<any[]>([]);
+
+  
 }

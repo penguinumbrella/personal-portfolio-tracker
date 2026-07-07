@@ -5,9 +5,22 @@
     [appendTo]="'body'"
 >
 
-<form [formGroup]="form()">
+<form [formGroup]="form()" class="flex flex-col">
     <!-- Example form field -->
-    <input formControlName="username" pInputText />
+    <p-floatLabel>
+        <input pInputText id="username" formControlName="username" />
+        <label for="username">Username</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input pInputText id="password" type="password" formControlName="password" />
+        <label for="password">Password</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input pInputText id="email" formControlName="email" />
+        <label for="email">Email</label>
+    </p-floatLabel>
     <!-- ... other fields ... -->
   </form>
 
@@ -27,8 +40,7 @@
             label="Update"
             severity="primary"
             [outlined]="true"
-            (onClick)="confirmed.emit()"
-            
+            (onClick)="onUpdate()"
         />
 
     </ng-template>
