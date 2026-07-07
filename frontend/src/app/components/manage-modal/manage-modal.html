@@ -1,1 +1,47 @@
-<p>manage-modal works!</p>
+<p-dialog
+    header="Add Investment Account"
+    [modal]="true"
+    [visible]="visible()"
+    [appendTo]="'body'"
+>
+
+<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
+    <!-- Example form field -->
+    <p-floatLabel>
+        <input pInputText id="nickname" formControlName="nickname" />
+        <label for="nickname">Nickname</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input pInputText id="accountName" type="password" formControlName="password" />
+        <label for="password">Password</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input pInputText id="email" formControlName="email" />
+        <label for="email">Email</label>
+    </p-floatLabel>
+    <!-- ... other fields ... -->
+  </form>
+
+
+
+    <ng-template #footer>
+
+        <!-- fire off events when buttons are clicked -->
+        <p-button 
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cancelled.emit()"
+        />
+
+        <p-button 
+            label="Update"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="onUpdate()"
+        />
+
+    </ng-template>
+</p-dialog>
