@@ -39,14 +39,12 @@ public class Holding {
     @ManyToOne
     @JsonIgnoreProperties(value = { "holdings" })
     @JoinColumn(name = "account_id", referencedColumnName = "id")
-    //@JsonIgnore
     private InvestmentAccount account;
 
     @MapsId("securityId") // connects to securityId field in HoldingPK
     @ManyToOne
     @JoinColumn(name = "security_id", referencedColumnName = "id")
     @JsonIgnoreProperties(value = { "holdings" })
-    @JsonIgnore
     private Security security;
 
     public Holding() {

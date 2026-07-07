@@ -7,7 +7,6 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -49,11 +48,12 @@ public class InvestmentAccount {
     private Date dateOpened;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "investmentAccounts", "user" })
+    @JsonIgnoreProperties(value = { "investmentAccounts", "user", "securities", "holdings" })
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @OneToMany(mappedBy = "account")
+    @JsonIgnoreProperties(value = { "account" })
     private List<Holding> holdings;
 
     public InvestmentAccount() {

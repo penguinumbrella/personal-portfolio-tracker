@@ -1,6 +1,6 @@
 <!--https://v17.primeng.org/table#stateful-->
 <p-table #dt [value]="holdings()"
-    [globalFilterFields]="['security.name', 'account.nickname', 'numShares', 'costPerShare', 'purchaseDate']" [rows]="5"
+    [globalFilterFields]="['security.name', 'account.nickname', 'shares', 'costPerShare', 'purchaseDate']" [rows]="5"
     [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
 
     <!--Table top, has add new and search features-->
@@ -21,8 +21,8 @@
     <ng-template pTemplate="header">
         <tr>
             <th>{{ tableMode() === 'byAccount' ? 'Security' : 'Account' }}</th>
-            <th pSortableColumn="numShares">
-                Shares <p-sortIcon field="numShares" />
+            <th pSortableColumn="shares">
+                Shares <p-sortIcon field="shares" />
             </th>
             <th pSortableColumn="costPerShare">
                 Cost/share <p-sortIcon field="costPerShare" />
@@ -30,7 +30,7 @@
             <th pSortableColumn="purchaseDate">
                 Purchase date <p-sortIcon field="purchaseDate" />
             </th>
-            <th style="width: 80px"></th>
+            <th style="width: 80px"> Edit/Delete </th>
         </tr>
     </ng-template>
 
@@ -44,7 +44,7 @@
                 {{ holding.account?.nickname }}
                 }
             </td>
-            <td>{{ holding.numShares }}</td>
+            <td>{{ holding.shares }}</td>
             <!-- Build in primeng pipes i found to format-->
             <td>{{ holding.costPerShare | currency }}</td>
             <td>{{ holding.purchaseDate | date:'mediumDate' }}</td>
