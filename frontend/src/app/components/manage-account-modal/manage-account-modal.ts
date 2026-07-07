@@ -7,17 +7,19 @@ import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
 import { IftaLabelModule } from 'primeng/iftalabel';
 
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { InvestmentType } from '../../types/InvestmentType';
+import { SelectModule } from 'primeng/select';
 
 
 @Component({
-  selector: 'app-manage-modal',
+  selector: 'app-manage-account-modal',
   imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule
-    ,IftaLabelModule
+    ,IftaLabelModule, SelectModule
   ],
-  templateUrl: './manage-modal.html',
-  styleUrl: './ma-modal.css',
+  templateUrl: './manage-account-modal.html',
+  styleUrl: './manage-account-modal.css',
 })
-export class ManageModal {
+export class ManageAccountModal {
 
   /**
    * INPUT and OUTPUT
@@ -31,6 +33,11 @@ export class ManageModal {
    *            - event payload will contain whatever data you want to send to the parent 
    */
 
+  readonly accountOptions = Object.values(InvestmentType).map(value => ({
+    name: value,
+    value: value
+  }));
+
   // creating values that need to be passed in by the parent
   visible = model.required<boolean>();
   recordName = input.required<string>();
@@ -42,19 +49,8 @@ export class ManageModal {
   cancelled = output<void>();
 
   onUpdate() {
-    // .value gives you the object { username: '...', email: '...' }
     this.confirmed.emit(this.form().value);
     this.visible.set(false); // Close the modal
-  }
-
-
-  /**
-   * IF YOU NEEDED TO SET A PAYLOD, HERE'S AN EXAMPLE
-   */
-  handleEvent() {
-    let payload = {}
-
-    //eventName.emit(payload);
   }
 
 

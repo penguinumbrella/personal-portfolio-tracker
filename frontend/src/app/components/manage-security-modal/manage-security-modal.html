@@ -1,5 +1,5 @@
 <p-dialog
-    header="Add Investment Account"
+    header="Add Security Account"
     [modal]="true"
     [visible]="visible()"
     [appendTo]="'body'"
@@ -13,13 +13,22 @@
     </p-floatLabel>
 
     <p-floatLabel>
-        <input pInputText id="accountName" type="password" formControlName="password" />
-        <label for="password">Password</label>
+        
+                <p-select 
+                    id="account-type"
+                    formControlName="accountType"
+                    [options]="accountOptions"
+                    class="w-full"
+                >
+                    <ng-template #item let-accountType>{{accountType.name}}</ng-template>
+                    <ng-template #selectedItem let-accountType>{{accountType.name}}</ng-template>
+                </p-select>
+                <label for="account-type">Institution Type</label>
     </p-floatLabel>
 
     <p-floatLabel>
-        <input pInputText id="email" formControlName="email" />
-        <label for="email">Email</label>
+        <input pInputText id="institution-name" formControlName="institutionName" />
+        <label for="institution-name">Institution Name</label>
     </p-floatLabel>
     <!-- ... other fields ... -->
   </form>

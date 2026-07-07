@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageModal } from './manage-modal';
+import { ManageSecurityModal } from './manage-security-modal';
 
-describe('ManageModal', () => {
-  let component: ManageModal;
-  let fixture: ComponentFixture<ManageModal>;
+describe('ManageSecurityModal', () => {
+  let component: ManageSecurityModal;
+  let fixture: ComponentFixture<ManageSecurityModal>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageModal],
+      imports: [ManageSecurityModal],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ManageModal);
+    fixture = TestBed.createComponent(ManageSecurityModal);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

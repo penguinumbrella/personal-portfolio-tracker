@@ -1,0 +1,56 @@
+<p-dialog
+    header="Add Investment Account"
+    [modal]="true"
+    [visible]="visible()"
+    [appendTo]="'body'"
+>
+
+<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
+    <!-- Example form field -->
+    <p-floatLabel>
+        <input pInputText id="nickname" formControlName="nickname" />
+        <label for="nickname">Nickname</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        
+                <p-select 
+                    id="account-type"
+                    formControlName="accountType"
+                    [options]="accountOptions"
+                    class="w-full"
+                >
+                    <ng-template #item let-accountType>{{accountType.name}}</ng-template>
+                    <ng-template #selectedItem let-accountType>{{accountType.name}}</ng-template>
+                </p-select>
+                <label for="account-type">Institution Type</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input pInputText id="institution-name" formControlName="institutionName" />
+        <label for="institution-name">Institution Name</label>
+    </p-floatLabel>
+    <!-- ... other fields ... -->
+  </form>
+
+
+
+    <ng-template #footer>
+
+        <!-- fire off events when buttons are clicked -->
+        <p-button 
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cancelled.emit()"
+        />
+
+        <p-button 
+            label="Update"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="onUpdate()"
+        />
+
+    </ng-template>
+</p-dialog>
