@@ -1,0 +1,10 @@
+.edit-del-buts {
+    display: flex; 
+    gap: 4px;
+}
+
+.table-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
