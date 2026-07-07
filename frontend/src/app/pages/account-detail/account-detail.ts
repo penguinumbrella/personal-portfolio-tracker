@@ -8,10 +8,12 @@ import { HoldingService } from '../../services/HoldingService';
 import { Holding } from '../../types/Holding';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { TableLazyLoadEvent } from 'primeng/types/table';
+import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
+import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 
 @Component({
   selector: 'app-account-detail',
-  imports: [DetailCard, HoldingTable, MetricCard],
+  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar],
   templateUrl: './account-detail.html',
   styleUrl: './account-detail.css',
 })
@@ -20,16 +22,42 @@ export class AccountDetail {
   account = signal<InvestmentAccount | null>(null);
   loading = signal<boolean>(false);
   accountFields = signal<{ label: string; value: any }[]>([]);
+  sidebarItems = signal<SidebarItem[]>([]);
 
   constructor(
     private route: ActivatedRoute,
     private holdingService: HoldingService,
+    private investmentAccountService: InvestmentAccountService,
   ) {}
 
+  // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
     //Use ActivatedRoute to get the accountId from url params
-    const accountId = Number(this.route.snapshot.params['accountId']);
-    this.loadHoldings(accountId);
+    this.loadAccounts();
+  }
+
+  loadAccounts() {
+    // TODO how do we get the userId???? For now, hardcoding to 1
+    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+      next: (data) => {
+        console.log('data:', data);
+        this.sidebarItems.set(
+          data.map((a) => ({
+            id: a.id!,
+            label: a.nickname,
+            subtitle: a.institutionName,
+          })),
+        );
+      },
+      error: (error) => {
+        console.error('Error loading accounts:', error);
+      },
+    });
+  }
+
+  // when an account is selected from the sidebar, load the holdings for that account
+  onAccountSelect(item: SidebarItem): void {
+    this.loadHoldings(item.id);
   }
 
   loadHoldings(accountId: number, event?: TableLazyLoadEvent) {
@@ -39,7 +67,7 @@ export class AccountDetail {
     // show loading spinner while request to backend is being made
     this.loading.set(true);
 
-    //TODO make this paginated??
+    //TODO make this paginated?? is it already?????
     this.holdingService.getAllHoldingsPerAccount(accountId).subscribe({
       next: (data) => {
         console.log('data:', data);
@@ -64,11 +92,6 @@ export class AccountDetail {
       { label: 'Nickname', value: a.nickname },
       { label: 'Opened', value: a.dateOpened },
     ]);
-  }
-
-  onAccountSelect($event: Event) {
-    // TODO load new account when selected
-    throw new Error('Method not implemented.');
   }
 
   editAccount() {
