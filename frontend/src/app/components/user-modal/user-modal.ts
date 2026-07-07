@@ -4,13 +4,16 @@ import { DialogModule } from 'primeng/dialog';
 import {FloatLabelModule} from 'primeng/floatlabel';
 import {InputGroupModule} from 'primeng/inputgroup';
 import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
+import { IftaLabelModule } from 'primeng/iftalabel';
 
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 
 
 @Component({
   selector: 'app-user-modal',
-  imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule],
+  imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule
+    ,IftaLabelModule
+  ],
   templateUrl: './user-modal.html',
   styleUrl: './user-modal.css',
 })
