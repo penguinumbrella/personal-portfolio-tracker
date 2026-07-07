@@ -7,6 +7,6 @@ export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: Dashboard },
   { path: 'account', component: AccountDetail },
-  { path: 'security/:securityId', component: SecurityDetail },
+  { path: 'security', component: SecurityDetail },
   // add account and security detail view
 ];
