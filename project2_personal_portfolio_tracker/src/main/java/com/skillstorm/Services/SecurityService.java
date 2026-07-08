@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
-import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
