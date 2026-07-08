@@ -46,7 +46,7 @@ export class ManageHoldingModal {
 
   // creating values that need to be passed in by the parent
   
-  allSecurities = input.required<Security[]>();
+  filteredSecurities = input.required<Security[]>();
   editingHolding = input<Holding | null>(null);
   visible = model.required<boolean>();
   recordName = input.required<string>();

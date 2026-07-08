@@ -1,57 +1,78 @@
-<p-dialog
+<p-dialog 
     [header]="editingHolding() ? 'Edit Holding' : 'Add Holding'"
-    [modal]="true"
+    [modal]="true" 
     [visible]="visible()"
+    (visibleChange)="visible.set($event)"
     [appendTo]="'body'"
+    [style]="{ width: '400px' }"
 >
-
-<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
-    <p-floatLabel>
+  <form [formGroup]="form()" class="flex flex-col gap-6 mt-5">
+    
+    @if (!editingHolding()) {
+      <div class="relative">
         <p-select 
-                    id="security"
-                    formControlName="security"
-                    [options]="allSecurities()"
-                    class="w-full"
-                >
-                    <!-- Tell PrimeNG how I want each item to look in the dropdown menu -->
-                    <ng-template #item let-security>{{security.name}}</ng-template>
-                    <ng-template #selectedItem let-security>{{security.name}}</ng-template>
-                </p-select>
-                <label for="security">Security</label>
-    </p-floatLabel>
-    <p-floatLabel>
-        <input pInputNumber id="shares" formControlName="shares" mode="currency" currency="USD" />
-        <label for="shares">Shares</label>
-    </p-floatLabel>
-    <p-floatLabel>
-        <input pInputNumber id="costPerShare" formControlName="costPerShare" mode="currency" currency="USD" />
-        <label for="costPerShare">Cost Per Share</label>
-    </p-floatLabel>
-
-    <p-floatLabel>
-        <p-datepicker id="purchaseDate" formControlName="purchaseDate" [showIcon]="true" />
-        <label for="purchaseDate">Purchase Date</label>
-    </p-floatLabel>
-</form>
-
-
-
-    <ng-template #footer>
-
-        <!-- fire off events when buttons are clicked -->
-        <p-button 
-            label="Cancel"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="cancelled.emit()"
+          id="security"
+          formControlName="security"
+          [options]="filteredSecurities()"
+          optionLabel="name"
+          class="w-full peer"
         />
+        <label for="security" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
+          Security
+        </label>
+      </div>
+    }
 
-        <p-button 
-            label="Update"
-            severity="primary"
-            [outlined]="true"
-            (onClick)="onUpdate()"
-        />
+    <div class="relative">
+      <p-inputNumber 
+        id="shares" 
+        formControlName="shares" 
+        class="w-full peer"
+      />
+      <label for="shares" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
+        Shares
+      </label>
+    </div>
 
-    </ng-template>
+    <div class="relative">
+      <p-inputNumber 
+        id="costPerShare" 
+        formControlName="costPerShare" 
+        mode="currency" 
+        currency="USD" 
+        class="w-full peer"
+      />
+      <label for="costPerShare" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
+        Cost Per Share
+      </label>
+    </div>
+
+    <div class="relative">
+      <p-datepicker 
+        id="purchaseDate" 
+        formControlName="purchaseDate" 
+        [showIcon]="true" 
+        class="w-full peer"
+      />
+      <label for="purchaseDate" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
+        Purchase Date
+      </label>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button 
+        label="Cancel" 
+        severity="secondary" 
+        [outlined]="true" 
+        (onClick)="cancelled.emit()" 
+      />
+      <p-button 
+        [label]="editingHolding() ? 'Update' : 'Add'" 
+        severity="primary" 
+        (onClick)="onUpdate()" 
+      />
+    </div>
+  </ng-template>
 </p-dialog>

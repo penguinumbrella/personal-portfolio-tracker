@@ -17,7 +17,7 @@
         [(visible)]="isHoldingModalVisible" 
         [form]="modalForm()"
         [editingHolding]="editingHolding()"
-        [allSecurities]="allSecurities()"
+        [allSecurities]="filteredSecurities()"
         [recordName]="'Holding'"
         (confirmed)="onHoldingModalConfirm($event)"
         (cancelled)="isHoldingModalVisible.set(false)"
