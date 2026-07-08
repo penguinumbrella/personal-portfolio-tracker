@@ -67,7 +67,7 @@ export class SecurityDetail {
         console.log('data:', data);
         this.holdings.set(data);
         this.loading.set(false);
-        this.security.set(this.holdings()[0].security);
+        this.security.set(this.holdings()[0].security!);
         this.buildSecurityFields();
       },
       error: (error) => {
@@ -108,7 +108,7 @@ export class SecurityDetail {
     // TODO reload metrics
     // TODO add modal to confirm deletion
 
-    this.holdingService.deleteHolding(holding.id).subscribe({
+    this.holdingService.deleteHolding(holding.id!).subscribe({
       next: () => {
         this.holdings.update((current) =>
           current.filter(

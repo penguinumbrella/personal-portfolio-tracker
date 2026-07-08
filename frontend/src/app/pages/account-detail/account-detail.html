@@ -16,6 +16,8 @@
     <app-manage-holding-modal 
         [(visible)]="isHoldingModalVisible" 
         [form]="modalForm()"
+        [editingHolding]="editingHolding()"
+        [allSecurities]="allSecurities()"
         [recordName]="'Holding'"
         (confirmed)="onHoldingModalConfirm($event)"
         (cancelled)="isHoldingModalVisible.set(false)"

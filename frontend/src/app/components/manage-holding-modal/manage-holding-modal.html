@@ -1,12 +1,24 @@
 <p-dialog
-    header="Add Holding"
+    [header]="editingHolding() ? 'Edit Holding' : 'Add Holding'"
     [modal]="true"
     [visible]="visible()"
     [appendTo]="'body'"
 >
 
 <form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
-
+    <p-floatLabel>
+        <p-select 
+                    id="security"
+                    formControlName="security"
+                    [options]="allSecurities()"
+                    class="w-full"
+                >
+                    <!-- Tell PrimeNG how I want each item to look in the dropdown menu -->
+                    <ng-template #item let-security>{{security.name}}</ng-template>
+                    <ng-template #selectedItem let-security>{{security.name}}</ng-template>
+                </p-select>
+                <label for="security">Security</label>
+    </p-floatLabel>
     <p-floatLabel>
         <input pInputNumber id="shares" formControlName="shares" mode="currency" currency="USD" />
         <label for="shares">Shares</label>
