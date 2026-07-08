@@ -2,7 +2,6 @@ package com.skillstorm.Models;
 
 import java.sql.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;

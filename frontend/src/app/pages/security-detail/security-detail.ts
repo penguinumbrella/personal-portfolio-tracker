@@ -20,6 +20,7 @@ export class SecurityDetail {
   holdings = signal<Holding[]>([]);
   security = signal<Security | null>(null);
   loading = signal<boolean>(false);
+  totalInvestedCost = signal<number>(0);
   securityFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
 
@@ -28,10 +29,12 @@ export class SecurityDetail {
     private securityService: SecurityService,
   ) {}
 
+  // get the list of securities on page load
   ngOnInit() {
     this.loadSecurities();
   }
 
+  // load the list of securities for the user and populate the sidebar
   loadSecurities() {
     this.securityService.getAllSecuritiesByUser(1).subscribe({
       next: (data) => {
@@ -50,10 +53,21 @@ export class SecurityDetail {
     });
   }
 
+  // when a security is selected from sidebar, get security and load details, holdings
   onSecuritySelect(item: SidebarItem): void {
-    this.loadHoldings(item.id);
+    this.securityService.getSecurityById(item.id).subscribe({
+      next: (data) => {
+        this.security.set(data);
+        this.buildSecurityFields();
+        this.loadHoldings(data.id!);
+      },
+      error: (err) => {
+        console.error('Error loading security:', err);
+      },
+    });
   }
 
+  // load holdings. invested cost calculated in loadHoldings() after holdings are loaded to avoid race condition
   loadHoldings(securityId: number, event?: TableLazyLoadEvent) {
     const page = event ? event?.first! / event?.rows! : 0;
     const size = event ? event?.rows! : 2;
@@ -64,11 +78,9 @@ export class SecurityDetail {
     //TODO make this paginated??
     this.holdingService.getAllHoldingsPerSecurity(securityId).subscribe({
       next: (data) => {
-        console.log('data:', data);
         this.holdings.set(data);
         this.loading.set(false);
-        this.security.set(this.holdings()[0].security!);
-        this.buildSecurityFields();
+        this.calcInvestedCost();
       },
       error: (error) => {
         console.error('Error loading holdings:', error);
@@ -88,6 +100,12 @@ export class SecurityDetail {
     ]);
   }
 
+  calcInvestedCost(): void {
+    const total = this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0);
+    this.totalInvestedCost.set(total);
+  }
+
+  // CRUDS BELOW
   editSecurity() {
     throw new Error('Method not implemented.');
   }

@@ -10,6 +10,14 @@ export class SecurityService {
 
   constructor(private http: HttpClient) {}
 
+  getSecurityById(id: number): Observable<Security> {
+    return this.http
+      .get<Security>(`${this.URL}/${id}`)
+      .pipe(
+        catchError(() => throwError(() => new Error('Failed to load Security for specified ID.'))),
+      );
+  }
+
   getAllSecuritiesByUser(userId?: number): Observable<Security[]> {
     return this.http
       .get<Security[]>(`${this.URL}/u/${userId}`)

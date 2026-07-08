@@ -24,19 +24,21 @@ export class AccountDetail {
   holdings = signal<Holding[]>([]);
   account = signal<InvestmentAccount | null>(null);
   loading = signal<boolean>(false);
+  totalInvestedCost = signal<number>(0);
   accountFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
   isHoldingModalVisible = signal<boolean>(false);
   editingHolding = signal<Holding | null>(null);
   allSecurities = signal<Security[]>([]);
-  
 
-  modalForm = signal<FormGroup>(new FormGroup({
-    security: new FormControl(null, Validators.required),
-    shares: new FormControl(0, [Validators.required, Validators.min(0)]),
-    costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
-    purchaseDate: new FormControl(new Date(), Validators.required)
-  }));
+  modalForm = signal<FormGroup>(
+    new FormGroup({
+      security: new FormControl(null, Validators.required),
+      shares: new FormControl(0, [Validators.required, Validators.min(0)]),
+      costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
+      purchaseDate: new FormControl(new Date(), Validators.required),
+    }),
+  );
 
   constructor(
     private holdingService: HoldingService,
@@ -44,7 +46,6 @@ export class AccountDetail {
     private securityService: SecurityService,
   ) {}
 
-  
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
     this.loadAccounts();
@@ -71,7 +72,7 @@ export class AccountDetail {
   }
 
   loadSecurities() {
-     this.securityService.getAllSecuritiesByUser(1).subscribe({
+    this.securityService.getAllSecuritiesByUser(1).subscribe({
       next: (data) => {
         console.log('data:', data);
         this.allSecurities.set(data);
@@ -95,7 +96,16 @@ export class AccountDetail {
 
   // when an account is selected from the sidebar, load the holdings for that account
   onAccountSelect(item: SidebarItem): void {
-    this.loadHoldings(item.id);
+    this.investmentAccountService.getInvestmentAccountById(item.id).subscribe({
+      next: (data) => {
+        this.account.set(data);
+        this.buildAccountFields();
+        this.loadHoldings(data.id!);
+      },
+      error: (err) => {
+        console.error('Error loading account:', err);
+      },
+    });
   }
 
   loadHoldings(accountId: number, event?: TableLazyLoadEvent) {
@@ -111,8 +121,7 @@ export class AccountDetail {
         console.log('data:', data);
         this.holdings.set(data);
         this.loading.set(false);
-        this.account.set(this.holdings()[0].account!);
-        this.buildAccountFields();
+        this.calcInvestedCost();
       },
       error: (error) => {
         console.error('Error loading holdings:', error);
@@ -132,7 +141,10 @@ export class AccountDetail {
     ]);
   }
 
-  
+  calcInvestedCost(): void {
+    const total = this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0);
+    this.totalInvestedCost.set(total);
+  }
 
   editAccount() {
     throw new Error('Method not implemented.');
@@ -141,95 +153,95 @@ export class AccountDetail {
     throw new Error('Method not implemented.');
   }
 
-addHolding() {
-  this.editingHolding.set(null);
-  this.modalForm().reset();
-  this.isHoldingModalVisible.set(true);
-}
+  addHolding() {
+    this.editingHolding.set(null);
+    this.modalForm().reset();
+    this.isHoldingModalVisible.set(true);
+  }
 
-editHolding(holding: Holding): void {
-  this.editingHolding.set(holding);
+  editHolding(holding: Holding): void {
+    this.editingHolding.set(holding);
 
-  console.log("Editing holding:", holding, "with id:", holding.id);
+    console.log('Editing holding:', holding, 'with id:', holding.id);
 
-  const dateValue = typeof holding.purchaseDate === 'number' 
-    ? new Date(holding.purchaseDate) 
-    : holding.purchaseDate;
+    const dateValue =
+      typeof holding.purchaseDate === 'number'
+        ? new Date(holding.purchaseDate)
+        : holding.purchaseDate;
 
-  this.modalForm().patchValue({
-    security: holding.security, 
-    shares: holding.shares,
-    costPerShare: holding.costPerShare,
-    purchaseDate: dateValue
-  });
-  
-  this.isHoldingModalVisible.set(true);
-}
+    this.modalForm().patchValue({
+      security: holding.security,
+      shares: holding.shares,
+      costPerShare: holding.costPerShare,
+      purchaseDate: dateValue,
+    });
 
-onHoldingModalConfirm(formData: any) {
-  if (this.modalForm().invalid) return;
+    this.isHoldingModalVisible.set(true);
+  }
 
-  const payload = {
-    id: this.editingHolding()?.id,
-    a_id: this.account()!.id,
-    s_id: formData.security.id,
-    //id:  // todo
-    //accountId: this.account()!.id, // Assuming account is always set when adding/editing a holding
-    shares: formData.shares,
-    costPerShare: formData.costPerShare,
-    purchaseDate: formData.purchaseDate instanceof Date ? formData.purchaseDate.getTime() : formData.purchaseDate,
-  };
+  onHoldingModalConfirm(formData: any) {
+    if (this.modalForm().invalid) return;
 
-  console.log('Payload to send to backend:', payload);
-  
-  if(this.modalForm().invalid) {
+    const payload = {
+      id: this.editingHolding()?.id,
+      a_id: this.account()!.id,
+      s_id: formData.security.id,
+      //id:  // todo
+      //accountId: this.account()!.id, // Assuming account is always set when adding/editing a holding
+      shares: formData.shares,
+      costPerShare: formData.costPerShare,
+      purchaseDate:
+        formData.purchaseDate instanceof Date
+          ? formData.purchaseDate.getTime()
+          : formData.purchaseDate,
+    };
+
+    console.log('Payload to send to backend:', payload);
+
+    if (this.modalForm().invalid) {
       return;
     }
-  if (this.editingHolding()) {
-    const id = payload.id;
-    // Call update service
-    this.holdingService.updateHolding(id!, payload).subscribe({
-      next: (updatedHolding) => {
-        this.holdings.update(current => 
-          current.map(h => h.id === id ? updatedHolding : h)
-        );
-      },
-      error: (err) => console.error(err)
-    });
-    console.log("Updating", formData);
-  } else {
-    // Call create service
-    // create and send payload to backend
-    
-    this.holdingService.createHolding(payload).subscribe({
-      next: (newHolding) => {
-        this.holdings.update((current) => [...current, newHolding]);
-      },
-      error: (err) => console.error(err),
-    });
-    
-    console.log("Creating", formData);
+    if (this.editingHolding()) {
+      const id = payload.id;
+      // Call update service
+      this.holdingService.updateHolding(id!, payload).subscribe({
+        next: (updatedHolding) => {
+          this.holdings.update((current) => current.map((h) => (h.id === id ? updatedHolding : h)));
+        },
+        error: (err) => console.error(err),
+      });
+      console.log('Updating', formData);
+    } else {
+      // Call create service
+      // create and send payload to backend
+
+      this.holdingService.createHolding(payload).subscribe({
+        next: (newHolding) => {
+          this.holdings.update((current) => [...current, newHolding]);
+        },
+        error: (err) => console.error(err),
+      });
+
+      console.log('Creating', formData);
+    }
+    this.isHoldingModalVisible.set(false);
   }
-  this.isHoldingModalVisible.set(false);
-}
 
   deleteHolding(holding: Holding): void {
     // TODO reload metrics
     // TODO add modal to confirm deletion
 
-
-      this.holdingService.deleteHolding(holding.id!).subscribe({
-        next: () => {
-          this.holdings.update((current) =>
-            current.filter(
-              (h) =>
-                h.id?.accountId !== holding.id?.accountId ||
-                h.id?.securityId !== holding.id?.securityId,
-            ),
-          );
-        },
-        error: (err) => console.error(err),
-      });
+    this.holdingService.deleteHolding(holding.id!).subscribe({
+      next: () => {
+        this.holdings.update((current) =>
+          current.filter(
+            (h) =>
+              h.id?.accountId !== holding.id?.accountId ||
+              h.id?.securityId !== holding.id?.securityId,
+          ),
+        );
+      },
+      error: (err) => console.error(err),
+    });
   }
-
 }
