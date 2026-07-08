@@ -23,4 +23,12 @@
         </div>
     </div>
 
+    <app-manage-holding-modal 
+        [(visible)]="isHoldingModalVisible" 
+        [form]="modalForm()"
+        [recordName]="'Holding'"
+        (confirmed)="onHoldingModalConfirm($event)"
+        (cancelled)="isHoldingModalVisible.set(false)"
+    />
+
 </div>

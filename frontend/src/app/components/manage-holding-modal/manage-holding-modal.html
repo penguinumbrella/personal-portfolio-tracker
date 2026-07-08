@@ -1,0 +1,45 @@
+<p-dialog
+    header="Add Holding"
+    [modal]="true"
+    [visible]="visible()"
+    [appendTo]="'body'"
+>
+
+<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
+
+    <p-floatLabel>
+        <input pInputNumber id="shares" formControlName="shares" mode="currency" currency="USD" />
+        <label for="shares">Shares</label>
+    </p-floatLabel>
+    <p-floatLabel>
+        <input pInputNumber id="costPerShare" formControlName="costPerShare" mode="currency" currency="USD" />
+        <label for="costPerShare">Cost Per Share</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <p-datepicker id="purchaseDate" formControlName="purchaseDate" [showIcon]="true" />
+        <label for="purchaseDate">Purchase Date</label>
+    </p-floatLabel>
+</form>
+
+
+
+    <ng-template #footer>
+
+        <!-- fire off events when buttons are clicked -->
+        <p-button 
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cancelled.emit()"
+        />
+
+        <p-button 
+            label="Update"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="onUpdate()"
+        />
+
+    </ng-template>
+</p-dialog>
