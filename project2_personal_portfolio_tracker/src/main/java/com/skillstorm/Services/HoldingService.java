@@ -35,6 +35,8 @@ public class HoldingService {
      * @return
      */
     public Holding addHolding(HoldingDto dto) {
+
+        System.out.println("Adding holding with account ID: " + dto.a_id() + ", security ID: " + dto.s_id());
         HoldingPK id = new HoldingPK(dto.a_id(), dto.s_id());
 
         if (repo.existsById(id)) {

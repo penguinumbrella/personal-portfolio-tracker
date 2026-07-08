@@ -95,4 +95,12 @@ public class User {
         this.investmentAccounts = investmentAccounts;
     }
 
+    public List<Security> getSecurities() {
+    return securities;
+}
+
+    public void setSecurities(List<Security> securities) {
+        this.securities = securities;
+    }
+
 }

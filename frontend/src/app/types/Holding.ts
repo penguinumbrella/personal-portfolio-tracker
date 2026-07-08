@@ -3,10 +3,12 @@ import { InvestmentAccount } from './InvestmentAccounts';
 import { Security } from './Security';
 
 export interface Holding {
-  security: Security;
-  account: InvestmentAccount;
-  id: HoldingId;
+  id?: HoldingId;
+  a_id?: number;
+  s_id?: number;
   shares: number;
   costPerShare: number;
   purchaseDate: number;
+  account?: InvestmentAccount;
+  security?: Security;
 }

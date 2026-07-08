@@ -13,6 +13,9 @@ import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 
+import { Security } from '../../types/Security';
+import { Holding } from '../../types/Holding';
+
 
 @Component({
   selector: 'app-manage-holding-modal',
@@ -43,6 +46,8 @@ export class ManageHoldingModal {
 
   // creating values that need to be passed in by the parent
   
+  allSecurities = input.required<Security[]>();
+  editingHolding = input<Holding | null>(null);
   visible = model.required<boolean>();
   recordName = input.required<string>();
   form = input.required<FormGroup>();

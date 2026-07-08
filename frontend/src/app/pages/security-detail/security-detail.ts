@@ -126,7 +126,7 @@ export class SecurityDetail {
     // TODO reload metrics
     // TODO add modal to confirm deletion
 
-    this.holdingService.deleteHolding(holding.id).subscribe({
+    this.holdingService.deleteHolding(holding.id!).subscribe({
       next: () => {
         this.holdings.update((current) =>
           current.filter(

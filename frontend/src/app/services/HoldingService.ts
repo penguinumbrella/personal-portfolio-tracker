@@ -50,6 +50,7 @@ export class HoldingService {
   }
 
   updateHolding(id: HoldingId, holding: Holding): Observable<Holding> {
+    console.log("Updating holding with ID:", id, "and data:", holding);
     return this.http
       .put<Holding>(this.URL + `/a` + `/${id.accountId}` + `/s` + `/${id.securityId}`, holding)
       .pipe(catchError(() => throwError(() => new Error('Failed to update Holding.'))));

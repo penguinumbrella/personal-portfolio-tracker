@@ -11,6 +11,8 @@ import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/deta
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ManageHoldingModal } from '../../components/manage-holding-modal/manage-holding-modal';
+import { SecurityService } from '../../services/SecurityService';
+import { Security } from '../../types/Security';
 
 @Component({
   selector: 'app-account-detail',
@@ -27,9 +29,11 @@ export class AccountDetail {
   sidebarItems = signal<SidebarItem[]>([]);
   isHoldingModalVisible = signal<boolean>(false);
   editingHolding = signal<Holding | null>(null);
+  allSecurities = signal<Security[]>([]);
 
   modalForm = signal<FormGroup>(
     new FormGroup({
+      security: new FormControl(null, Validators.required),
       shares: new FormControl(0, [Validators.required, Validators.min(0)]),
       costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
       purchaseDate: new FormControl(new Date(), Validators.required),
@@ -39,11 +43,13 @@ export class AccountDetail {
   constructor(
     private holdingService: HoldingService,
     private investmentAccountService: InvestmentAccountService,
+    private securityService: SecurityService,
   ) {}
 
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
     this.loadAccounts();
+    this.loadSecurities();
   }
 
   loadAccounts() {
@@ -58,6 +64,18 @@ export class AccountDetail {
             subtitle: a.institutionName,
           })),
         );
+      },
+      error: (error) => {
+        console.error('Error loading accounts:', error);
+      },
+    });
+  }
+
+  loadSecurities() {
+    this.securityService.getAllSecuritiesByUser(1).subscribe({
+      next: (data) => {
+        console.log('data:', data);
+        this.allSecurities.set(data);
       },
       error: (error) => {
         console.error('Error loading accounts:', error);
@@ -133,12 +151,15 @@ export class AccountDetail {
   editHolding(holding: Holding): void {
     this.editingHolding.set(holding);
 
+    console.log('Editing holding:', holding, 'with id:', holding.id);
+
     const dateValue =
       typeof holding.purchaseDate === 'number'
         ? new Date(holding.purchaseDate)
         : holding.purchaseDate;
 
     this.modalForm().patchValue({
+      security: holding.security,
       shares: holding.shares,
       costPerShare: holding.costPerShare,
       purchaseDate: dateValue,
@@ -148,14 +169,48 @@ export class AccountDetail {
   }
 
   onHoldingModalConfirm(formData: any) {
+    if (this.modalForm().invalid) return;
+
+    const payload = {
+      id: this.editingHolding()?.id,
+      a_id: this.account()!.id,
+      s_id: formData.security.id,
+      //id:  // todo
+      //accountId: this.account()!.id, // Assuming account is always set when adding/editing a holding
+      shares: formData.shares,
+      costPerShare: formData.costPerShare,
+      purchaseDate:
+        formData.purchaseDate instanceof Date
+          ? formData.purchaseDate.getTime()
+          : formData.purchaseDate,
+    };
+
+    console.log('Payload to send to backend:', payload);
+
     if (this.modalForm().invalid) {
       return;
     }
     if (this.editingHolding()) {
+      const id = payload.id;
       // Call update service
+      this.holdingService.updateHolding(id!, payload).subscribe({
+        next: (updatedHolding) => {
+          this.holdings.update((current) => current.map((h) => (h.id === id ? updatedHolding : h)));
+        },
+        error: (err) => console.error(err),
+      });
       console.log('Updating', formData);
     } else {
       // Call create service
+      // create and send payload to backend
+
+      this.holdingService.createHolding(payload).subscribe({
+        next: (newHolding) => {
+          this.holdings.update((current) => [...current, newHolding]);
+        },
+        error: (err) => console.error(err),
+      });
+
       console.log('Creating', formData);
     }
     this.isHoldingModalVisible.set(false);
@@ -165,7 +220,7 @@ export class AccountDetail {
     // TODO reload metrics
     // TODO add modal to confirm deletion
 
-    this.holdingService.deleteHolding(holding.id).subscribe({
+    this.holdingService.deleteHolding(holding.id!).subscribe({
       next: () => {
         this.holdings.update((current) =>
           current.filter(
