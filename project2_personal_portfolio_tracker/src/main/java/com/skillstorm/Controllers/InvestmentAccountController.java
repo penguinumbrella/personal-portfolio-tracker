@@ -34,6 +34,12 @@ public class InvestmentAccountController {
         return ResponseEntity.status(200).body(service.getAccounts(userId));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<InvestmentAccount> getAccount(
+            @PathVariable int id) {
+        return ResponseEntity.status(200).body(service.getAccount(id));
+    }
+
     // POST (ADD ACCOUNT)
     @PostMapping
     public ResponseEntity<InvestmentAccount> addAccount(

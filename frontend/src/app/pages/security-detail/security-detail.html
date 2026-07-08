@@ -4,7 +4,11 @@
     </div>
 
     <div class="table-col">
-        <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy" />
+        <div class="metric-cards flex row justify-between m-3 gap-3">
+            <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
+                class="flex-1" />
+            <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" class="flex-1" />
+        </div>
 
         <app-detail-card title="Security Details" [fields]="securityFields()" (onEdit)="editSecurity()"
             (onDelete)="deleteSecurity()" />

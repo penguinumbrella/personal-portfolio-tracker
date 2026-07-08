@@ -36,35 +36,42 @@ public class InvestmentAccountService {
         return investmentAccountRepo.findByUserId(userId);
     }
 
+    public InvestmentAccount getAccount(int id) {
+        return investmentAccountRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Investment account with id " + id + " does not exist in the database."));
+    }
+
     public InvestmentAccount addAccount(InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsByNickname(dto.nickname())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
         }
-            
+
         User user = userRepo.findById(dto.userId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
         return investmentAccountRepo.save(
-                new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(), user));
-        
+                new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(),
+                        user));
 
     }
 
     public InvestmentAccount updateAccount(int id, InvestmentAccountDto dto) {
         InvestmentAccount investmentAccount = investmentAccountRepo.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Investment account with id " + id + " does not exist in the database."));
-            
-        if (!investmentAccount.getNickname().equals(dto.nickname()) && investmentAccountRepo.existsByNickname(dto.nickname())) {
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Investment account with id " + id + " does not exist in the database."));
+
+        if (!investmentAccount.getNickname().equals(dto.nickname())
+                && investmentAccountRepo.existsByNickname(dto.nickname())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Nickname is already in use.");
         }
 
         User user = userRepo.findById(dto.userId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
         return investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(),
                 dto.institutionName(), dto.dateOpened(), user));
-
 
     }
 
@@ -81,15 +88,13 @@ public class InvestmentAccountService {
 
     public Long UserInvestmentAccountTotal(int userId) {
         User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
         return investmentAccountRepo.countByUser(user);
-        
+
     }
 
     public List<InvestmentAccount> getRecentAccounts(Long userId) {
         return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
     }
-
-
 
 }

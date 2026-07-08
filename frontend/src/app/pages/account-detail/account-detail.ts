@@ -22,24 +22,25 @@ export class AccountDetail {
   holdings = signal<Holding[]>([]);
   account = signal<InvestmentAccount | null>(null);
   loading = signal<boolean>(false);
+  totalInvestedCost = signal<number>(0);
   accountFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
   isHoldingModalVisible = signal<boolean>(false);
   editingHolding = signal<Holding | null>(null);
-  
 
-  modalForm = signal<FormGroup>(new FormGroup({
-    shares: new FormControl(0, [Validators.required, Validators.min(0)]),
-    costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
-    purchaseDate: new FormControl(new Date(), Validators.required)
-  }));
+  modalForm = signal<FormGroup>(
+    new FormGroup({
+      shares: new FormControl(0, [Validators.required, Validators.min(0)]),
+      costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
+      purchaseDate: new FormControl(new Date(), Validators.required),
+    }),
+  );
 
   constructor(
     private holdingService: HoldingService,
     private investmentAccountService: InvestmentAccountService,
   ) {}
 
-  
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
     this.loadAccounts();
@@ -66,7 +67,16 @@ export class AccountDetail {
 
   // when an account is selected from the sidebar, load the holdings for that account
   onAccountSelect(item: SidebarItem): void {
-    this.loadHoldings(item.id);
+    this.investmentAccountService.getInvestmentAccountById(item.id).subscribe({
+      next: (data) => {
+        this.account.set(data);
+        this.buildAccountFields();
+        this.loadHoldings(data.id!);
+      },
+      error: (err) => {
+        console.error('Error loading account:', err);
+      },
+    });
   }
 
   loadHoldings(accountId: number, event?: TableLazyLoadEvent) {
@@ -82,8 +92,7 @@ export class AccountDetail {
         console.log('data:', data);
         this.holdings.set(data);
         this.loading.set(false);
-        this.account.set(this.holdings()[0].account);
-        this.buildAccountFields();
+        this.calcInvestedCost();
       },
       error: (error) => {
         console.error('Error loading holdings:', error);
@@ -103,7 +112,10 @@ export class AccountDetail {
     ]);
   }
 
-  
+  calcInvestedCost(): void {
+    const total = this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0);
+    this.totalInvestedCost.set(total);
+  }
 
   editAccount() {
     throw new Error('Method not implemented.');
@@ -112,41 +124,42 @@ export class AccountDetail {
     throw new Error('Method not implemented.');
   }
 
-addHolding() {
-  this.editingHolding.set(null);
-  this.modalForm().reset();
-  this.isHoldingModalVisible.set(true);
-}
+  addHolding() {
+    this.editingHolding.set(null);
+    this.modalForm().reset();
+    this.isHoldingModalVisible.set(true);
+  }
 
-editHolding(holding: Holding): void {
-  this.editingHolding.set(holding);
+  editHolding(holding: Holding): void {
+    this.editingHolding.set(holding);
 
-  const dateValue = typeof holding.purchaseDate === 'number' 
-    ? new Date(holding.purchaseDate) 
-    : holding.purchaseDate;
+    const dateValue =
+      typeof holding.purchaseDate === 'number'
+        ? new Date(holding.purchaseDate)
+        : holding.purchaseDate;
 
-  this.modalForm().patchValue({
-    shares: holding.shares,
-    costPerShare: holding.costPerShare,
-    purchaseDate: dateValue
-  });
-  
-  this.isHoldingModalVisible.set(true);
-}
+    this.modalForm().patchValue({
+      shares: holding.shares,
+      costPerShare: holding.costPerShare,
+      purchaseDate: dateValue,
+    });
 
-onHoldingModalConfirm(formData: any) {
-  if(this.modalForm().invalid) {
+    this.isHoldingModalVisible.set(true);
+  }
+
+  onHoldingModalConfirm(formData: any) {
+    if (this.modalForm().invalid) {
       return;
     }
-  if (this.editingHolding()) {
-    // Call update service
-    console.log("Updating", formData);
-  } else {
-    // Call create service
-    console.log("Creating", formData);
+    if (this.editingHolding()) {
+      // Call update service
+      console.log('Updating', formData);
+    } else {
+      // Call create service
+      console.log('Creating', formData);
+    }
+    this.isHoldingModalVisible.set(false);
   }
-  this.isHoldingModalVisible.set(false);
-}
 
   deleteHolding(holding: Holding): void {
     // TODO reload metrics
