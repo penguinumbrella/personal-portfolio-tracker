@@ -1,70 +1,64 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { environment } from "../../environments/environments";
-import { catchError, Observable, throwError } from "rxjs";
-import { Security } from "../types/Security";
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environments';
+import { catchError, Observable, throwError } from 'rxjs';
+import { Security } from '../types/Security';
 
-@Injectable({providedIn: "root"})
+@Injectable({ providedIn: 'root' })
 export class SecurityService {
+  private readonly URL = `${environment.baseApiUrl}/securities`;
 
-    private readonly URL = `${environment.baseApiUrl}/securities`;
+  constructor(private http: HttpClient) {}
 
-    constructor(private http: HttpClient){}
+  getAllSecuritiesByUser(userId?: number): Observable<Security[]> {
+    return this.http
+      .get<Security[]>(`${this.URL}/u/${userId}`)
+      .pipe(
+        catchError(() =>
+          throwError(() => new Error('Failed to load Securities for specified User.')),
+        ),
+      );
+  }
 
-    getAllSecuritiesByUser(userId?: number): Observable<Security[]> {
-        let params = new HttpParams();
+  createSecurity(security: Security): Observable<Security> {
+    return this.http
+      .post<Security>(this.URL, security)
+      .pipe(catchError(() => throwError(() => new Error('Failed to create Security.'))));
+  }
 
-        if(userId != null) {
-            params = params.set("userId", userId);
-        }
-    
-        return this.http.get<Security[]>(this.URL + '/u', {params})   
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to load Securities for specified User.")))
-            );
-    }
+  updateSecurity(id: number, security: Security): Observable<Security> {
+    return this.http
+      .put<Security>(this.URL + `/${id}`, security)
+      .pipe(catchError(() => throwError(() => new Error('Failed to update Security.'))));
+  }
 
-    createSecurity(security: Security): Observable<Security> {
-        return this.http.post<Security>(this.URL, security)
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to create Security.")))
-            );
-    }
+  deleteSecurity(id: number): Observable<void> {
+    return this.http
+      .delete<void>(this.URL + `/${id}`)
+      .pipe(catchError(() => throwError(() => new Error('Failed to delete Security.'))));
+  }
 
-    updateSecurity(id: number, security: Security): Observable<Security> {
-        return this.http.put<Security>(this.URL + `/${id}`, security)
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to update Security.")))
-            );
-    }
+  getUserSecurityTotal(userId: number): Observable<number> {
+    let params = new HttpParams();
 
-    deleteSecurity(id: number): Observable<void> {
-        return this.http.delete<void>(this.URL  + `/${id}`)
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to delete Security.")))
-            );
-    }
+    params = params.set('userId', userId);
 
-    getUserSecurityTotal(userId: number): Observable<number> {
-        let params = new HttpParams();
+    return this.http
+      .get<number>(this.URL + '/total', { params })
+      .pipe(catchError(() => throwError(() => new Error('Failed to load total user securities.'))));
+  }
 
-        params = params.set("userId", userId);
-    
-    
-        return this.http.get<number>(this.URL + '/total', {params})   
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to load total user securities.")))
-            );
-    }
+  getRecentSecurities(userId: number): Observable<Security[]> {
+    let params = new HttpParams();
 
-    getRecentSecurities(userId: number): Observable<Security[]> {
-        let params = new HttpParams();
+    params = params.set('userId', userId);
 
-        params = params.set("userId", userId);
-    
-        return this.http.get<Security[]>(this.URL + '/recent', {params})   
-            .pipe(
-                catchError(() => throwError(() => new Error("Failed to load recent Securities for specified User.")))
-            );
-    }
+    return this.http
+      .get<Security[]>(this.URL + '/recent', { params })
+      .pipe(
+        catchError(() =>
+          throwError(() => new Error('Failed to load recent Securities for specified User.')),
+        ),
+      );
+  }
 }

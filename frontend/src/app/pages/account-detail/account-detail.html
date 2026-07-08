@@ -1,26 +1,16 @@
-<div class="page-layout flex">
-    <div class="flex col">
+<div class="page-layout">
+    <div class="sidebar-col">
         <app-detail-sidebar [items]="sidebarItems()" (selected)="onAccountSelect($event)" />
     </div>
 
+    <div class="table-col">
+        <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy" />
 
-    <div class="flex col">
+        <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
+            (onDelete)="deleteAccount()" />
 
-        <div class="main-content">
-            <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy">
-            </app-metric-card>
-
-            <!-- TODO neeed to create this method. In accounts? <app-metric-card title="Total Invested Cost" [data]="totalInvestedCostAccount()" icon="pi pi-dollar">
-        </app-metric-card>-->
-
-            <!--add account detail card-->
-            <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
-                (onDelete)="deleteAccount()" />
-
-            <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
-                (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
-
-        </div>
+        <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
+            (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
     </div>
 
     <app-manage-holding-modal 

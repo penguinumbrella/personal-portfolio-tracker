@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 
-import { ActivatedRoute } from '@angular/router';
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
 import { MetricCard } from '../../components/metric-card/metric-card';
@@ -8,10 +7,12 @@ import { HoldingService } from '../../services/HoldingService';
 import { Holding } from '../../types/Holding';
 import { TableLazyLoadEvent } from 'primeng/types/table';
 import { Security } from '../../types/Security';
+import { SecurityService } from '../../services/SecurityService';
+import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
 
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard],
+  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
 })
@@ -20,16 +21,37 @@ export class SecurityDetail {
   security = signal<Security | null>(null);
   loading = signal<boolean>(false);
   securityFields = signal<{ label: string; value: any }[]>([]);
+  sidebarItems = signal<SidebarItem[]>([]);
 
   constructor(
-    private route: ActivatedRoute,
     private holdingService: HoldingService,
+    private securityService: SecurityService,
   ) {}
 
   ngOnInit() {
-    //Use ActivatedRoute to get the securityId from url params
-    const securityId = Number(this.route.snapshot.params['securityId']);
-    this.loadHoldings(securityId);
+    this.loadSecurities();
+  }
+
+  loadSecurities() {
+    this.securityService.getAllSecuritiesByUser(1).subscribe({
+      next: (data) => {
+        console.log('data:', data);
+        this.sidebarItems.set(
+          data.map((s) => ({
+            id: s.id!,
+            label: s.name,
+            subtitle: s.type,
+          })),
+        );
+      },
+      error: (error) => {
+        console.error('Error loading securities:', error);
+      },
+    });
+  }
+
+  onSecuritySelect(item: SidebarItem): void {
+    this.loadHoldings(item.id);
   }
 
   loadHoldings(securityId: number, event?: TableLazyLoadEvent) {
@@ -64,10 +86,6 @@ export class SecurityDetail {
       { label: 'Security Type', value: s.type },
       { label: 'Sector', value: s.sector },
     ]);
-  }
-  onSecuritySelect($event: Event) {
-    // TODO load new security when selected
-    throw new Error('Method not implemented.');
   }
 
   editSecurity() {

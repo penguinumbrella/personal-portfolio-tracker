@@ -1,5 +1,5 @@
-<mat-sidenav-container class="app-container">
-  <mat-sidenav #sidenav mode="side" opened>
+<mat-sidenav-container class="flex app-container">
+  <mat-sidenav #sidenav mode="side" opened style="width: 200px;">
     <!-- nav links here -->
     <app-menu></app-menu>
   </mat-sidenav>
@@ -7,13 +7,13 @@
 
   <mat-sidenav-content>
     <div class="flex flex-col">
-        <div class="flex flex-row justify-between p-5">
-            <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
-                <i class="pi pi-bars"></i>
-            </button>
-            <app-user-handle></app-user-handle>
-            
-            
+      <div class="flex flex-row justify-between p-6">
+        <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
+          <i class="pi pi-bars"></i>
+        </button>
+        <app-user-handle></app-user-handle>
+
+
       </div>
       <router-outlet />
     </div>

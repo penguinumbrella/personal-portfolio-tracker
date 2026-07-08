@@ -1,7 +1,7 @@
 <!--https://v17.primeng.org/scrollpanel-->
 
 <div class="card">
-    <p-scrollPanel [style]="{ width: '30%', height: '90vh' }">
+    <p-scrollPanel>
         @for (item of items(); track item.id) {
         <div class="sidebar-item" [class.selected]="selectedId() === item.id" (click)="onSelect(item)">
             <app-sidebar-card [title]="item.label" [data]="item.subtitle" />

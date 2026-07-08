@@ -1,44 +1,28 @@
-<div class="dashboard flex flex-col">
+<div class="dashboard flex flex-col p-4 m-6">
 
     <h1 class="text-3xl font-bold mb-4 ">Overview</h1>
     <!-- 4 cards -->
     <div class="flex flex-row justify-between">
 
-        <app-metric-card 
-            title="Total Accounts" 
-            [data]="totalAccounts()" 
-            icon="pi pi-user">
+        <app-metric-card title="Total Accounts" [data]="totalAccounts()" icon="pi pi-user">
         </app-metric-card>
 
-        <app-metric-card 
-            title="Total Securities" 
-            [data]="totalSecurities()" 
-            icon="pi pi-lock">
+        <app-metric-card title="Total Securities" [data]="totalSecurities()" icon="pi pi-lock">
         </app-metric-card>
 
-        <app-metric-card 
-            title="Total Holdings" 
-            [data]="totalHoldings()" 
-            icon="pi pi-briefcase">
+        <app-metric-card title="Total Holdings" [data]="totalHoldings()" icon="pi pi-briefcase">
         </app-metric-card>
 
-        <app-metric-card 
-            title="Total Invested Cost" 
-            [data]="totalInvestedCost()" 
-            icon="pi pi-dollar">
+        <app-metric-card title="Total Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar">
         </app-metric-card>
-        
+
     </div>
 
-    <div class = "flex flex-row justify-between gap-4">
-        <app-dashboard-table 
-        title="Recent Accounts"
-        [data]="recentAccounts()">
+    <div class="flex flex-row justify-between gap-4">
+        <app-dashboard-table title="Recent Accounts" [data]="recentAccounts()">
         </app-dashboard-table>
 
-        <app-dashboard-table 
-        title="Recent Securities"
-        [data]="recentSecurities()">
+        <app-dashboard-table title="Recent Securities" [data]="recentSecurities()">
         </app-dashboard-table>
     </div>
 

@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 
-import { ActivatedRoute } from '@angular/router';
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
 import { MetricCard } from '../../components/metric-card/metric-card';
@@ -36,7 +35,6 @@ export class AccountDetail {
   }));
 
   constructor(
-    private route: ActivatedRoute,
     private holdingService: HoldingService,
     private investmentAccountService: InvestmentAccountService,
   ) {}
@@ -44,7 +42,6 @@ export class AccountDetail {
   
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
-    //Use ActivatedRoute to get the accountId from url params
     this.loadAccounts();
   }
 
