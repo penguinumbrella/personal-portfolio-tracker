@@ -4,7 +4,7 @@
     </div>
 
     <div class="table-col">
-        <div class="metric-cards flex row justify-between m-3 gap-3">
+        <div class="metric-cards flex row justify-between m-3 gap-4">
             <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
                 class="flex-1" />
             <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" class="flex-1" />
@@ -17,8 +17,6 @@
             (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
     </div>
 
-    <!-- TODO neeed to create this method. In securitys? <app-metric-card title="Total Invested Cost" [data]="totalInvestedCostSecurity()" icon="pi pi-dollar">
-    </app-metric-card>-->
 
 
 

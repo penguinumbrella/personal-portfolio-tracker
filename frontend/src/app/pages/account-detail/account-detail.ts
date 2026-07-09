@@ -86,12 +86,12 @@ export class AccountDetail {
   filteredSecurities = computed(() => {
     const all = this.allSecurities();
     const currentHoldings = this.holdings();
-    
+
     // Get a set of IDs currently held in this account for O(1) lookup
-    const heldSecurityIds = new Set(currentHoldings.map(h => h.id?.securityId));
-    
+    const heldSecurityIds = new Set(currentHoldings.map((h) => h.id?.securityId));
+
     // Only return securities not in that set
-    return all.filter(s => !heldSecurityIds.has(s.id));
+    return all.filter((s) => !heldSecurityIds.has(s.id));
   });
 
   // when an account is selected from the sidebar, load the holdings for that account

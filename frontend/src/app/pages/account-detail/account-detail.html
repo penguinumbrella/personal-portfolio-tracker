@@ -4,7 +4,7 @@
     </div>
 
     <div class="table-col">
-        <div class="metric-cards flex row justify-between m-3 gap-3">
+        <div class="metric-cards flex row justify-between m-3 gap-4">
 
             <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
                 class="flex-1" />
@@ -20,14 +20,8 @@
             (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
     </div>
 
-    <app-manage-holding-modal 
-        [(visible)]="isHoldingModalVisible" 
-        [form]="modalForm()"
-        [editingHolding]="editingHolding()"
-        [allSecurities]="filteredSecurities()"
-        [recordName]="'Holding'"
-        (confirmed)="onHoldingModalConfirm($event)"
-        (cancelled)="isHoldingModalVisible.set(false)"
-    />
+    <app-manage-holding-modal [(visible)]="isHoldingModalVisible" [form]="modalForm()"
+        [editingHolding]="editingHolding()" [allSecurities]="filteredSecurities()" [recordName]="'Holding'"
+        (confirmed)="onHoldingModalConfirm($event)" (cancelled)="isHoldingModalVisible.set(false)" />
 
 </div>
