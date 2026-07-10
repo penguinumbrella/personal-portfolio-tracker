@@ -1,0 +1,18 @@
+<div class="login-page flex flex-col p-4 m-6">
+    <!-- Welcom message plus Login / Signup form -->
+
+    <p-card class="welcome-card">
+        <h1>Your portfolio made simple</h1>
+        <p>Please log in or sign up to continue.</p>
+    </p-card>
+    @if (loginMode()) {
+    <app-login-form />
+    } @else {
+    <app-signup-form />
+    }
+    <p-divider layout="vertical" />
+
+    <img src="" alt="Stock Market" class="login-image" />
+
+
+</div>

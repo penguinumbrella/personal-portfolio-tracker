@@ -1,0 +1,14 @@
+<div class="card flex justify-content-center">
+    <p-floatLabel>
+        <input pInputText id="username" [(ngModel)]="value" />
+        <label for="username">Username</label>
+    </p-floatLabel>
+    <p-floatLabel>
+        <p-password [toggleMask]="true" />
+        <label for="password">Password</label>
+    </p-floatLabel>
+
+    <p-button label="Login" severity="primary" [outlined]="true" (onClick)="triggerLogin()" />
+    <p>OR</p>
+    <p-button label="Sign Up" severity="secondary" [outlined]="true" (onClick)="switchToSignup()" />
+</div>

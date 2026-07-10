@@ -1,0 +1,20 @@
+<div class="card flex justify-content-center">
+    <form [formGroup]="signupForm" class="flex flex-col gap-y-6 mt-5">
+        <p-floatLabel>
+            <input pInputText id="username" formControlName="username" />
+            <label for="username">Username</label>
+        </p-floatLabel>
+        <p-floatLabel>
+            <p-password [toggleMask]="true" />
+            <label for="password">Password</label>
+        </p-floatLabel>
+        <p-floatLabel>
+            <input pInputText id="email" formControlName="email" />
+            <label for="email">Email</label>
+        </p-floatLabel>
+    </form>
+
+    <p-button label="Sign Up" severity="primary" [outlined]="true" (onClick)="triggerSignup()" />
+    <p>OR</p>
+    <p-button label="Login" severity="secondary" [outlined]="true" (onClick)="switchToLogin()" />
+</div>
