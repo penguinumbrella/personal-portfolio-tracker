@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.SecurityType;
@@ -52,8 +53,8 @@ public class SecurityServiceTest {
 
     @BeforeEach
     void dataInit() {
-        testUser1 = new User(1, "plswork", "plswork@test.com", "hash");
-        testUser2 = new User(2, "diff", "diff@test.com", "diff");
+        testUser1 = new User(1, "plswork", "plswork@test.com", "hash", true, RoleType.USER);
+        testUser2 = new User(2, "diff", "diff@test.com", "diff", true, RoleType.USER);
 
         testSecurity1 = new Security(1, "abc", "Security One", SectorType.CONSUMER, SecurityType.BOND,
                 "one", testUser1);

@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skillstorm.DTOs.UserDto;
+import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Services.UserService;
 
@@ -36,7 +37,7 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean 
+    @MockitoBean
     private UserService service;
 
     private User testUser;
@@ -46,10 +47,10 @@ class UserControllerTest {
 
     @BeforeEach
     void dataInit() {
-        testUser = new User(1, "plswork", "plswork@test.com", "hash");
+        testUser = new User(1, "plswork", "plswork@test.com", "hash", true, RoleType.USER);
         testDtoSame = new UserDto("plswork", "plswork@test.com", "hash");
         testDtoDiff = new UserDto("diff", "diff@test.com", "diff");
-        testUserDiff = new User(1, "diff", "diff@test.com", "diff");
+        testUserDiff = new User(1, "diff", "diff@test.com", "diff", true, RoleType.USER);
     }
 
     @Nested
@@ -61,10 +62,10 @@ class UserControllerTest {
             when(service.getAll()).thenReturn(List.of(testUser));
 
             mockMvc.perform(get("/v1/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value("plswork"))
-                .andExpect(jsonPath("$[0].email").value("plswork@test.com"))
-                .andExpect(jsonPath("$[0].passwordHash").value("hash"));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].username").value("plswork"))
+                    .andExpect(jsonPath("$[0].email").value("plswork@test.com"))
+                    .andExpect(jsonPath("$[0].passwordHash").value("hash"));
 
         }
     }
@@ -75,16 +76,16 @@ class UserControllerTest {
 
         @Test
         @DisplayName("201 OK user created")
-        void registerUser() throws Exception{
+        void registerUser() throws Exception {
             when(service.registerUser(testDtoSame)).thenReturn(testUser);
 
             mockMvc.perform(post("/v1/users")
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testDtoSame)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("plswork"))
-                .andExpect(jsonPath("$.email").value("plswork@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("hash"));
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(testDtoSame)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.username").value("plswork"))
+                    .andExpect(jsonPath("$.email").value("plswork@test.com"))
+                    .andExpect(jsonPath("$.passwordHash").value("hash"));
         }
 
     }
@@ -95,14 +96,14 @@ class UserControllerTest {
 
         @Test
         @DisplayName("200 OK user returned")
-        void registerUser() throws Exception{
+        void registerUser() throws Exception {
             when(service.viewProfile(1)).thenReturn(testUser);
 
             mockMvc.perform(get("/v1/users/" + 1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("plswork"))
-                .andExpect(jsonPath("$.email").value("plswork@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("hash"));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.username").value("plswork"))
+                    .andExpect(jsonPath("$.email").value("plswork@test.com"))
+                    .andExpect(jsonPath("$.passwordHash").value("hash"));
         }
 
     }
@@ -113,16 +114,16 @@ class UserControllerTest {
 
         @Test
         @DisplayName("200 OK user updated")
-        void updateProfile() throws Exception{
+        void updateProfile() throws Exception {
             when(service.updateProfile(1, testDtoDiff)).thenReturn(testUserDiff);
 
             mockMvc.perform(put("/v1/users/" + 1)
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testDtoDiff)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("diff"))
-                .andExpect(jsonPath("$.email").value("diff@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("diff"));
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(testDtoDiff)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.username").value("diff"))
+                    .andExpect(jsonPath("$.email").value("diff@test.com"))
+                    .andExpect(jsonPath("$.passwordHash").value("diff"));
         }
 
     }
@@ -133,17 +134,13 @@ class UserControllerTest {
 
         @Test
         @DisplayName("204 OK user deleted")
-        void deleteUser() throws Exception{
+        void deleteUser() throws Exception {
             when(service.deleteUser(1)).thenReturn(true);
 
             mockMvc.perform(delete("/v1/users/" + 1))
-                .andExpect(status().isNoContent());
+                    .andExpect(status().isNoContent());
         }
 
     }
-
-
-
-
 
 }

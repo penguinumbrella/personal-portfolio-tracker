@@ -1,10 +1,19 @@
 CREATE SCHEMA IF NOT EXISTS portfolio;
 
+DROP TYPE IF EXISTS portfolio.role_type CASCADE;
+CREATE TYPE portfolio.role_type AS ENUM (
+	'USER',
+	'ADMIN'
+);
+
+DROP TABLE IF EXISTS portfolio.users CASCADE;
 CREATE TABLE IF NOT EXISTS portfolio.users (
 	id				BIGSERIAL	PRIMARY KEY,
 	username 		VARCHAR(32) NOT NULL UNIQUE,
 	email			VARCHAR(64) NOT NULL,
-	password_hash	VARCHAR(64) NOT NULL
+	password_hash	VARCHAR(64) NOT NULL,
+	is_enabled		BOOLEAN NOT NULL DEFAULT TRUE,
+	user_role		portfolio.role_type NOT NULL DEFAULT 'USER'
 );
 
 DROP TYPE IF EXISTS portfolio.investment_type CASCADE;
@@ -16,7 +25,7 @@ CREATE TYPE portfolio.investment_type AS ENUM (
 	'HSA'
 );
 
-DROP TABLE IF EXISTS portfolio.investment_account;
+DROP TABLE IF EXISTS portfolio.investment_account CASCADE;
 CREATE TABLE IF NOT EXISTS portfolio.investment_account (
 	id					BIGSERIAL 		PRIMARY KEY,
 	nickname			VARCHAR(64) 	NOT NULL UNIQUE,
@@ -31,7 +40,7 @@ CREATE TABLE IF NOT EXISTS portfolio.investment_account (
 		ON DELETE CASCADE
 );
 
-DROP TYPE IF EXISTS portfolio.sector_type; 
+DROP TYPE IF EXISTS portfolio.sector_type CASCADE; 
 CREATE TYPE portfolio.sector_type AS ENUM (
 	'TECHNOLOGY',
 	'HEALTHCARE',
@@ -43,14 +52,14 @@ CREATE TYPE portfolio.sector_type AS ENUM (
 	'REAL_ESTATE'
 );
 
-DROP TYPE IF EXISTS portfolio.security_type_enum; 
+DROP TYPE IF EXISTS portfolio.security_type_enum CASCADE; 
 CREATE TYPE portfolio.security_type_enum AS ENUM (
 	'STOCK', 
 	'ETF', 
 	'MUTUAL_FUND', 
 	'BOND');
 
-DROP TABLE IF EXISTS portfolio.security;
+DROP TABLE IF EXISTS portfolio.security CASCADE;
 CREATE TABLE IF NOT EXISTS portfolio.security (
 	id 				BIGSERIAL 		PRIMARY KEY,
 	ticker_symbol 	VARCHAR(10) 	NOT NULL,
@@ -66,7 +75,7 @@ CREATE TABLE IF NOT EXISTS portfolio.security (
 		ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS portfolio.holding;
+DROP TABLE IF EXISTS portfolio.holding CASCADE;
 CREATE TABLE IF NOT EXISTS portfolio.holding (
 	account_id 		BIGINT NOT NULL,
 	security_id 	BIGINT NOT NULL,

@@ -32,21 +32,21 @@ public class UserController {
         return ResponseEntity.ok(service.getAll());
     }
 
-    // REGISTRATION
-    /**
-     * 
-     * @param dto:
-     *      - username
-     *      - email
-     *      - password
-     * @return
-     */
-    @PostMapping
-    public ResponseEntity<User> registerUser(
-            @RequestBody UserDto dto) {
+    // // USE REGISTRATION IN AUTH CONTROLLER INSTEAD OF THIS ENDPOINT
+    // /**
+    //  * 
+    //  * @param dto:
+    //  *      - username
+    //  *      - email
+    //  *      - password
+    //  * @return
+    //  */
+    // @PostMapping
+    // public ResponseEntity<User> registerUser(
+    //         @RequestBody UserDto dto) {
 
-        return ResponseEntity.status(201).body(service.registerUser(dto));
-    }
+    //     return ResponseEntity.status(201).body(service.registerUser(dto));
+    // }
 
     // VIEW PROFILE
     @GetMapping("/{id}")

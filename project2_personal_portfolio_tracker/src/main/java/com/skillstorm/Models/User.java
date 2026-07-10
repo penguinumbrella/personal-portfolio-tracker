@@ -3,10 +3,15 @@ package com.skillstorm.Models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,6 +40,14 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Column(name = "is_enabled", nullable = false)
+    private boolean enabled;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "user_role", nullable = false)
+    private RoleType role;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "user" })
     private List<InvestmentAccount> investmentAccounts;
@@ -46,11 +59,13 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String email, String passwordHash) {
+    public User(int id, String username, String email, String passwordHash, boolean enabled, RoleType role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
+        this.enabled = enabled;
+        this.role = role;
         this.investmentAccounts = new ArrayList<>();
         this.securities = new ArrayList<>();
     }
@@ -96,11 +111,33 @@ public class User {
     }
 
     public List<Security> getSecurities() {
-    return securities;
-}
+        return securities;
+    }
 
     public void setSecurities(List<Security> securities) {
         this.securities = securities;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", username=" + username + ", email=" + email + ", enabled=" + enabled + ", role="
+                + role + ", investmentAccounts=" + investmentAccounts + ", securities=" + securities + "]";
     }
 
 }

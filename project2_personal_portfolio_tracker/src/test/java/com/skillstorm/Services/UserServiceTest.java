@@ -13,8 +13,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 
-
-
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.UserDto;
+import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
 
@@ -47,7 +46,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void dataInit() {
-        testUser = new User(1, "plswork", "plswork@test.com", "hash");
+        testUser = new User(1, "plswork", "plswork@test.com", "hash", true, RoleType.USER);
         testDto = new UserDto("testuser", "test@test.com", "hash");
     }
 
@@ -82,14 +81,15 @@ public class UserServiceTest {
             assertEquals("hash", result.getPasswordHash());
 
             verify(repo).save(any(User.class));
-            
+
         }
 
         @Test
         @DisplayName("throw exception when username is taken")
         void throwExceptionWhenUsernameTaken() {
             when(repo.existsByUsername(anyString())).thenReturn(true);
-            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.registerUser(testDto));
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.registerUser(testDto));
 
             assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
             assertEquals("Username taken. Please use another username.", result.getReason());
@@ -118,9 +118,8 @@ public class UserServiceTest {
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
             assertEquals("User with id 99 does not exist in the database.", result.getReason());
             verify(repo).findById(99);
-            
-        }
 
+        }
 
     }
 
@@ -149,7 +148,8 @@ public class UserServiceTest {
             when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(testUser));
             when(repo.existsByUsername(anyString())).thenReturn(true);
-            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(1, testDto));
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.updateProfile(1, testDto));
 
             assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
             assertEquals("Username taken. Please use another username.", result.getReason());
@@ -160,7 +160,7 @@ public class UserServiceTest {
         @DisplayName("update success when username unchanged")
         void updateSuccessfulWhenUsernameChanged() {
 
-            User existingUser = new User(1, "testuser", "oldtest@test.com", "hash");
+            User existingUser = new User(1, "testuser", "oldtest@test.com", "hash", true, RoleType.USER);
 
             when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(existingUser));
@@ -176,13 +176,13 @@ public class UserServiceTest {
             verify(repo, never()).existsByUsername(anyString());
         }
 
-
         @Test
         @DisplayName("user id doesn't exist")
         void throwExceptionWhenNoSuchUserIdExists() {
             when(repo.existsById(99)).thenReturn(false);
 
-            ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(99, testDto));
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.updateProfile(99, testDto));
 
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
             assertEquals("User with id 99 does not exist in the database.", result.getReason());
@@ -217,11 +217,4 @@ public class UserServiceTest {
         }
     }
 
-
-
-
-
-
-
-    
 }

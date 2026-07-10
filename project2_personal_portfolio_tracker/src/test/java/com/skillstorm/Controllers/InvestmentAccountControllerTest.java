@@ -14,6 +14,7 @@ import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.InvestmentType;
+import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Services.InvestmentAccountService;
 import com.skillstorm.Services.UserService;
@@ -57,12 +58,10 @@ public class InvestmentAccountControllerTest {
     private InvestmentAccountDto testAccountDto1;
     private InvestmentAccountDto testAccountDto2;
 
-
-
     @BeforeEach
     void dataInit() {
-        testUser1 = new User(1, "test1", "test1@test.com", "test1");
-        testUser2 = new User(2, "test2", "test2@test.com", "test2");
+        testUser1 = new User(1, "test1", "test1@test.com", "test1", true, RoleType.USER);
+        testUser2 = new User(2, "test2", "test2@test.com", "test2", true, RoleType.USER);
 
         Date date1 = Date.valueOf("2026-06-26");
         Date date2 = Date.valueOf("2026-06-27");
@@ -82,48 +81,47 @@ public class InvestmentAccountControllerTest {
     class getAccounts {
         @Test
         @DisplayName("200 OK with a list of all investments")
-        void getAllAccounts() throws Exception{
+        void getAllAccounts() throws Exception {
             when(service.getAccounts(null)).thenReturn(List.of(testAccount1, testAccount2));
 
             mockMvc.perform(get("/v1/investments"))
-                .andExpect((status().isOk()))
+                    .andExpect((status().isOk()))
 
-                .andExpect(jsonPath("$", hasSize(2)))
+                    .andExpect(jsonPath("$", hasSize(2)))
 
-                .andExpect(jsonPath("$[0].nickname").value("test1"))
-                .andExpect(jsonPath("$[0].accountType").value("Brokerage"))
-                .andExpect(jsonPath("$[0].institutionName").value("test1"))
-                .andExpect(jsonPath("$[0].dateOpened").value("2026-06-26"))
-                .andExpect(jsonPath("$[0].user.id").value(testUser1.getId()))
+                    .andExpect(jsonPath("$[0].nickname").value("test1"))
+                    .andExpect(jsonPath("$[0].accountType").value("Brokerage"))
+                    .andExpect(jsonPath("$[0].institutionName").value("test1"))
+                    .andExpect(jsonPath("$[0].dateOpened").value("2026-06-26"))
+                    .andExpect(jsonPath("$[0].user.id").value(testUser1.getId()))
 
-                .andExpect(jsonPath("$[1].nickname").value("test2"))
-                .andExpect(jsonPath("$[1].accountType").value("Roth IRA"))
-                .andExpect(jsonPath("$[1].institutionName").value("test2"))
-                .andExpect(jsonPath("$[1].dateOpened").value("2026-06-27"))
-                .andExpect(jsonPath("$[1].user.id").value(testUser2.getId()));
+                    .andExpect(jsonPath("$[1].nickname").value("test2"))
+                    .andExpect(jsonPath("$[1].accountType").value("Roth IRA"))
+                    .andExpect(jsonPath("$[1].institutionName").value("test2"))
+                    .andExpect(jsonPath("$[1].dateOpened").value("2026-06-27"))
+                    .andExpect(jsonPath("$[1].user.id").value(testUser2.getId()));
 
         }
 
         @Test
         @DisplayName("200 OK with a list of accounts for a given user id")
         void getAccountsForUserId() throws Exception {
-            
+
             when(service.getAccounts(Long.valueOf(testUser1.getId()))).thenReturn(List.of(testAccount1));
 
             mockMvc.perform(get("/v1/investments?userId=" + testUser1.getId()))
-                .andExpect((status().isOk()))
+                    .andExpect((status().isOk()))
 
-                .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$", hasSize(1)))
 
-                .andExpect(jsonPath("$[0].nickname").value("test1"))
-                .andExpect(jsonPath("$[0].accountType").value("Brokerage"))
-                .andExpect(jsonPath("$[0].institutionName").value("test1"))
-                .andExpect(jsonPath("$[0].dateOpened").value("2026-06-26"))
-                .andExpect(jsonPath("$[0].user.id").value(testUser1.getId()));
+                    .andExpect(jsonPath("$[0].nickname").value("test1"))
+                    .andExpect(jsonPath("$[0].accountType").value("Brokerage"))
+                    .andExpect(jsonPath("$[0].institutionName").value("test1"))
+                    .andExpect(jsonPath("$[0].dateOpened").value("2026-06-26"))
+                    .andExpect(jsonPath("$[0].user.id").value(testUser1.getId()));
         }
     }
 
-    
     @Nested
     @DisplayName("POST /v1/investments")
     class addAccount {
@@ -135,27 +133,24 @@ public class InvestmentAccountControllerTest {
 
             when(service.addAccount(deserializedDto)).thenReturn(testAccount1);
             mockMvc.perform(post("/v1/investments")
-                .contentType(APPLICATION_JSON)
-                .content(jsonDto))
+                    .contentType(APPLICATION_JSON)
+                    .content(jsonDto))
 
-                .andExpect(status().isCreated())
+                    .andExpect(status().isCreated())
 
-                .andExpect(jsonPath("$.nickname").value("test1"))
-                .andExpect(jsonPath("$.accountType").value("Brokerage"))
-                .andExpect(jsonPath("$.institutionName").value("test1"))
-                .andExpect(jsonPath("$.dateOpened").value("2026-06-26"))
-                .andExpect(jsonPath("$.user.id").value(testUser1.getId()));
-                
+                    .andExpect(jsonPath("$.nickname").value("test1"))
+                    .andExpect(jsonPath("$.accountType").value("Brokerage"))
+                    .andExpect(jsonPath("$.institutionName").value("test1"))
+                    .andExpect(jsonPath("$.dateOpened").value("2026-06-26"))
+                    .andExpect(jsonPath("$.user.id").value(testUser1.getId()));
 
         }
     }
-        
 
-    
     @Nested
     @DisplayName("PUT /v1/investments")
     class updateAccount {
-        
+
         @Test
         @DisplayName("200 OK investment updated")
         void updateAccount() throws Exception {
@@ -165,21 +160,20 @@ public class InvestmentAccountControllerTest {
             when(service.updateAccount(testAccount1.getId(), deserializedDto)).thenReturn(testAccount1);
 
             mockMvc.perform(put("/v1/investments/" + testAccount1.getId())
-                .contentType(APPLICATION_JSON)
-                .content(jsonDto))
+                    .contentType(APPLICATION_JSON)
+                    .content(jsonDto))
 
-                .andExpect(status().isOk())
+                    .andExpect(status().isOk())
 
-                .andExpect(jsonPath("$.nickname").value("test1"))
-                .andExpect(jsonPath("$.accountType").value("Brokerage"))
-                .andExpect(jsonPath("$.institutionName").value("test1"))
-                .andExpect(jsonPath("$.dateOpened").value("2026-06-26"))
-                .andExpect(jsonPath("$.user.id").value(testUser1.getId()));
-                
+                    .andExpect(jsonPath("$.nickname").value("test1"))
+                    .andExpect(jsonPath("$.accountType").value("Brokerage"))
+                    .andExpect(jsonPath("$.institutionName").value("test1"))
+                    .andExpect(jsonPath("$.dateOpened").value("2026-06-26"))
+                    .andExpect(jsonPath("$.user.id").value(testUser1.getId()));
 
         }
     }
-        
+
     @Nested
     @DisplayName("DELETE /v1/investments/{id}")
     class deleteAccount {
@@ -189,10 +183,9 @@ public class InvestmentAccountControllerTest {
             when(service.deleteAccount(testAccount1.getId())).thenReturn(true);
             mockMvc.perform(delete("/v1/investments/" + testAccount1.getId()))
 
-                .andExpect(status().isNoContent());
-                
+                    .andExpect(status().isNoContent());
 
         }
     }
-    
+
 }

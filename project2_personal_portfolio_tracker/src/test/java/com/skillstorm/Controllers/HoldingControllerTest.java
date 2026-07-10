@@ -17,6 +17,7 @@ import com.skillstorm.Models.Holding;
 import com.skillstorm.Models.HoldingPK;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.InvestmentType;
+import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.SecurityType;
@@ -70,14 +71,14 @@ class HoldingControllerTest {
         @BeforeEach
         void dataInit() {
                 // User with an account and security
-                testUser1 = new User(1, "plswork", "plswork@test.com", "hash");
+                testUser1 = new User(1, "plswork", "plswork@test.com", "hash", true, RoleType.USER);
                 testAccount1 = new InvestmentAccount(1, "account One", InvestmentType.BROKERAGE, "test1",
                                 Date.valueOf("2026-06-25"), testUser1);
                 testSecurity1 = new Security(1, "abc", "Security One", SectorType.CONSUMER, SecurityType.BOND,
                                 "one", testUser1);
 
                 // Different User + account + security
-                testUser2 = new User(2, "diff", "diff@test.com", "diff");
+                testUser2 = new User(2, "diff", "diff@test.com", "diff", true, RoleType.USER);
                 testAccount2 = new InvestmentAccount(2, "Account Two", InvestmentType.HSA, "test2",
                                 Date.valueOf("2035-06-25"), testUser2);
                 testSecurity2 = new Security(2, "xyz", "Security Two", SectorType.ENERGY, SecurityType.ETF,
