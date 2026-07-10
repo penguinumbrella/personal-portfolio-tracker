@@ -15,6 +15,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 
 import { Security } from '../../types/Security';
 import { Holding } from '../../types/Holding';
+import { InvestmentAccount } from '../../types/InvestmentAccounts';
 
 
 @Component({
@@ -45,8 +46,11 @@ export class ManageHoldingModal {
   }));
 
   // creating values that need to be passed in by the parent
+
+  viewMode = input.required<'byAccount' | 'bySecurity'>();
   
-  filteredSecurities = input.required<Security[]>();
+  filteredSecurities = input<Security[]>();
+  filteredAccounts = input<InvestmentAccount[]>([]);
   editingHolding = input<Holding | null>(null);
   visible = model.required<boolean>();
   recordName = input.required<string>();
@@ -59,9 +63,16 @@ export class ManageHoldingModal {
   cancelled = output<void>();
 
   onUpdate() {
-    this.confirmed.emit(this.form().value);
-    this.visible.set(false); // Close the modal
-  }
+    console.log('Form status:', this.form().valid);
+    console.log('Form values:', this.form().value);
+    
+    if (this.form().valid) {
+      this.confirmed.emit(this.form().value);
+    } else {
+      // This logs exactly which fields are broken
+      console.log('Form errors:', this.form().errors);
+    }
+}
 
 
 }

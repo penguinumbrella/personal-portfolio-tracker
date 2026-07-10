@@ -1,8 +1,12 @@
 <div class="page-layout">
     <div class="sidebar-col">
-        <app-detail-sidebar [items]="sidebarItems()" (selected)="onSecuritySelect($event)" />
+        <app-detail-sidebar 
+        [items]="sidebarItems()" 
+        (selected)="onSecuritySelect($event)"
+        (onAddItem)="onOpenAddSecurityModal()" />
     </div>
 
+    @if (security()) {
     <div class="table-col">
         <div class="metric-cards flex row justify-between m-3 gap-3">
             <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
@@ -16,10 +20,26 @@
         <app-holding-table [holdings]="holdings()" [tableMode]="'bySecurity'" (onAdd)="addHolding()"
             (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
     </div>
+    } @else {
+    <div class="table-col flex justify-center items-center">
+        <p>Please select a security to view details.</p>
+    </div>
+    }
 
-    <!-- TODO neeed to create this method. In securitys? <app-metric-card title="Total Invested Cost" [data]="totalInvestedCostSecurity()" icon="pi pi-dollar">
-    </app-metric-card>-->
+    <app-manage-holding-modal 
+        [viewMode]="'bySecurity'"
+        [(visible)]="isHoldingModalVisible" 
+        [form]="modalForm()"
+        [editingHolding]="editingHolding()"
+        [recordName]="'Holding'"
+        (confirmed)="onHoldingModalConfirm($event)"
+        (cancelled)="isHoldingModalVisible.set(false)"
+    />
 
-
-
+    <app-manage-security-modal 
+    
+        [(visible)]="isSecurityModalVisible"
+        [form]="securityForm()"
+        [editingSecurity]="editingSecurity()"
+        (confirmed)="onSecurityModalConfirm($event)" />
 </div>

@@ -1,57 +1,37 @@
 import { Component, input, model, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import {FloatLabelModule} from 'primeng/floatlabel';
-import {InputGroupModule} from 'primeng/inputgroup';
-import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
-import { IftaLabelModule } from 'primeng/iftalabel';
-
+import { InputTextModule } from 'primeng/inputtext';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { InvestmentType } from '../../types/InvestmentType';
 import { SelectModule } from 'primeng/select';
-
+import { Sector} from "../../types/Sector";
+import { SecurityType } from '../../types/SecurityType';
 
 @Component({
   selector: 'app-manage-security-modal',
-  imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule
-    ,IftaLabelModule, SelectModule
+  imports: [
+    DialogModule, 
+    ButtonModule, 
+    ReactiveFormsModule, 
+    InputTextModule, 
+    SelectModule
   ],
   templateUrl: './manage-security-modal.html',
   styleUrl: './manage-security-modal.css',
 })
 export class ManageSecurityModal {
 
-  /**
-   * INPUT and OUTPUT
-   *    - move data between components
-   * 
-   *    - input: parent ->  child
-   *        - assigning a variable some data     
-   * 
-   *    - output: child -> parent
-   *        - broadcast an event that the parent will need to listen for
-   *            - event payload will contain whatever data you want to send to the parent 
-   */
+  readonly sectorTypes = Object.values(Sector).map(value => ({ name: value, value }));
+  readonly securityTypes = Object.values(SecurityType).map(value => ({ name: value, value }));
 
-  readonly accountOptions = Object.values(InvestmentType).map(value => ({
-    name: value,
-    value: value
-  }));
-
-  // creating values that need to be passed in by the parent
+  editingSecurity = input<any | null>(null);
   visible = model.required<boolean>();
-  recordName = input.required<string>();
   form = input.required<FormGroup>();
-  
 
-  // creating events for when the deletion is confirmed or cancelled - needs to be handled by parent
   confirmed = output<any>();
   cancelled = output<void>();
 
   onUpdate() {
     this.confirmed.emit(this.form().value);
-    this.visible.set(false); // Close the modal
   }
-
-
 }

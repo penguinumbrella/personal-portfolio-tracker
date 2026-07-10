@@ -10,16 +10,26 @@
     
     @if (!editingHolding()) {
       <div class="relative">
-        <p-select 
-          id="security"
-          formControlName="security"
-          [options]="filteredSecurities()"
-          optionLabel="name"
-          class="w-full peer"
-        />
-        <label for="security" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
-          Security
-        </label>
+        <div class="relative">
+          @if (viewMode() === 'byAccount') {
+            <p-select 
+              id="security"
+              formControlName="security" 
+              [options]="filteredSecurities()" 
+              optionLabel="name" 
+              class="w-full" />
+            <label>Security</label>
+            } 
+            @else {
+            <p-select 
+              id="account"
+              formControlName="account" 
+              [options]="filteredAccounts()" 
+              optionLabel="nickname" 
+              class="w-full" />
+            <label>Account</label>
+            }
+            </div>
       </div>
     }
 
@@ -48,11 +58,19 @@
     </div>
 
     <div class="relative">
+      <!--
       <p-datepicker 
         id="purchaseDate" 
         formControlName="purchaseDate" 
         [showIcon]="true" 
         class="w-full peer"
+      />
+      -->
+      <input 
+        type="date"
+        id="purchaseDate" 
+        formControlName="purchaseDate" 
+        class="w-full p-3 border border-gray-300 rounded-md peer focus:border-indigo-600 focus:outline-none"
       />
       <label for="purchaseDate" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600">
         Purchase Date

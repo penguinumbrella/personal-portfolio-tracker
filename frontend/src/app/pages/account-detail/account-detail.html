@@ -1,8 +1,12 @@
 <div class="page-layout">
     <div class="sidebar-col">
-        <app-detail-sidebar [items]="sidebarItems()" (selected)="onAccountSelect($event)" />
+        <app-detail-sidebar 
+        [items]="sidebarItems()" 
+        (selected)="onAccountSelect($event)" 
+        (onAddItem)="onOpenAddAccountModal()" />
     </div>
 
+    @if (account()) {
     <div class="table-col">
         <div class="metric-cards flex row justify-between m-3 gap-3">
 
@@ -19,15 +23,28 @@
         <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
             (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
     </div>
+    } @else {
+            <div class="table-col flex justify-center items-center">
+                <p>Please select an account to view details.</p>
+            </div>
+        }
 
     <app-manage-holding-modal 
+        [viewMode]="'byAccount'"
         [(visible)]="isHoldingModalVisible" 
         [form]="modalForm()"
         [editingHolding]="editingHolding()"
-        [allSecurities]="filteredSecurities()"
+        [filteredSecurities]="filteredSecurities()"
         [recordName]="'Holding'"
         (confirmed)="onHoldingModalConfirm($event)"
         (cancelled)="isHoldingModalVisible.set(false)"
     />
+
+    <app-manage-account-modal 
+    
+        [(visible)]="isAccountModalVisible"
+        [form]="accountForm()"
+        [editingAccount]="editingAccount()"
+        (confirmed)="onAccountModalConfirm($event)" />
 
 </div>

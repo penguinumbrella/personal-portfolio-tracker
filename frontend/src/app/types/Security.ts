@@ -10,4 +10,6 @@ export interface Security {
   sector: Sector;
   type: SecurityType;
   generalNotes: string;
+
+  userId?: number;
 }

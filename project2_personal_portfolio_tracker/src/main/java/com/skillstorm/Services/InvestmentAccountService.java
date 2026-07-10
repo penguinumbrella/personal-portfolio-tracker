@@ -70,7 +70,7 @@ public class InvestmentAccountService {
         User user = userRepo.findById(dto.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        return investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(),
+        return investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
                 dto.institutionName(), dto.dateOpened(), user));
 
     }
