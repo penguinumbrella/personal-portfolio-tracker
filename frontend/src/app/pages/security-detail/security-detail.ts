@@ -108,6 +108,7 @@ export class SecurityDetail {
       // Only return securities not in that set
       console.log('All accounts:', all);
       return all.filter(s => !heldAccountIds.has(s.id));
+      //return all;
     });
 
 
@@ -210,16 +211,18 @@ export class SecurityDetail {
         : holding.purchaseDate;
 
     this.modalForm().patchValue({
-      security: holding.security,
+      account: holding.account,
       shares: holding.shares,
       costPerShare: holding.costPerShare,
       purchaseDate: dateValue,
     });
 
     this.isHoldingModalVisible.set(true);
+    console.log('Modal form values after patch:', this.modalForm().value);
   }
 
   onHoldingModalConfirm(formData: any) {
+    console.log('Form data received from modal:', formData);
     if (this.modalForm().invalid) return;
 
     const payload = {
