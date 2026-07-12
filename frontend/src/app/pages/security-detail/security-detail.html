@@ -15,10 +15,10 @@
         </div>
 
         <app-detail-card title="Security Details" [fields]="securityFields()" (onEdit)="editSecurity()"
-            (onDelete)="deleteSecurity()" />
+            (onDelete)="confirmDeleteSecurity()" />
 
         <app-holding-table [holdings]="holdings()" [tableMode]="'bySecurity'" (onAdd)="addHolding()"
-            (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
+            (onEdit)="editHolding($event)" (onDelete)="confirmDeleteHolding($event.holding, $event.originalEvent)" />
     </div>
     } @else {
     <div class="table-col flex justify-center items-center">
@@ -43,4 +43,6 @@
         [form]="securityForm()"
         [editingSecurity]="editingSecurity()"
         (confirmed)="onSecurityModalConfirm($event)" />
+
+        <p-confirmDialog></p-confirmDialog>
 </div>

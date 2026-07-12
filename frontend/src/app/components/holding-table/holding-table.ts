@@ -27,7 +27,7 @@ export class HoldingTable {
 
   onAdd = output<void>();
   onEdit = output<Holding>();
-  onDelete = output<Holding>();
+  onDelete = output<{ holding: Holding, originalEvent: Event }>();
 
   // Used by two pages to load different data, so they handle loading
 }

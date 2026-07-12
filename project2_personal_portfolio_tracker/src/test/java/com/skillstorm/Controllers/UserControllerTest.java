@@ -23,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.List;
@@ -64,7 +65,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value("plswork"))
                 .andExpect(jsonPath("$[0].email").value("plswork@test.com"))
-                .andExpect(jsonPath("$[0].passwordHash").value("hash"));
+                .andExpect(jsonPath("$[0].passwordHash").doesNotExist());
 
         }
     }
@@ -84,7 +85,7 @@ class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("plswork"))
                 .andExpect(jsonPath("$.email").value("plswork@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("hash"));
+                .andExpect(jsonPath("$.passwordHash").doesNotExist());
         }
 
     }
@@ -102,7 +103,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("plswork"))
                 .andExpect(jsonPath("$.email").value("plswork@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("hash"));
+                .andExpect(jsonPath("$.passwordHash").doesNotExist());
         }
 
     }
@@ -122,7 +123,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("diff"))
                 .andExpect(jsonPath("$.email").value("diff@test.com"))
-                .andExpect(jsonPath("$.passwordHash").value("diff"));
+                .andExpect(jsonPath("$.passwordHash").doesNotExist());
         }
 
     }
@@ -138,6 +139,8 @@ class UserControllerTest {
 
             mockMvc.perform(delete("/v1/users/" + 1))
                 .andExpect(status().isNoContent());
+
+            verify(service).deleteUser(1);
         }
 
     }

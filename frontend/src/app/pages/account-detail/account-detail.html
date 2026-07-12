@@ -18,10 +18,10 @@
         </div>
 
         <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
-            (onDelete)="deleteAccount()" />
+            (onDelete)="confirmDeleteAccount()" />
 
         <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
-            (onEdit)="editHolding($event)" (onDelete)="deleteHolding($event)" />
+            (onEdit)="editHolding($event)" (onDelete)="confirmDeleteHolding($event.holding, $event.originalEvent)"> </app-holding-table>
     </div>
     } @else {
             <div class="table-col flex justify-center items-center">
@@ -47,4 +47,7 @@
         [editingAccount]="editingAccount()"
         (confirmed)="onAccountModalConfirm($event)" />
 
+    <p-confirmDialog></p-confirmDialog>
+
 </div>
+

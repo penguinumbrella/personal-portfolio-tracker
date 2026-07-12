@@ -10,8 +10,4 @@ import { ButtonModule } from 'primeng/button';
 export class SidebarCard {
   title = input<string>('');
   data = input<string>('');
-
-  onClick() {
-    console.log('Sidebar card clicked:', this.title(), this.data());
-  }
 }

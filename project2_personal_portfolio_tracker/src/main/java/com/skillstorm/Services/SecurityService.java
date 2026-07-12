@@ -11,6 +11,7 @@ import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
 import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class SecurityService {
@@ -49,16 +50,12 @@ public class SecurityService {
 
     // Read one
     public Security getSecurity(int id) {
-        return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Security with id " + id + " does not exist in the database."));
+        return RepoUtils.findOrThrow(repo, id, "Security");
     }
 
     // ----- PUT/UPDATE METHODS -----
     public Security updateSecurity(int id, SecurityDto dto) {
-        if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Security with id " + id + " does not exist in the database.");
-        }
+        RepoUtils.requireExists(repo, id, "Security");
 
         User linkedUser = userRepo.findById(dto.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -71,23 +68,17 @@ public class SecurityService {
 
     // ---- DELETE METHODS -----
     public boolean deleteSecurity(int id) {
-        if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Security with id " + id + " does not exist in the database.");
-        }
+        RepoUtils.requireExists(repo, id, "Security");
         repo.deleteById(id);
         return true;
     }
 
-    public Long UserSecurityAccountTotal(int userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+    public Long getUserSecurityAccountTotal(int userId) {
+        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
         return repo.countByUser(user);
-
     }
 
     public List<Security> getRecentSecurities(Long userId) {
-        System.out.println("Getting recent securities for userId: " + userId);
         return repo.findTop5ByUser_IdOrderByIdDesc(userId);
     }
 

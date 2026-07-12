@@ -11,7 +11,6 @@ import { InvestmentType } from '../../types/InvestmentType';
 import { SelectModule } from 'primeng/select';
 
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DatePickerModule } from 'primeng/datepicker';
 
 import { Security } from '../../types/Security';
 import { Holding } from '../../types/Holding';
@@ -21,7 +20,7 @@ import { InvestmentAccount } from '../../types/InvestmentAccounts';
 @Component({
   selector: 'app-manage-holding-modal',
   imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule
-    ,IftaLabelModule, SelectModule, InputNumberModule, DatePickerModule
+    ,IftaLabelModule, SelectModule, InputNumberModule
   ],
   templateUrl: './manage-holding-modal.html',
   styleUrl: './manage-holding-modal.css',
@@ -63,16 +62,8 @@ export class ManageHoldingModal {
   cancelled = output<void>();
 
   onUpdate() {
-    console.log('Form status:', this.form().valid);
-    console.log('Form values:', this.form().value);
-    
     if (this.form().valid) {
       this.confirmed.emit(this.form().value);
-    } else {
-      // This logs exactly which fields are broken
-      console.log('Form errors:', this.form().errors);
     }
-}
-
-
+  }
 }

@@ -51,7 +51,7 @@
             <td>
                 <div class="edit-del-buts">
                     <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="onEdit.emit(holding)" />
-                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="onDelete.emit(holding)" />
+                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="onDelete.emit({ holding, originalEvent: $event })" />
                 </div>
             </td>
         </tr>

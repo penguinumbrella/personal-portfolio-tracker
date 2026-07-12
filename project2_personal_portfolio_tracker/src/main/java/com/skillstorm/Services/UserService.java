@@ -1,7 +1,6 @@
 package com.skillstorm.Services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class UserService {
@@ -35,41 +35,25 @@ public class UserService {
 
     // VIEW PROFILE
     public User viewProfile(int id) {
-        Optional<User> userOptional = repo.findById(id);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
+        return RepoUtils.findOrThrow(repo, id, "User");
     }
 
     // EDIT PROFILE
 
     public User updateProfile(int id, UserDto dto) {
+        User user = RepoUtils.findOrThrow(repo, id, "User");
 
-        if (repo.existsById(id)) {
-            User user = repo.findById(id).get();
-            if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Username taken. Please use another username.");
-            }
-            return repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()));
+        if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Username taken. Please use another username.");
         }
-        //return null;
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
+        return repo.save(new User(id, dto.username(), dto.email(), dto.passwordHash()));
     }
 
     public boolean deleteUser(int id) {
-        if (repo.existsById(id)) {
-            repo.deleteById(id);
-            return true;
-        }
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
-
+        RepoUtils.requireExists(repo, id, "User");
+        repo.deleteById(id);
+        return true;
     }
 
     // LOGIN (TODO)
