@@ -2,7 +2,6 @@ package com.skillstorm.Services;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -15,12 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.skillstorm.Util.RepoUtils;
 
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
-import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -68,7 +67,9 @@ public class UserService implements UserDetailsService {
 
     // EDIT PROFILE
     public User updateProfile(int id, UserDto dto) {
-        User user = RepoUtils.findOrThrow(repo, id, "User");
+        User user = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User with id " + id + " does not exist in the database."));
 
         if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
