@@ -231,14 +231,14 @@ class HoldingControllerTest {
         class updateHolding {
 
                 @Test
-                @DisplayName("201 OK holding updated")
-                void updateHoldingSuccess201() throws Exception {
+                @DisplayName("200 OK holding updated")
+                void updateHoldingSuccess200() throws Exception {
                         when(service.updateHolding(anyInt(), anyInt(), any(HoldingDto.class))).thenReturn(testHolding2);
 
                         mockMvc.perform(put("/v1/holdings/a/1/s/1")
                                         .contentType(APPLICATION_JSON)
                                         .content(objectMapper.writeValueAsString(testHDto2)))
-                                        .andExpect(status().isCreated())
+                                        .andExpect(status().isOk())
                                         .andExpect(jsonPath("$.id.accountId").value(2))
                                         .andExpect(jsonPath("$.id.securityId").value(2))
                                         .andExpect(jsonPath("$.shares").value(55))

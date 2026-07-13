@@ -1,11 +1,11 @@
 <!--https://v17.primeng.org/table#stateful-->
-<p-table class="m-2" #dt [value]="holdings()"
+<p-table class="w-full" #dt [value]="holdings()"
     [globalFilterFields]="['security.name', 'account.nickname', 'shares', 'costPerShare', 'purchaseDate']" [rows]="5"
     [paginator]="true" [tableStyle]="{ 'min-width': '40rem' }" dataKey="id.securityId">
 
     <!--Table top, has add new and search features-->
     <ng-template pTemplate="caption">
-        <div class="table-top">
+        <div class="flex items-center justify-between">
             <p-iconField iconPosition="left">
                 <p-inputIcon>
                     <i class="pi pi-search"></i>
@@ -49,9 +49,9 @@
             <td>{{ holding.costPerShare | currency }}</td>
             <td>{{ holding.purchaseDate | date:'mediumDate' }}</td>
             <td>
-                <div class="edit-del-buts">
+                <div class="flex gap-1">
                     <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="onEdit.emit(holding)" />
-                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="onDelete.emit(holding)" />
+                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="onDelete.emit({ holding, originalEvent: $event })" />
                 </div>
             </td>
         </tr>

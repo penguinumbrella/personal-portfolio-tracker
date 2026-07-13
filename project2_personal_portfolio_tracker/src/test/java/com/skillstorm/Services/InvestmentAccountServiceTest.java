@@ -160,7 +160,8 @@ public class InvestmentAccountServiceTest {
                     () -> service.addAccount(testInvestmentAccountDto1));
 
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-            assertEquals("User not found.", result.getReason());
+            assertEquals("User with id " + testInvestmentAccountDto1.userId() + " does not exist in the database.",
+                    result.getReason());
 
             verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
 
@@ -242,7 +243,8 @@ public class InvestmentAccountServiceTest {
                     () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2));
 
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-            assertEquals("User not found.", result.getReason());
+            assertEquals("User with id " + testInvestmentAccountDto2.userId() + " does not exist in the database.",
+                    result.getReason());
 
             verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
 

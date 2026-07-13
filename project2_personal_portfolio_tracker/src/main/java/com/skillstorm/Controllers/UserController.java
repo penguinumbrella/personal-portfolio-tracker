@@ -1,7 +1,6 @@
 package com.skillstorm.Controllers;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/v1/users")
-@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
-        "http://localhost:4200" })
 public class UserController {
 
     private final UserService service;
@@ -71,7 +68,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(
             @PathVariable int id) {
-
+        service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 

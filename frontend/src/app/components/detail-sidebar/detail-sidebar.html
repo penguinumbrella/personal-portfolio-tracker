@@ -1,14 +1,23 @@
-<!--https://v17.primeng.org/scrollpanel-->
-
-<div class="card">
-    <p-scrollPanel>
+<div class="w-full h-full flex flex-col">
+    <div class="p-2">
+        <button pButton
+                icon="pi pi-plus"
+                [label]="addLabel()"
+                class="p-button-outlined p-button-sm w-full"
+                (click)="onAddClick()">
+        </button>
+    </div>
+    <p-scrollPanel class="flex-1">
+        <div class="flex flex-col gap-1">
         @for (item of items(); track item.id) {
-        <div class="sidebar-item" [class.selected]="selectedId() === item.id" (click)="onSelect(item)">
-            <app-sidebar-card [title]="item.label" [data]="item.subtitle" />
+        <div class="rounded-lg cursor-pointer transition-colors hover:bg-gray-100"
+            [class.bg-gray-900]="selectedId() === item.id"
+            (click)="onSelect(item)">
+            <app-sidebar-card [title]="item.label" [data]="item.subtitle" [selected]="selectedId() === item.id" />
         </div>
+        } @empty {
+        <p class="text-sm text-gray-400 text-center p-4">No items found.</p>
         }
-        @empty {
-        <p class="empty-message">No items found.</p>
-        }
+        </div>
     </p-scrollPanel>
 </div>

@@ -11,6 +11,7 @@ import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class InvestmentAccountService {
@@ -23,12 +24,6 @@ public class InvestmentAccountService {
         this.userRepo = userRepo;
     }
 
-    /*
-    public Iterable<InvestmentAccount> getAll() {
-        return investmentAccountRepo.findAll();
-    }
-    
-    */
     public List<InvestmentAccount> getAccounts(Long userId) {
         if (userId == null) {
             return investmentAccountRepo.findAll();
@@ -37,9 +32,7 @@ public class InvestmentAccountService {
     }
 
     public InvestmentAccount getAccount(int id) {
-        return investmentAccountRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Investment account with id " + id + " does not exist in the database."));
+        return RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
     }
 
     public InvestmentAccount addAccount(InvestmentAccountDto dto) {
@@ -47,8 +40,7 @@ public class InvestmentAccountService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
         }
 
-        User user = userRepo.findById(dto.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        User user = RepoUtils.findOrThrow(userRepo, dto.userId(), "User");
 
         return investmentAccountRepo.save(
                 new InvestmentAccount(0, dto.nickname(), dto.accountType(), dto.institutionName(), dto.dateOpened(),
@@ -57,9 +49,7 @@ public class InvestmentAccountService {
     }
 
     public InvestmentAccount updateAccount(int id, InvestmentAccountDto dto) {
-        InvestmentAccount investmentAccount = investmentAccountRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Investment account with id " + id + " does not exist in the database."));
+        InvestmentAccount investmentAccount = RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
 
         if (!investmentAccount.getNickname().equals(dto.nickname())
                 && investmentAccountRepo.existsByNickname(dto.nickname())) {
@@ -67,30 +57,22 @@ public class InvestmentAccountService {
                     "Nickname is already in use.");
         }
 
-        User user = userRepo.findById(dto.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        User user = RepoUtils.findOrThrow(userRepo, dto.userId(), "User");
 
-        return investmentAccountRepo.save(new InvestmentAccount(0, dto.nickname(), dto.accountType(),
+        return investmentAccountRepo.save(new InvestmentAccount(id, dto.nickname(), dto.accountType(),
                 dto.institutionName(), dto.dateOpened(), user));
 
     }
 
     public boolean deleteAccount(int id) {
-        if (investmentAccountRepo.existsById(id)) {
-            investmentAccountRepo.deleteById(id);
-            return true;
-        }
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Investment account with id " + id + " does not exist in the database.");
-
+        RepoUtils.requireExists(investmentAccountRepo, id, "Investment account");
+        investmentAccountRepo.deleteById(id);
+        return true;
     }
 
-    public Long UserInvestmentAccountTotal(int userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+    public Long getUserInvestmentAccountTotal(int userId) {
+        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
         return investmentAccountRepo.countByUser(user);
-
     }
 
     public List<InvestmentAccount> getRecentAccounts(Long userId) {

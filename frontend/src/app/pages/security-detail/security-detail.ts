@@ -1,44 +1,90 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
 import { MetricCard } from '../../components/metric-card/metric-card';
-import { HoldingService } from '../../services/HoldingService';
-import { Holding } from '../../types/Holding';
-import { TableLazyLoadEvent } from 'primeng/types/table';
 import { Security } from '../../types/Security';
 import { SecurityService } from '../../services/SecurityService';
 import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Validators } from '@angular/forms';
+import { ManageHoldingModal } from '../../components/manage-holding-modal/manage-holding-modal';
+import { ManageSecurityModal } from '../../components/manage-security-modal/manage-security-modal';
+import { InvestmentAccount } from '../../types/InvestmentAccounts';
+import { InvestmentAccountService } from '../../services/InvestmentAccountService';
+import { BaseDetailDirective } from '../../base/base-detail.directive';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar],
+  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule],
+  providers: [ConfirmationService],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
 })
-export class SecurityDetail {
-  holdings = signal<Holding[]>([]);
+export class SecurityDetail extends BaseDetailDirective<Security> {
+
   security = signal<Security | null>(null);
-  loading = signal<boolean>(false);
-  totalInvestedCost = signal<number>(0);
+
   securityFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
 
+  editingSecurity = signal<Security | null>(null);
+  allAccounts = signal<InvestmentAccount[]>([]);
+  isSecurityModalVisible = signal<boolean>(false);
+
+  modalForm = signal<FormGroup>(
+    new FormGroup({
+      account: new FormControl(null, Validators.required),
+      shares: new FormControl(0, [Validators.required, Validators.min(0)]),
+      costPerShare: new FormControl(0, [Validators.required, Validators.min(0)]),
+      purchaseDate: new FormControl(new Date(), Validators.required),
+    }),
+  );
+
+  securityForm = signal<FormGroup>(
+    new FormGroup({
+      tickerSymbol: new FormControl('', Validators.required),
+      name: new FormControl('', Validators.required),
+      sector: new FormControl('', Validators.required),
+      securityType: new FormControl('', Validators.required),
+    })
+  );
+
+  protected override readonly counterpartyFormKey = 'account' as const;
+
   constructor(
-    private holdingService: HoldingService,
     private securityService: SecurityService,
-  ) {}
+    private investmentAccountService: InvestmentAccountService,
+  ) { super(); }
+
+  protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
+    return { a_id: formData.account.id, s_id: this.security()!.id! };
+  }
 
   // get the list of securities on page load
   ngOnInit() {
+    this.loadAccounts();
     this.loadSecurities();
+  }
+
+  loadAccounts() {
+    // TODO how do we get the userId???? For now, hardcoding to 1
+    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+      next: (data) => {
+        this.allAccounts.set(data);
+      },
+      error: (error) => {
+        console.error('Error loading accounts:', error);
+      },
+    });
   }
 
   // load the list of securities for the user and populate the sidebar
   loadSecurities() {
     this.securityService.getAllSecuritiesByUser(1).subscribe({
       next: (data) => {
-        console.log('data:', data);
         this.sidebarItems.set(
           data.map((s) => ({
             id: s.id!,
@@ -52,6 +98,8 @@ export class SecurityDetail {
       },
     });
   }
+
+  filteredAccounts = computed(() => this.excludeHeld(this.allAccounts(), (h) => h.id?.accountId));
 
   // when a security is selected from sidebar, get security and load details, holdings
   onSecuritySelect(item: SidebarItem): void {
@@ -67,11 +115,14 @@ export class SecurityDetail {
     });
   }
 
-  // load holdings. invested cost calculated in loadHoldings() after holdings are loaded to avoid race condition
-  loadHoldings(securityId: number, event?: TableLazyLoadEvent) {
-    const page = event ? event?.first! / event?.rows! : 0;
-    const size = event ? event?.rows! : 2;
+  onOpenAddSecurityModal(): void {
+    this.editingSecurity.set(null);
+    this.securityForm().reset();
+    this.isSecurityModalVisible.set(true);
+  }
 
+  // load holdings for the selected security
+  loadHoldings(securityId: number) {
     // show loading spinner while request to backend is being made
     this.loading.set(true);
 
@@ -80,10 +131,10 @@ export class SecurityDetail {
       next: (data) => {
         this.holdings.set(data);
         this.loading.set(false);
-        this.calcInvestedCost();
       },
       error: (error) => {
         console.error('Error loading holdings:', error);
+        this.loading.set(false);
       },
     });
   }
@@ -100,43 +151,92 @@ export class SecurityDetail {
     ]);
   }
 
-  calcInvestedCost(): void {
-    const total = this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0);
-    this.totalInvestedCost.set(total);
-  }
-
   // CRUDS BELOW
+
   editSecurity() {
-    throw new Error('Method not implemented.');
-  }
-  deleteSecurity() {
-    throw new Error('Method not implemented.');
-  }
+    this.editingSecurity.set(this.security());
+    const currentSecurity = this.security();
+    if (!currentSecurity) return;
 
-  // HOLDING CRUD methods
-  addHolding() {
-    throw new Error('Method not implemented.');
-  }
-
-  editHolding(holding: Holding): void {
-    throw new Error('Method not implemented.');
-  }
-
-  deleteHolding(holding: Holding): void {
-    // TODO reload metrics
-    // TODO add modal to confirm deletion
-
-    this.holdingService.deleteHolding(holding.id!).subscribe({
-      next: () => {
-        this.holdings.update((current) =>
-          current.filter(
-            (h) =>
-              h.id?.securityId !== holding.id?.securityId ||
-              h.id?.securityId !== holding.id?.securityId,
-          ),
-        );
-      },
-      error: (err) => console.error(err),
+    this.securityForm().patchValue({
+      name: currentSecurity.name,
+      tickerSymbol: currentSecurity.tickerSymbol,
+      securityType: currentSecurity.type,
+      sector: currentSecurity.sector
     });
+
+    this.isSecurityModalVisible.set(true);
+  }
+
+  confirmDeleteSecurity(): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this security? This will also delete all holdings for this security.',
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.executeDeleteSecurity();
+      }
+    });
+  }
+
+  private executeDeleteSecurity(): void {
+    const security = this.security();
+    if (!security?.id) return;
+
+    this.securityService.deleteSecurity(security.id).subscribe({
+      next: () => {
+        this.security.set(null);
+        this.holdings.set([]);
+        this.loadSecurities();
+      },
+      error: (err) => console.error('Delete failed:', err),
+    });
+  }
+
+  onSecurityModalConfirm(formData: any) {
+    if (this.securityForm().invalid) {
+      return;
+    }
+
+    const payload: Security = {
+      id: this.editingSecurity()?.id, // Only include if editing
+      name: formData.name,
+      tickerSymbol: formData.tickerSymbol,
+      sector: formData.sector,
+      type: formData.securityType,
+      generalNotes: formData.generalNotes || "",
+      userId: 1
+    };
+
+    if (this.editingSecurity()) {
+      // UPDATE
+      this.securityService.updateSecurity(payload.id!, payload).subscribe({
+        next: (updatedSecurity) => {
+          // Update sidebar list
+          this.loadSecurities();
+
+          if (this.security()?.id === updatedSecurity.id) {
+            this.security.set(updatedSecurity);
+            this.buildSecurityFields();
+          }
+          this.isSecurityModalVisible.set(false);
+        },
+        error: (err) => {
+          console.error('Error updating security:', err);
+        }
+      });
+    } else {
+      // CREATE
+      this.securityService.createSecurity(payload).subscribe({
+        next: (newSecurity) => {
+          this.loadSecurities(); // Refresh sidebar
+          this.isSecurityModalVisible.set(false);
+        },
+        error: (err) => {
+          console.error('Error:', err);
+        }
+      });
+    }
   }
 }

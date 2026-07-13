@@ -20,6 +20,7 @@ import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -56,36 +57,26 @@ public class UserService implements UserDetailsService {
 
     // VIEW PROFILE
     public User viewProfile(int id) {
-        Optional<User> userOptional = repo.findById(id);
-        if (userOptional.isPresent()) {
-            return userOptional.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
+        return RepoUtils.findOrThrow(repo, id, "User");
     }
 
     // EDIT PROFILE
     public User updateProfile(int id, UserDto dto) {
+        User user = RepoUtils.findOrThrow(repo, id, "User");
 
-        if (repo.existsById(id)) {
-            User user = repo.findById(id).get();
-            if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Username taken. Please use another username.");
-            }
-            User updatedUser = new User();
-            updatedUser.setId(id);
-            updatedUser.setUsername(dto.username());
-            updatedUser.setEmail(dto.email());
-            updatedUser.setPasswordHash(passwordEncoder.encode(dto.passwordHash()));
-            updatedUser.setEnabled(user.isEnabled());
-            updatedUser.setRole(user.getRole());
-            return repo.save(updatedUser);
+        if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Username taken. Please use another username.");
         }
-        //return null;
+        User updatedUser = new User();
+        updatedUser.setId(id);
+        updatedUser.setUsername(dto.username());
+        updatedUser.setEmail(dto.email());
+        updatedUser.setPasswordHash(passwordEncoder.encode(dto.passwordHash()));
+        updatedUser.setEnabled(user.isEnabled());
+        updatedUser.setRole(user.getRole());
+        return repo.save(updatedUser);
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
     }
 
     // DELETE (sets enabled to false)
