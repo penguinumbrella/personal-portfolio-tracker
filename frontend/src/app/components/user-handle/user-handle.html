@@ -17,9 +17,10 @@
         [recordName]="user.username"
         (confirmed)="saveUser($event)"
         (cancelled)="closeModal()"
+        (loggedOut)="logout()"
         [form]="form"
         >
-        
+
     </app-user-modal>
 </div>
 } @else {

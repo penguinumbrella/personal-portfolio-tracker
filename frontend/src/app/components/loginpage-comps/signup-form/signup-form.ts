@@ -1,44 +1,47 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormsModule, Validators } from '@angular/forms';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { ButtonModule } from 'primeng/button';
-import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/AuthService';
 
 @Component({
   selector: 'app-signup-form',
-  imports: [
-    PasswordModule,
-    InputTextModule,
-    FormsModule,
-    FloatLabelModule,
-    ButtonModule,
-    ReactiveFormsModule,
-  ],
+  imports: [PasswordModule, InputTextModule, ButtonModule, ReactiveFormsModule],
   templateUrl: './signup-form.html',
   styleUrl: './signup-form.css',
 })
 export class SignupForm {
-  signupForm!: FormGroup;
-  value: string | undefined;
-  email: string | undefined;
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
 
-  constructor(private formBuilder: FormBuilder) {}
+  switchToLogin = output<void>();
 
-  onInit() {
-    this.signupForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(2)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      email: ['', [Validators.required, Validators.email]],
+  submitting = signal(false);
+  errorMessage = signal<string | null>(null);
+
+  form = this.formBuilder.group({
+    username: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
+
+  signup(): void {
+    if (this.form.invalid) return;
+
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    const { username, email, password } = this.form.getRawValue();
+    this.authService.register({ username: username!, email: email!, passwordHash: password! }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.switchToLogin.emit();
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.errorMessage.set('Failed to create account. Please try again.');
+      },
     });
-  }
-
-  triggerSignup() {
-    console.log('Signup triggered');
-  }
-
-  switchToLogin() {
-    console.log('Switching to login form');
   }
 }

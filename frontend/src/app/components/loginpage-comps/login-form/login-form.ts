@@ -1,24 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { ButtonModule } from 'primeng/button';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/AuthService';
 
 @Component({
   selector: 'app-login-form',
-  imports: [PasswordModule, InputTextModule, FormsModule, FloatLabelModule, ButtonModule],
+  imports: [PasswordModule, InputTextModule, ButtonModule, ReactiveFormsModule],
   templateUrl: './login-form.html',
   styleUrl: './login-form.css',
 })
 export class LoginForm {
-  value: string | undefined;
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  triggerLogin() {
-    console.log('Login triggered');
-  }
+  switchToSignup = output<void>();
 
-  switchToSignup() {
-    console.log('Switching to signup form');
+  submitting = signal(false);
+  errorMessage = signal<string | null>(null);
+
+  form = this.formBuilder.group({
+    username: ['', Validators.required],
+    password: ['', Validators.required],
+  });
+
+  login(): void {
+    if (this.form.invalid) return;
+
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    const { username, password } = this.form.getRawValue();
+    this.authService.login(username!, password!).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.errorMessage.set('Invalid username or password.');
+      },
+    });
   }
 }

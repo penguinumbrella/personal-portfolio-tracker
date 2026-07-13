@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MetricCard } from '../../components/metric-card/metric-card';
 import { DashboardTable } from '../../components/dashboard-table/dashboard-table';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
@@ -6,10 +6,7 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
 import { Security } from '../../types/Security';
-
-
-
-
+import { AuthService } from '../../services/AuthService';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +15,8 @@ import { Security } from '../../types/Security';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
+
+  private authService = inject(AuthService);
 
   recentAccounts = signal<InvestmentAccount[]>([]);
   recentSecurities = signal<Security[]>([]);
@@ -33,13 +32,20 @@ export class Dashboard {
   ) {}
 
   ngOnInit(): void {
-    this.loadTotals();
-    this.loadRecentAccounts();
-    this.loadRecentSecurities();
+    // Always re-verify with the server rather than trusting a cached value, so switching
+    // accounts never leaves the dashboard showing the previous session's data.
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.loadTotals(user.id!);
+        this.loadRecentAccounts(user.id!);
+        this.loadRecentSecurities(user.id!);
+      },
+      error: (err) => console.error('Failed to resolve current user:', err),
+    });
   }
 
-  loadTotals(): void {
-    this.investmentAccountService.getUserInvestmentAccountTotal(1).subscribe({
+  loadTotals(userId: number): void {
+    this.investmentAccountService.getUserInvestmentAccountTotal(userId).subscribe({
       next: (data) => {
         this.totalAccounts.set(data);
       },
@@ -48,7 +54,7 @@ export class Dashboard {
       }
     })
 
-    this.securityService.getUserSecurityTotal(1).subscribe({
+    this.securityService.getUserSecurityTotal(userId).subscribe({
       next: (data) => {
         this.totalSecurities.set(data);
       },
@@ -57,7 +63,7 @@ export class Dashboard {
       }
     })
 
-    this.holdingService.getUserHoldingTotal(1).subscribe({
+    this.holdingService.getUserHoldingTotal(userId).subscribe({
       next: (data) => {
         this.totalHoldings.set(data);
       },
@@ -66,7 +72,7 @@ export class Dashboard {
       }
     })
 
-    this.holdingService.totalInvestedCost(1).subscribe({
+    this.holdingService.totalInvestedCost(userId).subscribe({
       next: (data) => {
         this.totalInvestedCost.set(data);
       },
@@ -76,8 +82,8 @@ export class Dashboard {
     })
   }
 
-  loadRecentAccounts(): void {
-    this.investmentAccountService.getRecentAccounts(1).subscribe({
+  loadRecentAccounts(userId: number): void {
+    this.investmentAccountService.getRecentAccounts(userId).subscribe({
       next: (data) => {
         this.recentAccounts.set(data);
       },
@@ -87,8 +93,8 @@ export class Dashboard {
     })
   }
 
-  loadRecentSecurities(): void {
-    this.securityService.getRecentSecurities(1).subscribe({
+  loadRecentSecurities(userId: number): void {
+    this.securityService.getRecentSecurities(userId).subscribe({
       next: (data) => {
         this.recentSecurities.set(data);
       },

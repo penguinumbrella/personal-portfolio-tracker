@@ -20,3 +20,11 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    session:
+      cookie:
+        # frontend (localhost:4200) and backend (localhost:8080) are different origins, so the
+        # session cookie needs SameSite=None to be sent back on cross-origin requests after login
+        # (same issue as the CSRF cookie - see SecurityConfig's csrfTokenRepository())
+        same-site: none
+        secure: true

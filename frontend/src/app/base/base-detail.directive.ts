@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { Holding } from '../types/Holding';
 import { HoldingService } from '../services/HoldingService';
+import { AuthService } from '../services/AuthService';
 
 @Directive()
 export abstract class BaseDetailDirective<T> {
@@ -11,12 +12,31 @@ export abstract class BaseDetailDirective<T> {
   isHoldingModalVisible = signal<boolean>(false);
   editingHolding = signal<Holding | null>(null);
 
+  /** The signed-in user's id, resolved once via resolveCurrentUserId() before any data loads. */
+  currentUserId = signal<number | null>(null);
+
   totalInvestedCost = computed(() =>
     this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0),
   );
 
   protected holdingService = inject(HoldingService);
   protected confirmationService = inject(ConfirmationService);
+  private authService = inject(AuthService);
+
+  /**
+   * Resolves the signed-in user's id, then runs the callback (call from ngOnInit before loading any data).
+   * Always re-verifies with the server rather than trusting a cached value, so switching accounts
+   * never leaves a page showing the previous session's data.
+   */
+  protected resolveCurrentUserId(onResolved: () => void): void {
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUserId.set(user.id!);
+        onResolved();
+      },
+      error: (err) => console.error('Failed to resolve current user:', err),
+    });
+  }
 
   /** Form control holding the FormGroup used by the add/edit holding modal. */
   protected abstract modalForm: WritableSignal<FormGroup>;

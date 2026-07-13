@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.UserDto;
@@ -37,6 +38,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepo repo;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService service;
@@ -72,6 +76,7 @@ public class UserServiceTest {
         @DisplayName("successfully register a user")
         void registerNewUser() {
             when(repo.existsByUsername(anyString())).thenReturn(false);
+            when(passwordEncoder.encode(anyString())).thenReturn("hash");
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
             User result = service.registerUser(testDto);
@@ -130,6 +135,7 @@ public class UserServiceTest {
         @DisplayName("updated user successfully")
         void updateSuccessful() {
             when(repo.findById(1)).thenReturn(Optional.of(testUser));
+            when(passwordEncoder.encode(anyString())).thenReturn("hash");
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
             User result = service.updateProfile(1, testDto);
@@ -161,6 +167,7 @@ public class UserServiceTest {
             User existingUser = new User(1, "testuser", "oldtest@test.com", "hash", true, RoleType.USER);
 
             when(repo.findById(1)).thenReturn(Optional.of(existingUser));
+            when(passwordEncoder.encode(anyString())).thenReturn("hash");
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
             User result = service.updateProfile(1, testDto);
@@ -195,10 +202,14 @@ public class UserServiceTest {
         @DisplayName("successfully delete a user")
         void deleteUserSuccess() {
             when(repo.existsById(1)).thenReturn(true);
-            boolean result = service.deleteUser(1);
-            assertTrue(result);
-            verify(repo).deleteById(1);
+            when(repo.findById(1)).thenReturn(Optional.of(testUser));
+            when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
+            boolean result = service.deleteUser(1);
+
+            assertTrue(result);
+            assertFalse(testUser.isEnabled());
+            verify(repo).save(testUser);
         }
 
         @Test

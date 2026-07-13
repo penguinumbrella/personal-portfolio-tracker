@@ -60,6 +60,12 @@ public class UserService implements UserDetailsService {
         return RepoUtils.findOrThrow(repo, id, "User");
     }
 
+    public User viewProfileByUsername(String username) {
+        return repo.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User with username " + username + " does not exist in the database."));
+    }
+
     // EDIT PROFILE
     public User updateProfile(int id, UserDto dto) {
         User user = RepoUtils.findOrThrow(repo, id, "User");
@@ -115,7 +121,6 @@ public class UserService implements UserDetailsService {
                 authorities);
     }
 
-    // LOGIN (TODO)
     // LOGOUT (TODO)
     // DATA SCOPING?
 

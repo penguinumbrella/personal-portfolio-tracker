@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
 import { User } from '../../types/User';
-import { UserService } from '../../services/UserService';
+import { AuthService } from '../../services/AuthService';
 import { UserModal } from '../user-modal/user-modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -14,15 +15,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class UserHandle {
 
-  currentUser = signal<User | null>(null); 
+  private authService = inject(AuthService);
+  private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
+
+  currentUser = this.authService.currentUser;
   isModalVisible = signal<boolean>(false);
 
-  form! : FormGroup;
-
-  constructor(
-    private userService: UserService,
-    private formBuilder: FormBuilder
-  ){}
+  form!: FormGroup;
 
   ngOnInit(): void {
     this.loadUser();
@@ -35,16 +35,10 @@ export class UserHandle {
   }
 
   loadUser(): void {
-    
-    // change this when we implement authentication
-    this.userService.viewProfile(1).subscribe({
-      next: (data) => {
-        this.currentUser.set(data);
-      },
+    this.authService.getCurrentUser().subscribe({
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
-
     })
   }
 
@@ -56,12 +50,11 @@ export class UserHandle {
     this.isModalVisible.set(false);
   }
 
-  async saveUser(formData: any) {
-
+  saveUser(formData: any) {
     const updatedUser: User = { ...this.currentUser(), ...formData };
 
-    this.userService.updateUser(updatedUser.id!, updatedUser).subscribe({
-      next: (response) => {
+    this.authService.updateCurrentUser(updatedUser).subscribe({
+      next: () => {
         this.isModalVisible.set(false);
       },
       error: (err) => {
@@ -69,5 +62,17 @@ export class UserHandle {
       }
     });
   }
-  
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isModalVisible.set(false);
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
 }

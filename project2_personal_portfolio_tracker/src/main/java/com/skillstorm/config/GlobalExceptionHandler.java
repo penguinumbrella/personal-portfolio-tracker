@@ -3,6 +3,9 @@ package com.skillstorm.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +16,8 @@ import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // anytime exception is thrown due to bad input, usually
     @ExceptionHandler(ResponseStatusException.class)
@@ -66,7 +71,8 @@ public class GlobalExceptionHandler {
     // generic handler for any other exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception e) {
-        return ResponseEntity.status(405).body("Uh oh! Unknown error");
+        log.error("Unhandled exception", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Uh oh! Unknown error");
     }
 
 }

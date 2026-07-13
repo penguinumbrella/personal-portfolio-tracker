@@ -65,13 +65,17 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // get the list of securities on page load
   ngOnInit() {
-    this.loadAccounts();
-    this.loadSecurities();
+    this.resolveCurrentUserId(() => {
+      this.loadAccounts();
+      this.loadSecurities();
+    });
   }
 
   loadAccounts() {
-    // TODO how do we get the userId???? For now, hardcoding to 1
-    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+    const userId = this.currentUserId();
+    if (userId == null) return;
+
+    this.investmentAccountService.getAllInvestmentAccounts(userId).subscribe({
       next: (data) => {
         this.allAccounts.set(data);
       },
@@ -83,7 +87,10 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // load the list of securities for the user and populate the sidebar
   loadSecurities() {
-    this.securityService.getAllSecuritiesByUser(1).subscribe({
+    const userId = this.currentUserId();
+    if (userId == null) return;
+
+    this.securityService.getAllSecuritiesByUser(userId).subscribe({
       next: (data) => {
         this.sidebarItems.set(
           data.map((s) => ({
@@ -206,7 +213,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       sector: formData.sector,
       type: formData.securityType,
       generalNotes: formData.generalNotes || "",
-      userId: 1
+      userId: this.currentUserId()!
     };
 
     if (this.editingSecurity()) {

@@ -137,7 +137,8 @@ public class HoldingService {
 
     public Long totalInvestedCost(Long userId) {
         RepoUtils.requireExists(userRepo, userId.intValue(), "User");
-        return repo.totalInvestedCost(userId);
+        Long total = repo.totalInvestedCost(userId);
+        return total != null ? total : 0L;
     }
 
 }

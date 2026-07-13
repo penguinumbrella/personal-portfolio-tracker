@@ -72,13 +72,17 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
-    this.loadAccounts();
-    this.loadSecurities();
+    this.resolveCurrentUserId(() => {
+      this.loadAccounts();
+      this.loadSecurities();
+    });
   }
 
   loadAccounts() {
-    // TODO how do we get the userId???? For now, hardcoding to 1
-    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+    const userId = this.currentUserId();
+    if (userId == null) return;
+
+    this.investmentAccountService.getAllInvestmentAccounts(userId).subscribe({
       next: (data) => {
         this.sidebarItems.set(
           data.map((a) => ({
@@ -95,7 +99,10 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   }
 
   loadSecurities() {
-    this.securityService.getAllSecuritiesByUser(1).subscribe({
+    const userId = this.currentUserId();
+    if (userId == null) return;
+
+    this.securityService.getAllSecuritiesByUser(userId).subscribe({
       next: (data) => {
         this.allSecurities.set(data);
       },
@@ -211,7 +218,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       ...this.editingAccount(),
       ...formData,
       dateOpened: this.editingAccount()?.dateOpened || new Date(),
-      userId: 1, // TODO: Replace with actual user ID when available
+      userId: this.currentUserId()!,
     };
 
     if (this.editingAccount()) {

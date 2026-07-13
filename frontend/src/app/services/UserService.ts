@@ -21,11 +21,6 @@ export class UserService {
             .pipe(catchWithMessage("Failed to load user"));
     }
 
-    registerUser(user: User): Observable<User> {
-        return this.http.post<User>(this.URL, user)
-            .pipe(catchWithMessage("Failed to create user"));
-    }
-
     updateUser(id: number, user: User): Observable<User> {
         return this.http.put<User>(`${this.URL}/${id}`, user)
             .pipe(catchWithMessage("Failed to update user"));

@@ -48,18 +48,26 @@
   </form>
 
   <ng-template #footer>
-    <div class="flex justify-end gap-2 mt-4">
+    <div class="flex justify-between mt-4">
       <p-button
-        label="Cancel"
-        severity="secondary"
+        label="Log Out"
+        severity="danger"
         [outlined]="true"
-        (onClick)="cancelled.emit()"
+        (onClick)="loggedOut.emit()"
       />
-      <p-button
-        label="Update"
-        severity="primary"
-        (onClick)="onUpdate()"
-      />
+      <div class="flex justify-end gap-2">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="cancelled.emit()"
+        />
+        <p-button
+          label="Update"
+          severity="primary"
+          (onClick)="onUpdate()"
+        />
+      </div>
     </div>
   </ng-template>
 </p-dialog>

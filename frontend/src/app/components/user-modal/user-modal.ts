@@ -18,6 +18,7 @@ export class UserModal {
 
   confirmed = output<any>();
   cancelled = output<void>();
+  loggedOut = output<void>();
 
   onUpdate() {
     if (this.form().valid) {
