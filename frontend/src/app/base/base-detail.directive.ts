@@ -40,8 +40,21 @@ export abstract class BaseDetailDirective<T> {
 
   addHolding(): void {
     this.editingHolding.set(null);
-    this.modalForm().reset();
+    this.modalForm().reset({
+      [this.counterpartyFormKey]: null,
+      shares: 0,
+      costPerShare: 0,
+      purchaseDate: this.todayForDateInput(),
+    });
     this.isHoldingModalVisible.set(true);
+  }
+
+  /** Today's date formatted as yyyy-MM-dd, the format a native <input type="date"> expects. */
+  private todayForDateInput(): string {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${now.getFullYear()}-${month}-${day}`;
   }
 
   editHolding(holding: Holding): void {
@@ -72,10 +85,7 @@ export abstract class BaseDetailDirective<T> {
       s_id,
       shares: formData.shares,
       costPerShare: formData.costPerShare,
-      purchaseDate:
-        formData.purchaseDate instanceof Date
-          ? formData.purchaseDate.getTime()
-          : formData.purchaseDate,
+      purchaseDate: new Date(formData.purchaseDate).getTime(),
     };
 
     if (this.editingHolding()) {
@@ -84,14 +94,14 @@ export abstract class BaseDetailDirective<T> {
         next: (updatedHolding) => {
           this.holdings.update((current) => current.map((h) => (h.id === id ? updatedHolding : h)));
         },
-        error: (err) => console.error(err),
+        error: (err) => console.error('[holding] update failed:', err),
       });
     } else {
       this.holdingService.createHolding(payload).subscribe({
         next: (newHolding) => {
           this.holdings.update((current) => [...current, newHolding]);
         },
-        error: (err) => console.error(err),
+        error: (err) => console.error('[holding] create failed:', err),
       });
     }
     this.isHoldingModalVisible.set(false);
