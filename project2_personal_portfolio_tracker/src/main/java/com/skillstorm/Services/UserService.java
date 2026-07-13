@@ -61,15 +61,12 @@ public class UserService implements UserDetailsService {
 
     public User viewProfileByUsername(String username) {
         return repo.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "User with username " + username + " does not exist in the database."));
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
     }
 
     // EDIT PROFILE
     public User updateProfile(int id, UserDto dto) {
-        User user = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "User with id " + id + " does not exist in the database."));
+        User user = RepoUtils.findOrThrow(repo, id, "User");
 
         if (!user.getUsername().equals(dto.username()) && repo.existsByUsername(dto.username())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -88,16 +85,10 @@ public class UserService implements UserDetailsService {
 
     // DELETE (sets enabled to false)
     public boolean deleteUser(int id) {
-        if (repo.existsById(id)) {
-            User user = repo.findById(id).get();
-            user.setEnabled(false);
-            repo.save(user);
-            return true;
-        }
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
-
+        User user = RepoUtils.findOrThrow(repo, id, "User");
+        user.setEnabled(false);
+        repo.save(user);
+        return true;
     }
 
     @Override
@@ -122,7 +113,6 @@ public class UserService implements UserDetailsService {
                 authorities);
     }
 
-    // LOGOUT (TODO)
     // DATA SCOPING?
 
 }
