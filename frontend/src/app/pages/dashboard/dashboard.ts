@@ -17,6 +17,9 @@ import { AuthService } from '../../services/AuthService';
 export class Dashboard {
 
   private authService = inject(AuthService);
+  private investmentAccountService = inject(InvestmentAccountService);
+  private holdingService = inject(HoldingService);
+  private securityService = inject(SecurityService);
 
   recentAccounts = signal<InvestmentAccount[]>([]);
   recentSecurities = signal<Security[]>([]);
@@ -24,12 +27,6 @@ export class Dashboard {
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
   totalInvestedCost = signal<number>(0);
-
-  constructor(
-    private investmentAccountService: InvestmentAccountService,
-    private holdingService: HoldingService,
-    private securityService: SecurityService
-  ) {}
 
   ngOnInit(): void {
     // Always re-verify with the server rather than trusting a cached value, so switching

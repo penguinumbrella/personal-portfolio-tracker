@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { Holding } from '../types/Holding';
@@ -8,9 +8,9 @@ import { catchWithMessage, userIdParams } from '../shared/http.util';
 
 @Injectable({ providedIn: 'root' })
 export class HoldingService {
-  private readonly URL = `${environment.baseApiUrl}/holdings`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly URL = `${environment.baseApiUrl}/holdings`;
 
   getAllHoldingsPerAccount(accountId: number): Observable<Holding[]> {
     return this.http

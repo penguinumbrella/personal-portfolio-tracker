@@ -47,8 +47,6 @@ export abstract class BaseDetailDirective<T> {
   /** Resolve the account/security ids for a holding create/update payload from the modal's raw form value. */
   protected abstract resolveHoldingIds(formData: any): { a_id: number; s_id: number };
 
-  constructor() {}
-
   /** Filter a list of candidates down to ones not already held, keyed by the holding id field the caller cares about. */
   protected excludeHeld<I extends { id?: number }>(
     all: I[],

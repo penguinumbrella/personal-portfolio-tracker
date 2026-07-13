@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { InvestmentAccount } from '../types/InvestmentAccounts';
@@ -16,9 +16,9 @@ export class InvestmentAccountService {
    *          - one central location for all your related requests
    */
 
-  private readonly URL = `${environment.baseApiUrl}/investments`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly URL = `${environment.baseApiUrl}/investments`;
 
   getAllInvestmentAccounts(userId?: number): Observable<InvestmentAccount[]> {
     let params = new HttpParams();

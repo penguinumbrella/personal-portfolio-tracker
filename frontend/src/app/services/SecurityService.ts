@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { Security } from '../types/Security';
@@ -7,9 +7,9 @@ import { catchWithMessage, userIdParams } from '../shared/http.util';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
-  private readonly URL = `${environment.baseApiUrl}/securities`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly URL = `${environment.baseApiUrl}/securities`;
 
   getSecurityById(id: number): Observable<Security> {
     return this.http

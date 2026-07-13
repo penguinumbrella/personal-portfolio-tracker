@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
@@ -32,6 +32,9 @@ import { ConfirmationService } from 'primeng/api';
   styleUrl: './account-detail.css',
 })
 export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
+  private investmentAccountService = inject(InvestmentAccountService);
+  private securityService = inject(SecurityService);
+
   account = signal<InvestmentAccount | null>(null);
   accountFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
@@ -58,13 +61,6 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   );
 
   protected override readonly counterpartyFormKey = 'security' as const;
-
-  constructor(
-    private investmentAccountService: InvestmentAccountService,
-    private securityService: SecurityService,
-  ) {
-    super();
-  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: this.account()!.id!, s_id: formData.security.id };
