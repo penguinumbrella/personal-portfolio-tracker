@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.List;
@@ -190,8 +191,8 @@ public class InvestmentAccountControllerTest {
             mockMvc.perform(delete("/v1/investments/" + testAccount1.getId()))
 
                 .andExpect(status().isNoContent());
-                
 
+            verify(service).deleteAccount(testAccount1.getId());
         }
     }
     

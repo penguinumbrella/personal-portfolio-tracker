@@ -2,7 +2,6 @@ package com.skillstorm.Controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +23,6 @@ import com.skillstorm.Services.HoldingService;
 
 @RestController
 @RequestMapping("/v1/holdings")
-@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
-        "http://localhost:4200" })
 public class HoldingController {
     private final HoldingService service;
 
@@ -71,7 +68,7 @@ public class HoldingController {
             @PathVariable int accountId,
             @PathVariable int securityId,
             @RequestBody HoldingDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.updateHolding(accountId, securityId, dto));
+        return ResponseEntity.ok(service.updateHolding(accountId, securityId, dto));
     }
 
     // ----- DELETE METHODS -----
@@ -85,8 +82,8 @@ public class HoldingController {
     }
 
     @GetMapping("total")
-    public ResponseEntity<Long> UserHoldingTotal(@RequestParam(required = true) Long userId) {
-        return ResponseEntity.status(200).body(service.UserHoldingTotal(userId));
+    public ResponseEntity<Long> getUserHoldingTotal(@RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.getUserHoldingTotal(userId));
     }
 
     @GetMapping("totalInvestedCost")

@@ -11,16 +11,16 @@ import { InvestmentType } from '../../types/InvestmentType';
 import { SelectModule } from 'primeng/select';
 
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DatePickerModule } from 'primeng/datepicker';
 
 import { Security } from '../../types/Security';
 import { Holding } from '../../types/Holding';
+import { InvestmentAccount } from '../../types/InvestmentAccounts';
 
 
 @Component({
   selector: 'app-manage-holding-modal',
   imports: [DialogModule, ButtonModule, ReactiveFormsModule, FloatLabelModule, InputGroupModule, InputGroupAddonModule
-    ,IftaLabelModule, SelectModule, InputNumberModule, DatePickerModule
+    ,IftaLabelModule, SelectModule, InputNumberModule
   ],
   templateUrl: './manage-holding-modal.html',
   styleUrl: './manage-holding-modal.css',
@@ -45,8 +45,11 @@ export class ManageHoldingModal {
   }));
 
   // creating values that need to be passed in by the parent
+
+  viewMode = input.required<'byAccount' | 'bySecurity'>();
   
-  filteredSecurities = input.required<Security[]>();
+  filteredSecurities = input<Security[]>();
+  filteredAccounts = input<InvestmentAccount[]>([]);
   editingHolding = input<Holding | null>(null);
   visible = model.required<boolean>();
   recordName = input.required<string>();
@@ -59,9 +62,8 @@ export class ManageHoldingModal {
   cancelled = output<void>();
 
   onUpdate() {
-    this.confirmed.emit(this.form().value);
-    this.visible.set(false); // Close the modal
+    if (this.form().valid) {
+      this.confirmed.emit(this.form().value);
+    }
   }
-
-
 }

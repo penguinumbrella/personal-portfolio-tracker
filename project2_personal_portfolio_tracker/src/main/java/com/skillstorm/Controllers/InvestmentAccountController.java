@@ -1,7 +1,6 @@
 package com.skillstorm.Controllers;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +17,6 @@ import com.skillstorm.Services.InvestmentAccountService;
 
 @RestController
 @RequestMapping("/v1/investments")
-@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
-        "http://localhost:4200" })
 public class InvestmentAccountController {
 
     private final InvestmentAccountService service;
@@ -44,13 +41,8 @@ public class InvestmentAccountController {
     @PostMapping
     public ResponseEntity<InvestmentAccount> addAccount(
             @RequestBody InvestmentAccountDto dto) {
-
         InvestmentAccount investmentAccount = service.addAccount(dto);
-
-        System.out.println(investmentAccount);
-
         return ResponseEntity.status(201).body(investmentAccount);
-
     }
 
     // PUT (EDIT ACCOUNT)
@@ -69,12 +61,13 @@ public class InvestmentAccountController {
     public ResponseEntity<Void> deleteAccount(
             @PathVariable int id) {
 
+        service.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("total")
-    public ResponseEntity<Long> UserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
-        return ResponseEntity.status(200).body(service.UserInvestmentAccountTotal(userId));
+    public ResponseEntity<Long> getUserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
+        return ResponseEntity.status(200).body(service.getUserInvestmentAccountTotal(userId));
     }
 
     @GetMapping("recent")

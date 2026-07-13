@@ -2,46 +2,64 @@
     header="Edit User Profile"
     [modal]="true"
     [visible]="visible()"
+    (visibleChange)="visible.set($event)"
     [appendTo]="'body'"
+    [styleClass]="'w-full max-w-2xl min-h-[500px] flex flex-col'"
+    class="w-full max-w-lg"
 >
+  <form [formGroup]="form()" class="flex flex-col gap-6 mt-5">
 
-<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
-    <!-- Example form field -->
-    <p-floatLabel>
-        <input pInputText id="username" formControlName="username" />
-        <label for="username">Username</label>
-    </p-floatLabel>
+    <div class="relative">
+      <input
+        pInputText
+        id="username"
+        formControlName="username"
+        class="w-full peer"
+      />
+      <label for="username" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Username
+      </label>
+    </div>
 
-    <p-floatLabel>
-        <input pInputText id="password" type="password" formControlName="password" />
-        <label for="password">Password</label>
-    </p-floatLabel>
+    <div class="relative">
+      <input
+        pInputText
+        id="password"
+        type="password"
+        formControlName="password"
+        class="w-full peer"
+      />
+      <label for="password" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Password
+      </label>
+    </div>
 
-    <p-floatLabel>
-        <input pInputText id="email" formControlName="email" />
-        <label for="email">Email</label>
-    </p-floatLabel>
-    <!-- ... other fields ... -->
+    <div class="relative">
+      <input
+        pInputText
+        id="email"
+        formControlName="email"
+        class="w-full peer"
+      />
+      <label for="email" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Email
+      </label>
+    </div>
   </form>
 
-
-
-    <ng-template #footer>
-
-        <!-- fire off events when buttons are clicked -->
-        <p-button 
-            label="Cancel"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="cancelled.emit()"
-        />
-
-        <p-button 
-            label="Update"
-            severity="primary"
-            [outlined]="true"
-            (onClick)="onUpdate()"
-        />
-
-    </ng-template>
+  <ng-template #footer>
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelled.emit()"
+      />
+      <p-button
+        label="Update"
+        severity="primary"
+        (onClick)="onUpdate()"
+      />
+    </div>
+  </ng-template>
 </p-dialog>

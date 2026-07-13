@@ -141,14 +141,14 @@ public class SecurityControllerTest {
     class updateSecurity {
 
         @Test
-        @DisplayName("201 CREATED - security updated")
-        void updateSecuritySuccess201() throws Exception {
+        @DisplayName("200 OK - security updated")
+        void updateSecuritySuccess200() throws Exception {
             when(service.updateSecurity(anyInt(), any(SecurityDto.class))).thenReturn(testSecurity1);
 
             mockMvc.perform(put("/v1/securities/1")
                     .contentType(APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(testSDto1)))
-                    .andExpect(status().isCreated())
+                    .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(1))
                     .andExpect(jsonPath("$.tickerSymbol").value("abc"))
                     .andExpect(jsonPath("$.name").value("Security One"));

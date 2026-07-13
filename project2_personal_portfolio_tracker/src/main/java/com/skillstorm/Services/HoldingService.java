@@ -12,6 +12,8 @@ import com.skillstorm.Models.Security;
 import com.skillstorm.Repositories.HoldingRepo;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.SecurityRepo;
+import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class HoldingService {
@@ -19,11 +21,14 @@ public class HoldingService {
     private final HoldingRepo repo;
     private final InvestmentAccountRepo accountRepo;
     private final SecurityRepo securityRepo;
+    private final UserRepo userRepo;
 
-    public HoldingService(HoldingRepo repo, InvestmentAccountRepo accountRepo, SecurityRepo securityRepo) {
+    public HoldingService(HoldingRepo repo, InvestmentAccountRepo accountRepo, SecurityRepo securityRepo,
+            UserRepo userRepo) {
         this.repo = repo;
         this.accountRepo = accountRepo;
         this.securityRepo = securityRepo;
+        this.userRepo = userRepo;
     }
 
     // ----- POST/CREATE METHODS -----
@@ -35,8 +40,6 @@ public class HoldingService {
      * @return
      */
     public Holding addHolding(HoldingDto dto) {
-
-        System.out.println("Adding holding with account ID: " + dto.a_id() + ", security ID: " + dto.s_id());
         HoldingPK id = new HoldingPK(dto.a_id(), dto.s_id());
 
         if (repo.existsById(id)) {
@@ -73,17 +76,13 @@ public class HoldingService {
     // Read one
     public Holding getHolding(int accountId, int securityId) {
         HoldingPK id = new HoldingPK(accountId, securityId);
-        return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Holding with id " + id + " does not exist in the database."));
+        return RepoUtils.findOrThrow(repo, id, "Holding");
     }
 
     // ----- PUT/UPDATE METHODS -----
     public Holding updateHolding(int accountId, int securityId, HoldingDto dto) {
         HoldingPK id = new HoldingPK(accountId, securityId);
-        if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Holding with id " + id + " does not exist in the database.");
-        }
+        RepoUtils.requireExists(repo, id, "Holding");
 
         Object[] links = existingAndMatching(accountId, securityId);
 
@@ -99,10 +98,7 @@ public class HoldingService {
     // ----- DELETE METHODS -----
     public boolean deleteHolding(int accountId, int securityId) {
         HoldingPK id = new HoldingPK(accountId, securityId);
-        if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Holding with id " + id + " does not exist in the database.");
-        }
+        RepoUtils.requireExists(repo, id, "Holding");
         repo.deleteById(id);
         return true;
     }
@@ -134,20 +130,14 @@ public class HoldingService {
         return links;
     }
 
-    public Long UserHoldingTotal(Long userId) {
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
-
+    public Long getUserHoldingTotal(Long userId) {
+        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
         return repo.countByAccountUserId(userId);
-
     }
 
     public Long totalInvestedCost(Long userId) {
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
-
+        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
         return repo.totalInvestedCost(userId);
-
     }
 
 }

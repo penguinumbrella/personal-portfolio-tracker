@@ -148,9 +148,9 @@ public class InvestmentAccountServiceTest {
             when(userRepo.findById(testInvestmentAccountDto1.userId())).thenReturn(Optional.empty());
 
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.addAccount(testInvestmentAccountDto1));
-            
+
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-            assertEquals("User not found.", result.getReason());
+            assertEquals("User with id " + testInvestmentAccountDto1.userId() + " does not exist in the database.", result.getReason());
 
             verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
             
@@ -237,9 +237,9 @@ public class InvestmentAccountServiceTest {
             when(userRepo.findById(testInvestmentAccountDto2.userId())).thenReturn(Optional.empty());
 
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateAccount(testInvestmentAccount1.getId(), testInvestmentAccountDto2));
-            
+
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-            assertEquals("User not found.", result.getReason());
+            assertEquals("User with id " + testInvestmentAccountDto2.userId() + " does not exist in the database.", result.getReason());
 
             verify(investmentAccountRepo, never()).save(any(InvestmentAccount.class));
             

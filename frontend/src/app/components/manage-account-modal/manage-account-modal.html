@@ -1,56 +1,66 @@
-<p-dialog
-    header="Add Investment Account"
-    [modal]="true"
+<p-dialog 
+    [header]="editingAccount() ? 'Edit Account' : 'Add Account'"
+    [modal]="true" 
     [visible]="visible()"
+    (visibleChange)="visible.set($event)"
     [appendTo]="'body'"
+    [styleClass]="'w-full max-w-2xl min-h-[500px] flex flex-col'"
+    class = "w-full max-w-lg"
 >
+  <form [formGroup]="form()" class="flex flex-col gap-6 mt-5">
+    
+    <div class="relative">
+      <input 
+        pInputText 
+        id="nickname" 
+        formControlName="nickname" 
+        class="w-full peer"
+      />
+      <label for="nickname" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Nickname
+      </label>
+    </div>
 
-<form [formGroup]="form()" class="flex flex-col gap-y-6 mt-5">
-    <!-- Example form field -->
-    <p-floatLabel>
-        <input pInputText id="nickname" formControlName="nickname" />
-        <label for="nickname">Nickname</label>
-    </p-floatLabel>
+    <div class="relative">
+        <p-select 
+        id="accountType"
+        formControlName="accountType"
+        [options]="accountTypes" 
+        optionLabel="name"
+        optionValue="value" 
+        class="w-full peer"
+        />
+      <label for="accountType" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Account Type
+      </label>
+    </div>
 
-    <p-floatLabel>
-        
-                <p-select 
-                    id="account-type"
-                    formControlName="accountType"
-                    [options]="accountOptions"
-                    class="w-full"
-                >
-                    <ng-template #item let-accountType>{{accountType.name}}</ng-template>
-                    <ng-template #selectedItem let-accountType>{{accountType.name}}</ng-template>
-                </p-select>
-                <label for="account-type">Institution Type</label>
-    </p-floatLabel>
-
-    <p-floatLabel>
-        <input pInputText id="institution-name" formControlName="institutionName" />
-        <label for="institution-name">Institution Name</label>
-    </p-floatLabel>
-    <!-- ... other fields ... -->
+    <div class="relative">
+      <input 
+        pInputText 
+        id="institutionName" 
+        formControlName="institutionName" 
+        class="w-full peer"
+      />
+      <label for="institutionName" class="absolute left-3 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700">
+        Institution Name
+      </label>
+    </div>
   </form>
 
-
-
-    <ng-template #footer>
-
-        <!-- fire off events when buttons are clicked -->
-        <p-button 
-            label="Cancel"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="cancelled.emit()"
-        />
-
-        <p-button 
-            label="Update"
-            severity="primary"
-            [outlined]="true"
-            (onClick)="onUpdate()"
-        />
-
-    </ng-template>
+  <ng-template #footer>
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button 
+        label="Cancel" 
+        severity="secondary" 
+        [outlined]="true" 
+        (onClick)="cancelled.emit()" 
+      />
+      <p-button 
+        [label]="editingAccount() ? 'Update' : 'Add'" 
+        severity="primary" 
+        (onClick)="onUpdate()" 
+      />
+    </div>
+  </ng-template>
 </p-dialog>

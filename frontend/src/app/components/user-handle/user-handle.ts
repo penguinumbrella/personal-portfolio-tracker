@@ -57,12 +57,11 @@ export class UserHandle {
   }
 
   async saveUser(formData: any) {
-    console.log(this.currentUser());
+
     const updatedUser: User = { ...this.currentUser(), ...formData };
 
     this.userService.updateUser(updatedUser.id!, updatedUser).subscribe({
       next: (response) => {
-        console.log('User updated successfully', response);
         this.isModalVisible.set(false);
       },
       error: (err) => {

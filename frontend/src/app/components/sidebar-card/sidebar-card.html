@@ -1,6 +1,4 @@
-<p-button class="flex-col flex m-2" (click)="onClick()">
-    <div>
-        <div class="row"><span class='text-primary text-xl mr-3'>{{ title() }}</span></div>
-        <div class="row"><span class="text-lg">{{ data() }}</span></div>
-    </div>
-</p-button>
+<div class="flex flex-col px-3 py-2">
+    <span class="text-base font-semibold" [class]="selected() ? 'text-white' : 'text-gray-900'">{{ title() }}</span>
+    <span class="text-sm" [class]="selected() ? 'text-gray-300' : 'text-gray-500'">{{ data() }}</span>
+</div>

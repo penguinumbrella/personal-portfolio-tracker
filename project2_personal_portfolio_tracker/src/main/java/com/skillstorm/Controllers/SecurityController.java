@@ -2,7 +2,6 @@ package com.skillstorm.Controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +16,8 @@ import com.skillstorm.DTOs.SecurityDto;
 import com.skillstorm.Services.SecurityService;
 import com.skillstorm.Models.Security;
 
-//TODO cross will need to change
 @RestController
 @RequestMapping("/v1/securities")
-@CrossOrigin({ "https://d13to6rck5cj2.cloudfront.net", "https://d1jcki4jtvzqdz.cloudfront.net", "http://127.0.0.1:5500",
-        "http://localhost:4200" })
 public class SecurityController {
 
     private final SecurityService service;
@@ -61,7 +57,7 @@ public class SecurityController {
     public ResponseEntity<Security> updateSecurity(
             @PathVariable int id,
             @RequestBody SecurityDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.updateSecurity(id, dto));
+        return ResponseEntity.ok(service.updateSecurity(id, dto));
     }
 
     // ----- DELETE METHODS -----
@@ -74,8 +70,8 @@ public class SecurityController {
     }
 
     @GetMapping("total")
-    public ResponseEntity<Long> UserSecurityAccountTotal(@RequestParam(required = true) int userId) {
-        return ResponseEntity.status(200).body(service.UserSecurityAccountTotal(userId));
+    public ResponseEntity<Long> getUserSecurityAccountTotal(@RequestParam(required = true) int userId) {
+        return ResponseEntity.status(200).body(service.getUserSecurityAccountTotal(userId));
     }
 
     @GetMapping("recent")

@@ -9,6 +9,8 @@ import { Security } from '../../types/Security';
 
 
 
+
+
 @Component({
   selector: 'app-dashboard',
   imports: [MetricCard, DashboardTable],
@@ -23,17 +25,6 @@ export class Dashboard {
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
   totalInvestedCost = signal<number>(0);
-  // need securities observer set up
-  //rSecurities = signal<Security[]>([]);
-
-  //todo: implement total things in backend sql
-  /**
-   * totals:
-   * account
-   * security
-   * holding
-   * invested cost
-   */
 
   constructor(
     private investmentAccountService: InvestmentAccountService,
@@ -45,63 +36,53 @@ export class Dashboard {
     this.loadTotals();
     this.loadRecentAccounts();
     this.loadRecentSecurities();
-    //this.loadRecentServices();
   }
 
-  loadTotals(): void{ 
-    // todo: add the other totals
+  loadTotals(): void {
     this.investmentAccountService.getUserInvestmentAccountTotal(1).subscribe({
       next: (data) => {
-
         this.totalAccounts.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
 
     this.securityService.getUserSecurityTotal(1).subscribe({
       next: (data) => {
-
         this.totalSecurities.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
 
     this.holdingService.getUserHoldingTotal(1).subscribe({
       next: (data) => {
-
         this.totalHoldings.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
 
     this.holdingService.totalInvestedCost(1).subscribe({
       next: (data) => {
-
         this.totalInvestedCost.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
-
-    
-
   }
 
   loadRecentAccounts(): void {
     this.investmentAccountService.getRecentAccounts(1).subscribe({
       next: (data) => {
-        //console.log(data);
         this.recentAccounts.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
   }
@@ -109,17 +90,11 @@ export class Dashboard {
   loadRecentSecurities(): void {
     this.securityService.getRecentSecurities(1).subscribe({
       next: (data) => {
-        //console.log(data);
         this.recentSecurities.set(data);
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
   }
-  
-  // recentAccounts = [
-  //   { name: "Brokerage", date: "10-21-26", totalAmount: "$24,000" },
-  //   { name: "IRA", date: "10-21-26", totalAmount: "$28,000" }
-  // ];
 }

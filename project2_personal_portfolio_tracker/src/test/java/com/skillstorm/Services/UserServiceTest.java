@@ -130,7 +130,6 @@ public class UserServiceTest {
         @Test
         @DisplayName("updated user successfully")
         void updateSuccessful() {
-            when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(testUser));
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -146,7 +145,6 @@ public class UserServiceTest {
         @Test
         @DisplayName("throw exception when username is taken")
         void throwExceptionWhenUsernameTaken() {
-            when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(testUser));
             when(repo.existsByUsername(anyString())).thenReturn(true);
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(1, testDto));
@@ -162,7 +160,6 @@ public class UserServiceTest {
 
             User existingUser = new User(1, "testuser", "oldtest@test.com", "hash");
 
-            when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(existingUser));
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -180,7 +177,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("user id doesn't exist")
         void throwExceptionWhenNoSuchUserIdExists() {
-            when(repo.existsById(99)).thenReturn(false);
+            when(repo.findById(99)).thenReturn(Optional.empty());
 
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.updateProfile(99, testDto));
 
