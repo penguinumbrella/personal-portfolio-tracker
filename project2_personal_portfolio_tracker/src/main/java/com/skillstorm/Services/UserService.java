@@ -55,6 +55,16 @@ public class UserService implements UserDetailsService {
         return repo.save(newUser);
     }
 
+    // GET USER ID BY USERNAME
+    public Integer getUserIdByUsername(String username) {
+        Optional<User> userOptional = repo.findByUsername(username);
+        if (userOptional.isPresent()) {
+            return userOptional.get().getId();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + username + " not found.");
+        }
+    }
+
     // VIEW PROFILE
     public User viewProfile(int id) {
         return RepoUtils.findOrThrow(repo, id, "User");

@@ -1,30 +1,40 @@
 import { Component, computed, signal } from '@angular/core';
 
-import { DetailCard } from '../../components/detail-card/detail-card';
-import { HoldingTable } from '../../components/holding-table/holding-table';
-import { MetricCard } from '../../components/metric-card/metric-card';
-import { Security } from '../../types/Security';
-import { SecurityService } from '../../services/SecurityService';
-import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
-import { FormControl, FormGroup } from '@angular/forms';
-import { Validators } from '@angular/forms';
-import { ManageHoldingModal } from '../../components/manage-holding-modal/manage-holding-modal';
-import { ManageSecurityModal } from '../../components/manage-security-modal/manage-security-modal';
-import { InvestmentAccount } from '../../types/InvestmentAccounts';
-import { InvestmentAccountService } from '../../services/InvestmentAccountService';
-import { BaseDetailDirective } from '../../base/base-detail.directive';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
+import { DetailCard } from '../../components/detail-card/detail-card';
+import { HoldingTable } from '../../components/holding-table/holding-table';
+import { MetricCard } from '../../components/metric-card/metric-card';
+import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
+
+import { ManageHoldingModal } from '../../components/manage-holding-modal/manage-holding-modal';
+import { ManageSecurityModal } from '../../components/manage-security-modal/manage-security-modal';
+
+import { BaseDetailDirective } from '../../base/base-detail.directive';
+
+import { Security } from '../../types/Security';
+import { SecurityService } from '../../services/SecurityService';
+import { InvestmentAccount } from '../../types/InvestmentAccounts';
+import { InvestmentAccountService } from '../../services/InvestmentAccountService';
+
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule],
+  imports: [
+    DetailCard,
+    HoldingTable,
+    MetricCard,
+    DetailSidebar,
+    ManageHoldingModal,
+    ManageSecurityModal,
+    ConfirmDialogModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
 })
 export class SecurityDetail extends BaseDetailDirective<Security> {
-
   security = signal<Security | null>(null);
 
   securityFields = signal<{ label: string; value: any }[]>([]);
@@ -49,7 +59,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: new FormControl('', Validators.required),
       sector: new FormControl('', Validators.required),
       securityType: new FormControl('', Validators.required),
-    })
+    }),
   );
 
   protected override readonly counterpartyFormKey = 'account' as const;
@@ -57,7 +67,9 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   constructor(
     private securityService: SecurityService,
     private investmentAccountService: InvestmentAccountService,
-  ) { super(); }
+  ) {
+    super();
+  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: formData.account.id, s_id: this.security()!.id! };
@@ -65,13 +77,14 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // get the list of securities on page load
   ngOnInit() {
+    this.loadUser();
     this.loadAccounts();
     this.loadSecurities();
   }
 
   loadAccounts() {
     // TODO how do we get the userId???? For now, hardcoding to 1
-    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+    this.investmentAccountService.getAllInvestmentAccounts(this.userId()!).subscribe({
       next: (data) => {
         this.allAccounts.set(data);
       },
@@ -83,7 +96,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // load the list of securities for the user and populate the sidebar
   loadSecurities() {
-    this.securityService.getAllSecuritiesByUser(1).subscribe({
+    this.securityService.getAllSecuritiesByUser(this.userId()!).subscribe({
       next: (data) => {
         this.sidebarItems.set(
           data.map((s) => ({
@@ -162,7 +175,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: currentSecurity.name,
       tickerSymbol: currentSecurity.tickerSymbol,
       securityType: currentSecurity.type,
-      sector: currentSecurity.sector
+      sector: currentSecurity.sector,
     });
 
     this.isSecurityModalVisible.set(true);
@@ -170,13 +183,14 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   confirmDeleteSecurity(): void {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this security? This will also delete all holdings for this security.',
+      message:
+        'Are you sure you want to delete this security? This will also delete all holdings for this security.',
       header: 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.executeDeleteSecurity();
-      }
+      },
     });
   }
 
@@ -205,8 +219,8 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       tickerSymbol: formData.tickerSymbol,
       sector: formData.sector,
       type: formData.securityType,
-      generalNotes: formData.generalNotes || "",
-      userId: 1
+      generalNotes: formData.generalNotes || '',
+      userId: 1,
     };
 
     if (this.editingSecurity()) {
@@ -224,7 +238,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         },
         error: (err) => {
           console.error('Error updating security:', err);
-        }
+        },
       });
     } else {
       // CREATE
@@ -235,7 +249,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         },
         error: (err) => {
           console.error('Error:', err);
-        }
+        },
       });
     }
   }

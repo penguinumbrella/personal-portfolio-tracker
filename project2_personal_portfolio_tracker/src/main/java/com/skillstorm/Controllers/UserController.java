@@ -2,7 +2,6 @@ package com.skillstorm.Controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +43,13 @@ public class UserController {
 
     //     return ResponseEntity.status(201).body(service.registerUser(dto));
     // }
+    // GET USER ID BY USERNAME
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Integer> getUserIdByUsername(
+            @PathVariable String username) {
+        Integer userId = service.getUserIdByUsername(username);
+        return ResponseEntity.ok(userId);
+    }
 
     // VIEW PROFILE
     @GetMapping("/{id}")

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,12 @@ public class AuthController {
 
     public AuthController(UserService userService) {
         this.userService = userService;
+    }
+
+    // returns the username of the currently authenticated user
+    @GetMapping("/username")
+    public String getCurrentUserName(Authentication authentication) {
+        return authentication.getName();
     }
 
     @GetMapping("/csrf")

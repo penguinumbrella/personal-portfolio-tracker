@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { Holding } from '../types/Holding';
 import { HoldingService } from '../services/HoldingService';
+import { UserService } from '../services/UserService';
 
 @Directive()
 export abstract class BaseDetailDirective<T> {
@@ -10,6 +11,7 @@ export abstract class BaseDetailDirective<T> {
   loading = signal<boolean>(false);
   isHoldingModalVisible = signal<boolean>(false);
   editingHolding = signal<Holding | null>(null);
+  userId = signal<number | null>(null);
 
   totalInvestedCost = computed(() =>
     this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0),
@@ -17,6 +19,7 @@ export abstract class BaseDetailDirective<T> {
 
   protected holdingService = inject(HoldingService);
   protected confirmationService = inject(ConfirmationService);
+  protected userService = inject(UserService);
 
   /** Form control holding the FormGroup used by the add/edit holding modal. */
   protected abstract modalForm: WritableSignal<FormGroup>;
@@ -36,6 +39,15 @@ export abstract class BaseDetailDirective<T> {
   ): I[] {
     const heldIds = new Set(this.holdings().map(heldIdSelector));
     return all.filter((item) => !heldIds.has(item.id));
+  }
+
+  // Load current user from auth in userService and set userId signal
+  protected loadUser() {
+    this.userService.getCurrentUserId().subscribe({
+      next: (id) => {
+        this.userId.set(id);
+      },
+    });
   }
 
   addHolding(): void {
@@ -126,7 +138,8 @@ export abstract class BaseDetailDirective<T> {
         this.holdings.update((current) =>
           current.filter(
             (h) =>
-              h.id?.accountId !== holding.id?.accountId || h.id?.securityId !== holding.id?.securityId,
+              h.id?.accountId !== holding.id?.accountId ||
+              h.id?.securityId !== holding.id?.securityId,
           ),
         );
       },

@@ -4,15 +4,14 @@ import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
 import { MetricCard } from '../../components/metric-card/metric-card';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
-import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
+import { SidebarItem, DetailSidebar } from '../../components/detail-sidebar/detail-sidebar';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ManageHoldingModal } from '../../components/manage-holding-modal/manage-holding-modal';
-import { SecurityService } from '../../services/SecurityService';
-import { Security } from '../../types/Security';
 import { ManageAccountModal } from '../../components/manage-account-modal/manage-account-modal';
+import { Security } from '../../types/Security';
+import { SecurityService } from '../../services/SecurityService';
 import { BaseDetailDirective } from '../../base/base-detail.directive';
-
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
@@ -72,13 +71,14 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
   // page loads all accounts on the side and waits for one to be selected
   ngOnInit() {
+    this.loadUser();
     this.loadAccounts();
     this.loadSecurities();
   }
 
   loadAccounts() {
     // TODO how do we get the userId???? For now, hardcoding to 1
-    this.investmentAccountService.getAllInvestmentAccounts(1).subscribe({
+    this.investmentAccountService.getAllInvestmentAccounts(this.userId()!).subscribe({
       next: (data) => {
         this.sidebarItems.set(
           data.map((a) => ({
@@ -95,7 +95,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   }
 
   loadSecurities() {
-    this.securityService.getAllSecuritiesByUser(1).subscribe({
+    this.securityService.getAllSecuritiesByUser(this.userId()!).subscribe({
       next: (data) => {
         this.allSecurities.set(data);
       },
