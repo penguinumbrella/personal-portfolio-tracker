@@ -1,14 +1,14 @@
-<div class="page-layout">
-    <div class="sidebar-col">
-        <app-detail-sidebar 
-        [items]="sidebarItems()" 
-        (selected)="onAccountSelect($event)" 
+<div class="flex h-[90vh] overflow-hidden gap-4 p-4 bg-gray-50">
+    <div class="w-1/4 min-w-60 h-full overflow-y-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <app-detail-sidebar
+        [items]="sidebarItems()"
+        (selected)="onAccountSelect($event)"
         (onAddItem)="onOpenAddAccountModal()" />
     </div>
 
     @if (account()) {
-    <div class="table-col">
-        <div class="metric-cards flex row justify-between m-3 gap-3">
+    <div class="flex-1 h-full overflow-y-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col gap-4">
+        <div class="flex justify-between gap-4">
 
             <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
                 class="flex-1" />
@@ -24,7 +24,7 @@
             (onEdit)="editHolding($event)" (onDelete)="confirmDeleteHolding($event.holding, $event.originalEvent)"> </app-holding-table>
     </div>
     } @else {
-            <div class="table-col flex justify-center items-center">
+            <div class="flex-1 h-full flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 shadow-sm">
                 <p>Please select an account to view details.</p>
             </div>
         }
@@ -40,12 +40,13 @@
         (cancelled)="isHoldingModalVisible.set(false)"
     />
 
-    <app-manage-account-modal 
-    
+    <app-manage-account-modal
+
         [(visible)]="isAccountModalVisible"
         [form]="accountForm()"
         [editingAccount]="editingAccount()"
-        (confirmed)="onAccountModalConfirm($event)" />
+        (confirmed)="onAccountModalConfirm($event)"
+        (cancelled)="isAccountModalVisible.set(false)" />
 
     <p-confirmDialog></p-confirmDialog>
 

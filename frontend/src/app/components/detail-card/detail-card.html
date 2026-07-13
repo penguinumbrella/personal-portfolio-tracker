@@ -1,8 +1,8 @@
-<p-card class="m-2">
+<p-card class="shadow-sm">
     <ng-template pTemplate="header">
-        <div class="card-header">
-            <span class="card-title">{{ title }}</span>
-            <div class="card-actions">
+        <div class="flex items-center justify-between p-4">
+            <span class="text-xl font-bold text-gray-900">{{ title }}</span>
+            <div class="flex gap-1">
                 <p-button icon="pi pi-pencil" label="Edit" [text]="true" severity="secondary"
                     (onClick)="onEdit.emit()" />
                 <p-button icon="pi pi-trash" label="Delete" [text]="true" severity="danger"
@@ -11,11 +11,11 @@
         </div>
     </ng-template>
 
-    <div class="fields-grid">
+    <div class="grid grid-cols-2 gap-x-6 gap-y-3">
         @for (field of fields(); track field.label) {
-        <div class="field-row">
-            <span class="field-label">{{ field.label }}</span>
-            <span class="field-value">{{ field.value }}</span>
+        <div class="flex flex-col gap-1">
+            <span class="text-xs text-gray-500">{{ field.label }}</span>
+            <span class="text-base font-semibold text-gray-900">{{ field.value }}</span>
         </div>
         }
     </div>
