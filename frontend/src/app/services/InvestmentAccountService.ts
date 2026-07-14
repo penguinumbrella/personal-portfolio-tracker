@@ -1,9 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { InvestmentAccount } from '../types/InvestmentAccounts';
 import { catchWithMessage, userIdParams } from '../shared/http.util';
+import { Holding } from '../types/Holding';
+import { HoldingService } from './HoldingService';
 
 @Injectable({ providedIn: 'root' })
 export class InvestmentAccountService {

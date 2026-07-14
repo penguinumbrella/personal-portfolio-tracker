@@ -2,6 +2,11 @@ import { Component, input, Input } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 
+export interface TableColumn {
+  header: string;
+  field: string;
+}
+
 @Component({
   selector: 'app-dashboard-table',
   imports: [TableModule, CardModule],
@@ -11,6 +16,5 @@ import { TableModule } from 'primeng/table';
 export class DashboardTable {
   @Input() title: string = '';
   data = input<any[]>([]);
-
-  
+  columns = input<TableColumn[]>([]);
 }

@@ -13,3 +13,9 @@ export interface Security {
 
   userId?: number;
 }
+
+export interface TopSecurity {
+  securityId: number;
+  name: string;
+  value: number;
+}

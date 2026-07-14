@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
-import { Security } from '../types/Security';
+import { Security, TopSecurity } from '../types/Security';
 import { catchWithMessage, userIdParams } from '../shared/http.util';
 
 @Injectable({ providedIn: 'root' })
@@ -47,9 +47,10 @@ export class SecurityService {
       .pipe(catchWithMessage('Failed to load total user securities.'));
   }
 
-  getRecentSecurities(userId: number): Observable<Security[]> {
+  getTopSecurities(userId: number): Observable<TopSecurity[]> {
+    console.log(`Fetching top securities for userId: ${userId}`);
     return this.http
-      .get<Security[]>(`${this.URL}/recent`, { params: userIdParams(userId) })
-      .pipe(catchWithMessage('Failed to load recent Securities for specified User.'));
+      .get<TopSecurity[]>(`${this.URL}/top`, { params: userIdParams(userId) })
+      .pipe(catchWithMessage('Failed to load top Securities for specified User.'));
   }
 }
