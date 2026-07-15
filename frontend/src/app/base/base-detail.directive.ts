@@ -144,7 +144,8 @@ export abstract class BaseDetailDirective<T> {
         this.holdings.update((current) =>
           current.filter(
             (h) =>
-              h.id?.accountId !== holding.id?.accountId || h.id?.securityId !== holding.id?.securityId,
+              h.id?.accountId !== holding.id?.accountId ||
+              h.id?.securityId !== holding.id?.securityId,
           ),
         );
       },

@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.User;
+import com.skillstorm.Repositories.HoldingRepo;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.UserRepo;
 import com.skillstorm.Util.RepoUtils;
@@ -18,12 +19,16 @@ public class InvestmentAccountService {
 
     private final InvestmentAccountRepo investmentAccountRepo;
     private final UserRepo userRepo;
+    private final HoldingRepo holdingRepo;
 
-    public InvestmentAccountService(InvestmentAccountRepo investmentAccountRepo, UserRepo userRepo) {
+    public InvestmentAccountService(InvestmentAccountRepo investmentAccountRepo, UserRepo userRepo,
+            HoldingRepo holdingRepo) {
         this.investmentAccountRepo = investmentAccountRepo;
         this.userRepo = userRepo;
+        this.holdingRepo = holdingRepo;
     }
 
+    // ----- GET/READ METHODS -----
     public List<InvestmentAccount> getAccounts(Long userId) {
         if (userId == null) {
             return investmentAccountRepo.findAll();
@@ -35,6 +40,20 @@ public class InvestmentAccountService {
         return RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
     }
 
+    public Long getAccountTotalCost(int accountId) {
+        return holdingRepo.sumCostByAccountId(accountId);
+    }
+
+    public Long getUserInvestmentAccountTotal(int userId) {
+        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
+        return investmentAccountRepo.countByUser(user);
+    }
+
+    public List<InvestmentAccount> getRecentAccounts(Long userId) {
+        return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
+    }
+
+    // ----- POST/CREATE METHODS -----
     public InvestmentAccount addAccount(InvestmentAccountDto dto) {
         if (investmentAccountRepo.existsByNickname(dto.nickname())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nickname is already in use.");
@@ -48,6 +67,7 @@ public class InvestmentAccountService {
 
     }
 
+    // ----- PUT/UPDATE METHODS -----
     public InvestmentAccount updateAccount(int id, InvestmentAccountDto dto) {
         InvestmentAccount investmentAccount = RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
 
@@ -64,19 +84,11 @@ public class InvestmentAccountService {
 
     }
 
+    // ----- DELETE METHODS -----
     public boolean deleteAccount(int id) {
         RepoUtils.requireExists(investmentAccountRepo, id, "Investment account");
         investmentAccountRepo.deleteById(id);
         return true;
-    }
-
-    public Long getUserInvestmentAccountTotal(int userId) {
-        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
-        return investmentAccountRepo.countByUser(user);
-    }
-
-    public List<InvestmentAccount> getRecentAccounts(Long userId) {
-        return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
     }
 
 }

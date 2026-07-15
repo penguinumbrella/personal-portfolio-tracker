@@ -37,6 +37,11 @@ public class InvestmentAccountController {
         return ResponseEntity.status(200).body(service.getAccount(id));
     }
 
+    @GetMapping("/{id}/total-cost")
+    public ResponseEntity<Long> getAccountTotalCost(@PathVariable int id) {
+        return ResponseEntity.ok(service.getAccountTotalCost(id));
+    }
+
     // POST (ADD ACCOUNT)
     @PostMapping
     public ResponseEntity<InvestmentAccount> addAccount(

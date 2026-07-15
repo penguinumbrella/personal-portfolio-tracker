@@ -5,7 +5,7 @@ import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
-import { Security, TopSecurity } from '../../types/Security';
+import { TopSecurity } from '../../types/Security';
 import { AuthService } from '../../services/AuthService';
 
 @Component({
@@ -25,15 +25,12 @@ export class Dashboard {
   totalAccounts = signal<number>(0);
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
-  // totalInvestedCost = computed(() =>
-  //   this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0),
-  // );
   totalInvestedCost = signal<number>(0);
 
   accountColumns: TableColumn[] = [
     { header: 'Name', field: 'nickname' },
     { header: 'Date', field: 'dateOpened' },
-    { header: 'Amount', field: this.totalInvestedCost().toString() },
+    { header: 'Amount', field: 'totalCost' },
   ];
 
   securityColumns: TableColumn[] = [
@@ -101,6 +98,23 @@ export class Dashboard {
   loadRecentAccounts(userId: number): void {
     this.investmentAccountService.getRecentAccounts(userId).subscribe({
       next: (data) => {
+        // add total cost to each account
+        data.forEach((account) => {
+          this.investmentAccountService.getInvestmentAccountTotalCost(account.id!).subscribe({
+            next: (cost) => {
+              // if an account has no holdings
+              if (cost === null) {
+                cost = 0;
+              }
+              account.totalCost = cost;
+              // update the signal each time a cost comes back
+              this.recentAccounts.update((current) =>
+                current.map((a) => (a.id === account.id ? { ...a, totalCost: cost } : a)),
+              );
+            },
+            error: (err) => console.error(err),
+          });
+        });
         this.recentAccounts.set(data);
       },
       error: (err) => {

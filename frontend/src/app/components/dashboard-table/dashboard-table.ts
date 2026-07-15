@@ -1,6 +1,7 @@
 import { Component, input, Input } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
+import { CurrencyPipe } from '@angular/common';
 
 export interface TableColumn {
   header: string;
@@ -9,7 +10,7 @@ export interface TableColumn {
 
 @Component({
   selector: 'app-dashboard-table',
-  imports: [TableModule, CardModule],
+  imports: [TableModule, CardModule, CurrencyPipe],
   templateUrl: './dashboard-table.html',
   styleUrl: './dashboard-table.css',
 })
