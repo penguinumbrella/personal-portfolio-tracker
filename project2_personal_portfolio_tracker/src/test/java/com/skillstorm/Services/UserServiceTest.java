@@ -4,8 +4,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -129,6 +129,26 @@ public class UserServiceTest {
     }
 
     @Nested
+    @DisplayName("viewProfileByUsername()")
+    class viewProfileByUsername {
+        @Test
+        @DisplayName("return User when they exist")
+        void returnUserWhenExists() {
+            when(repo.findByUsername("plswork")).thenReturn(Optional.of(testUser));
+            assertEquals(testUser, service.viewProfileByUsername("plswork"));
+            verify(repo).findByUsername("plswork");
+        }
+
+        @Test
+        @DisplayName("throws when no user is found with the given username")
+        void throwExceptionWhenUserDoesntExist() {
+            when(repo.findByUsername("nobody")).thenReturn(Optional.empty());
+
+            assertThrows(UsernameNotFoundException.class, () -> service.viewProfileByUsername("nobody"));
+        }
+    }
+
+    @Nested
     @DisplayName("editUser()")
     class updateProfile {
         @Test
@@ -201,7 +221,6 @@ public class UserServiceTest {
         @Test
         @DisplayName("successfully delete a user")
         void deleteUserSuccess() {
-            when(repo.existsById(1)).thenReturn(true);
             when(repo.findById(1)).thenReturn(Optional.of(testUser));
             when(repo.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -215,13 +234,40 @@ public class UserServiceTest {
         @Test
         @DisplayName("deletion: no user found")
         void deleteUserFailNotFound() {
-            when(repo.existsById(99)).thenReturn(false);
+            when(repo.findById(99)).thenReturn(Optional.empty());
 
             ResponseStatusException result = assertThrows(ResponseStatusException.class, () -> service.deleteUser(99));
 
             assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
             assertEquals("User with id 99 does not exist in the database.", result.getReason());
             verify(repo, never()).deleteById(anyInt());
+        }
+    }
+
+    @Nested
+    @DisplayName("loadUserByUsername()")
+    class loadUserByUsername {
+
+        @Test
+        @DisplayName("returns UserDetails when the user exists")
+        void loadUserByUsernameSuccess() {
+            when(repo.findByUsername("plswork")).thenReturn(Optional.of(testUser));
+
+            UserDetails result = service.loadUserByUsername("plswork");
+
+            assertEquals("plswork", result.getUsername());
+            assertEquals("hash", result.getPassword());
+            assertTrue(result.isEnabled());
+            assertTrue(result.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
+        }
+
+        @Test
+        @DisplayName("throws when no user is found with the given username")
+        void loadUserByUsernameNotFound() {
+            when(repo.findByUsername("nobody")).thenReturn(Optional.empty());
+
+            assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("nobody"));
         }
     }
 

@@ -24,6 +24,7 @@ import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.HoldingRepo;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.SecurityRepo;
+import com.skillstorm.Repositories.UserRepo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,6 +48,9 @@ public class HoldingServiceTest {
 
     @Mock
     private SecurityRepo securityRepo;
+
+    @Mock
+    private UserRepo userRepo;
 
     @InjectMocks
     private HoldingService service;
@@ -192,6 +196,40 @@ public class HoldingServiceTest {
     }
 
     @Nested
+    @DisplayName("getAllHoldingsPerAccount()")
+    class getAllHoldingsPerAccount {
+
+        @Test
+        @DisplayName("Success, holdings for account returned")
+        void getAllHoldingsPerAccountSuccess() {
+            when(repo.findById_AccountId(1)).thenReturn(List.of(testHolding1));
+
+            Iterable<Holding> result = service.getAllHoldingsPerAccount(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<Holding>) result).size());
+            verify(repo).findById_AccountId(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("getAllHoldingsPerSecurity()")
+    class getAllHoldingsPerSecurity {
+
+        @Test
+        @DisplayName("Success, holdings for security returned")
+        void getAllHoldingsPerSecuritySuccess() {
+            when(repo.findById_SecurityId(1)).thenReturn(List.of(testHolding1));
+
+            Iterable<Holding> result = service.getAllHoldingsPerSecurity(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<Holding>) result).size());
+            verify(repo).findById_SecurityId(1);
+        }
+    }
+
+    @Nested
     @DisplayName("getHolding()")
     class getHolding {
 
@@ -321,6 +359,74 @@ public class HoldingServiceTest {
 
             assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
             verify(repo, never()).deleteById(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserHoldingTotal()")
+    class getUserHoldingTotal {
+
+        @Test
+        @DisplayName("Success, total returned")
+        void getUserHoldingTotalSuccess() {
+            when(userRepo.existsById(1)).thenReturn(true);
+            when(repo.countByAccountUserId(1L)).thenReturn(5L);
+
+            Long result = service.getUserHoldingTotal(1L);
+
+            assertEquals(5L, result);
+            verify(repo).countByAccountUserId(1L);
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND user not found")
+        void getUserHoldingTotalUserNotFound() {
+            when(userRepo.existsById(99)).thenReturn(false);
+
+            ResponseStatusException except = assertThrows(ResponseStatusException.class,
+                    () -> service.getUserHoldingTotal(99L));
+
+            assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
+            verify(repo, never()).countByAccountUserId(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("totalInvestedCost()")
+    class totalInvestedCost {
+
+        @Test
+        @DisplayName("Success, non-null total returned")
+        void totalInvestedCostSuccess() {
+            when(userRepo.existsById(1)).thenReturn(true);
+            when(repo.totalInvestedCost(1L)).thenReturn(900L);
+
+            Long result = service.totalInvestedCost(1L);
+
+            assertEquals(900L, result);
+        }
+
+        @Test
+        @DisplayName("Success, null total defaults to 0")
+        void totalInvestedCostNullDefaultsToZero() {
+            when(userRepo.existsById(1)).thenReturn(true);
+            when(repo.totalInvestedCost(1L)).thenReturn(null);
+
+            Long result = service.totalInvestedCost(1L);
+
+            assertEquals(0L, result);
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND user not found")
+        void totalInvestedCostUserNotFound() {
+            when(userRepo.existsById(99)).thenReturn(false);
+
+            ResponseStatusException except = assertThrows(ResponseStatusException.class,
+                    () -> service.totalInvestedCost(99L));
+
+            assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
+            verify(repo, never()).totalInvestedCost(any());
         }
     }
 }

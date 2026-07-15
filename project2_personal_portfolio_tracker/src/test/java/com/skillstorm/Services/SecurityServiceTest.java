@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
 import com.skillstorm.Models.Security;
@@ -122,6 +123,23 @@ public class SecurityServiceTest {
     }
 
     @Nested
+    @DisplayName("getAllSecuritiesPerUser()")
+    class getAllSecuritiesPerUser {
+
+        @Test
+        @DisplayName("Success, securities for user returned")
+        void getAllSecuritiesPerUserSuccess() {
+            when(repo.findByUser_Id(1)).thenReturn(List.of(testSecurity1));
+
+            Iterable<Security> result = service.getAllSecuritiesPerUser(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<Security>) result).size());
+            verify(repo).findByUser_Id(1);
+        }
+    }
+
+    @Nested
     @DisplayName("getSecurity()")
     class getSecurity {
 
@@ -222,6 +240,53 @@ public class SecurityServiceTest {
 
             assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
             verify(repo, never()).deleteById(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserSecurityAccountTotal()")
+    class getUserSecurityAccountTotal {
+
+        @Test
+        @DisplayName("Success, total returned")
+        void getUserSecurityAccountTotalSuccess() {
+            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            when(repo.countByUser(testUser1)).thenReturn(3L);
+
+            Long result = service.getUserSecurityAccountTotal(1);
+
+            assertEquals(3L, result);
+            verify(repo).countByUser(testUser1);
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND user not found")
+        void getUserSecurityAccountTotalUserNotFound() {
+            when(userRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException except = assertThrows(ResponseStatusException.class,
+                    () -> service.getUserSecurityAccountTotal(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
+            verify(repo, never()).countByUser(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("getTop5SecurityValues()")
+    class getTop5SecurityValues {
+
+        @Test
+        @DisplayName("Success, top securities returned")
+        void getTop5SecurityValuesSuccess() {
+            TopSecurityDto top = new TopSecurityDto(1, "Security One", 500L);
+            when(repo.findTop5SecurityValues(1)).thenReturn(List.of(top));
+
+            Iterable<TopSecurityDto> result = service.getTop5SecurityValues(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<TopSecurityDto>) result).size());
+            verify(repo).findTop5SecurityValues(1);
         }
     }
 }

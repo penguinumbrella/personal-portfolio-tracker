@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
 import com.skillstorm.Models.Security;
@@ -112,6 +113,22 @@ public class SecurityControllerTest {
     }
 
     @Nested
+    @DisplayName("GET /v1/securities/u/{userId}")
+    class getAllSecuritiesPerUser {
+
+        @Test
+        @DisplayName("200 securities returned for user")
+        void getAllSecuritiesPerUserSuccess200() throws Exception {
+            when(service.getAllSecuritiesPerUser(1)).thenReturn(List.of(testSecurity1));
+
+            mockMvc.perform(get("/v1/securities/u/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].tickerSymbol").value("abc"))
+                    .andExpect(jsonPath("$[0].name").value("Security One"));
+        }
+    }
+
+    @Nested
     @DisplayName("GET /v1/securities/{id}")
     class getSecurity {
 
@@ -192,6 +209,37 @@ public class SecurityControllerTest {
 
             mockMvc.perform(delete("/v1/securities/1"))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/securities/total")
+    class getUserSecurityAccountTotal {
+
+        @Test
+        @DisplayName("200 OK total returned")
+        void getUserSecurityAccountTotalSuccess200() throws Exception {
+            when(service.getUserSecurityAccountTotal(1)).thenReturn(5L);
+
+            mockMvc.perform(get("/v1/securities/total").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value(5));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/securities/top")
+    class getTopSecurities {
+
+        @Test
+        @DisplayName("200 OK top securities returned")
+        void getTopSecuritiesSuccess200() throws Exception {
+            TopSecurityDto top = new TopSecurityDto(1, "Security One", 500L);
+            when(service.getTop5SecurityValues(1)).thenReturn(List.of(top));
+
+            mockMvc.perform(get("/v1/securities/top").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].name").value("Security One"));
         }
     }
 }

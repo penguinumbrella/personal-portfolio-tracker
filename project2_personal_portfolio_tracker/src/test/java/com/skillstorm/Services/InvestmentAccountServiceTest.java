@@ -35,6 +35,7 @@ import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.InvestmentType;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
+import com.skillstorm.Repositories.HoldingRepo;
 import com.skillstorm.Repositories.InvestmentAccountRepo;
 import com.skillstorm.Repositories.UserRepo;
 
@@ -46,6 +47,9 @@ public class InvestmentAccountServiceTest {
 
     @Mock
     private InvestmentAccountRepo investmentAccountRepo;
+
+    @Mock
+    private HoldingRepo holdingRepo;
 
     @InjectMocks
     private InvestmentAccountService service;
@@ -108,6 +112,95 @@ public class InvestmentAccountServiceTest {
             verify(investmentAccountRepo, never()).findAll();
         }
 
+    }
+
+    @Nested
+    @DisplayName("getAccount()")
+    class getAccount {
+
+        @Test
+        @DisplayName("returns the account when it exists")
+        void getAccountSuccess() {
+            when(investmentAccountRepo.findById(1)).thenReturn(Optional.of(testInvestmentAccount1));
+
+            InvestmentAccount result = service.getAccount(1);
+
+            assertEquals(testInvestmentAccount1, result);
+            verify(investmentAccountRepo).findById(1);
+        }
+
+        @Test
+        @DisplayName("throws when the account doesn't exist")
+        void getAccountNotFound() {
+            when(investmentAccountRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.getAccount(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("getAccountTotalCost()")
+    class getAccountTotalCost {
+
+        @Test
+        @DisplayName("returns the account's total cost")
+        void getAccountTotalCostSuccess() {
+            when(holdingRepo.sumCostByAccountId(1)).thenReturn(250L);
+
+            Long result = service.getAccountTotalCost(1);
+
+            assertEquals(250L, result);
+            verify(holdingRepo).sumCostByAccountId(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserInvestmentAccountTotal()")
+    class getUserInvestmentAccountTotal {
+
+        @Test
+        @DisplayName("returns the total for the user")
+        void getUserInvestmentAccountTotalSuccess() {
+            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            when(investmentAccountRepo.countByUser(testUser1)).thenReturn(2L);
+
+            Long result = service.getUserInvestmentAccountTotal(1);
+
+            assertEquals(2L, result);
+            verify(investmentAccountRepo).countByUser(testUser1);
+        }
+
+        @Test
+        @DisplayName("throws when the user doesn't exist")
+        void getUserInvestmentAccountTotalUserNotFound() {
+            when(userRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.getUserInvestmentAccountTotal(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            verify(investmentAccountRepo, never()).countByUser(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("getRecentAccounts()")
+    class getRecentAccounts {
+
+        @Test
+        @DisplayName("returns the user's most recent accounts")
+        void getRecentAccountsSuccess() {
+            when(investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(1L))
+                    .thenReturn(List.of(testInvestmentAccount1));
+
+            List<InvestmentAccount> result = service.getRecentAccounts(1L);
+
+            assertEquals(1, result.size());
+            verify(investmentAccountRepo).findTop5ByUserIdOrderByDateOpenedDesc(1L);
+        }
     }
 
     @Nested
@@ -191,6 +284,25 @@ public class InvestmentAccountServiceTest {
             assertEquals(testUser1, result.getUser());
 
             verify(investmentAccountRepo).save(any(InvestmentAccount.class));
+        }
+
+        @Test
+        @DisplayName("update account successful: nickname unchanged")
+        void updateAccountSuccessNicknameUnchanged() {
+            InvestmentAccountDto sameNicknameDto = new InvestmentAccountDto(testInvestmentAccount1.getNickname(),
+                    testInvestmentAccount2.getAccountType(), testInvestmentAccount2.getInstitutionName(),
+                    testInvestmentAccount2.getDateOpened(), testUser1.getId());
+
+            when(investmentAccountRepo.findById(testInvestmentAccount1.getId()))
+                    .thenReturn(Optional.of(testInvestmentAccount1));
+            when(userRepo.findById(testUser1.getId())).thenReturn(Optional.of(testUser1));
+            when(investmentAccountRepo.save(any(InvestmentAccount.class))).thenAnswer(i -> i.getArgument(0));
+
+            InvestmentAccount result = service.updateAccount(testInvestmentAccount1.getId(), sameNicknameDto);
+
+            assertEquals(testInvestmentAccount1.getNickname(), result.getNickname());
+            verify(investmentAccountRepo).save(any(InvestmentAccount.class));
+            verify(investmentAccountRepo, never()).existsByNickname(anyString());
         }
 
         @Test

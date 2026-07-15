@@ -287,4 +287,34 @@ class HoldingControllerTest {
                                         .andExpect(status().isNotFound());
                 }
         }
+
+        @Nested
+        @DisplayName("GET /v1/holdings/total")
+        class getUserHoldingTotal {
+
+                @Test
+                @DisplayName("200 OK total returned")
+                void getUserHoldingTotalSuccess200() throws Exception {
+                        when(service.getUserHoldingTotal(1L)).thenReturn(500L);
+
+                        mockMvc.perform(get("/v1/holdings/total").param("userId", "1"))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$").value(500));
+                }
+        }
+
+        @Nested
+        @DisplayName("GET /v1/holdings/totalInvestedCost")
+        class totalInvestedCost {
+
+                @Test
+                @DisplayName("200 OK total invested cost returned")
+                void totalInvestedCostSuccess200() throws Exception {
+                        when(service.totalInvestedCost(1L)).thenReturn(900L);
+
+                        mockMvc.perform(get("/v1/holdings/totalInvestedCost").param("userId", "1"))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$").value(900));
+                }
+        }
 }

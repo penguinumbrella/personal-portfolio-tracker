@@ -126,6 +126,63 @@ public class InvestmentAccountControllerTest {
     }
 
     @Nested
+    @DisplayName("GET /v1/investments/{id}")
+    class getAccount {
+        @Test
+        @DisplayName("200 OK with the account")
+        void getAccountSuccess200() throws Exception {
+            when(service.getAccount(1)).thenReturn(testAccount1);
+
+            mockMvc.perform(get("/v1/investments/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nickname").value("test1"));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/investments/{id}/total-cost")
+    class getAccountTotalCost {
+        @Test
+        @DisplayName("200 OK with the account's total cost")
+        void getAccountTotalCostSuccess200() throws Exception {
+            when(service.getAccountTotalCost(1)).thenReturn(250L);
+
+            mockMvc.perform(get("/v1/investments/1/total-cost"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value(250));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/investments/total")
+    class getUserInvestmentAccountTotal {
+        @Test
+        @DisplayName("200 OK with the user's investment account total")
+        void getUserInvestmentAccountTotalSuccess200() throws Exception {
+            when(service.getUserInvestmentAccountTotal(1)).thenReturn(2L);
+
+            mockMvc.perform(get("/v1/investments/total").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value(2));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/investments/recent")
+    class getRecentAccounts {
+        @Test
+        @DisplayName("200 OK with the user's most recent accounts")
+        void getRecentAccountsSuccess200() throws Exception {
+            when(service.getRecentAccounts(1L)).thenReturn(List.of(testAccount1));
+
+            mockMvc.perform(get("/v1/investments/recent").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].nickname").value("test1"));
+        }
+    }
+
+    @Nested
     @DisplayName("POST /v1/investments")
     class addAccount {
         @Test
