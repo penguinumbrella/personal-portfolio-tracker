@@ -1,4 +1,4 @@
-<mat-sidenav-container class="flex app-container">
+<mat-sidenav-container class="flex app-container h-screen">
   <mat-sidenav #sidenav mode="side" opened style="width: 200px;">
     <!-- nav links here -->
     <app-menu></app-menu>
@@ -6,16 +6,23 @@
 
 
   <mat-sidenav-content>
-    <div class="flex flex-col">
+    <div class="flex flex-col h-full">
       <div class="flex flex-row justify-between p-6">
         <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
           <i class="pi pi-bars"></i>
         </button>
-        <app-user-handle></app-user-handle>
+        <div class="flex align-items-center gap-3">
+          <button mat-icon-button (click)="themeService.toggle()" aria-label="Toggle dark mode">
+            <i class="pi" [class.pi-sun]="themeService.theme() === 'dark'" [class.pi-moon]="themeService.theme() === 'light'"></i>
+          </button>
+          <app-user-handle></app-user-handle>
+        </div>
 
 
       </div>
-      <router-outlet />
+      <div class="flex-1 min-h-0">
+        <router-outlet />
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

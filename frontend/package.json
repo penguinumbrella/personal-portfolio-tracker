@@ -39,10 +39,11 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "autoprefixer": "^10.5.3",
     "jsdom": "^28.1.0",
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.19",
     "prettier": "^3.8.1",
-    "tailwindcss": "^4.1.12",
+    "tailwindcss": "^4.3.2",
     "typescript": "~6.0.2",
     "vitest": "^4.1.10",
     "zone.js": "^0.16.2"

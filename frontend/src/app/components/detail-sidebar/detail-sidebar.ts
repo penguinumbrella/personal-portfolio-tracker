@@ -1,4 +1,5 @@
 import { Component, output, input, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { SidebarCard } from '../sidebar-card/sidebar-card';
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +13,7 @@ export interface SidebarItem {
 
 @Component({
   selector: 'app-detail-sidebar',
-  imports: [ScrollPanelModule, SidebarCard, ButtonModule],
+  imports: [NgClass, ScrollPanelModule, SidebarCard, ButtonModule],
   templateUrl: './detail-sidebar.html',
   styleUrl: './detail-sidebar.css',
 })

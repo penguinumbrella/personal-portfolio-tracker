@@ -22,17 +22,16 @@ const MyCustomTheme = definePreset(Aura, {
         }
     }
 });
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(),
+    provideRouter(routes), 
+    provideClientHydration(),
     provideHttpClient(withInterceptors([credentialsInterceptor])),
     providePrimeNG({
       theme: {
         preset: MyCustomTheme,
         options: {
-          css: Stonks.css,
           darkModeSelector: '.my-app-dark'
         }
       },
