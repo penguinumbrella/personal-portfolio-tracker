@@ -2,13 +2,9 @@ package com.skillstorm.Controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.User;
 import com.skillstorm.Services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,21 +25,7 @@ public class UserController {
         return ResponseEntity.ok(service.getAll());
     }
 
-    // // USE REGISTRATION IN AUTH CONTROLLER INSTEAD OF THIS ENDPOINT
-    // /**
-    //  * 
-    //  * @param dto:
-    //  *      - username
-    //  *      - email
-    //  *      - password
-    //  * @return
-    //  */
-    // @PostMapping
-    // public ResponseEntity<User> registerUser(
-    //         @RequestBody UserDto dto) {
-
-    //     return ResponseEntity.status(201).body(service.registerUser(dto));
-    // }
+    // User registation, update, and find by username are handled in AuthController
 
     // VIEW PROFILE
     @GetMapping("/{id}")
@@ -53,17 +35,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // EDIT PROFILE
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateProfile(
-            @PathVariable int id,
-            @RequestBody UserDto dto) {
-        User user = service.updateProfile(id, dto);
-        return ResponseEntity.status(200).body(user);
-
-    }
-
     // DELETE (DELETE ACCOUNT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(
@@ -71,9 +42,5 @@ public class UserController {
         service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
-    // USER LOGIN (TODO)
-    // USER LOGOUT (TODO)
-    // DATA SCOPING?
 
 }

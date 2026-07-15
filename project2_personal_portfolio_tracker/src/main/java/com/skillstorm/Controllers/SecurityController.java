@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Services.SecurityService;
 import com.skillstorm.Models.Security;
 
@@ -74,10 +75,10 @@ public class SecurityController {
         return ResponseEntity.status(200).body(service.getUserSecurityAccountTotal(userId));
     }
 
-    @GetMapping("recent")
-    public ResponseEntity<Iterable<Security>> getRecentSecurities(
-            @RequestParam(required = true) Long userId) {
-        return ResponseEntity.status(200).body(service.getRecentSecurities(userId));
+    @GetMapping("top")
+    public ResponseEntity<Iterable<TopSecurityDto>> getTopSecurities(
+            @RequestParam(required = true) int userId) {
+        return ResponseEntity.status(200).body(service.getTop5SecurityValues((int) userId));
     }
 
 }

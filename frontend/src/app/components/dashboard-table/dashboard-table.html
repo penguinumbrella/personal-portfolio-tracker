@@ -1,21 +1,24 @@
 <a routerLink="/your-target-path" class="block cursor-pointer hover:shadow-lg transition-shadow duration-200">
-<p-card 
-  [header]="title">
-  <p-table [value]="data()">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Name</th>
-        <th>Date</th>
-        <th>Amount</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-row>
-      <tr>
-        <td>{{ row.nickname }}</td>
-        <td>{{ row.dateOpened }}</td>
-        <td>{{ row.totalAmount }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
-</p-card>
+  <p-card [header]="title">
+    <p-table [value]="data()">
+      <ng-template pTemplate="header">
+        <tr>
+          @for (col of columns(); track col.field) {
+          <th>{{ col.header }}</th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          @for (col of columns(); track col.field) {
+          @if (col.field === 'value') {
+          <td>{{ row[col.field] | currency }}</td>
+          } @else {
+          <td>{{ row[col.field] }}</td>
+          }
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
 </a>

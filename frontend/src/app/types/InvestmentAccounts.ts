@@ -1,12 +1,13 @@
-import {InvestmentType} from "./InvestmentType";
+import { InvestmentType } from './InvestmentType';
 
 export interface InvestmentAccount {
-    id?: number;
-    
-    nickname: string;
-    institutionName: string;
-    accountType: InvestmentType;
-    dateOpened: Date;
+  id?: number;
 
-    userId?: number;
+  nickname: string;
+  institutionName: string;
+  accountType: InvestmentType;
+  dateOpened: Date;
+
+  userId?: number;
+  value?: number; // total cost of all holdings in this account
 }

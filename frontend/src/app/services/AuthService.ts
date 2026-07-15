@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { environment } from "../../environments/environments";
 import { Observable, switchMap, tap } from "rxjs";
 import { User } from "../types/User";
@@ -7,12 +7,12 @@ import { catchWithMessage } from "../shared/http.util";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
+    private http = inject(HttpClient);
+
     private readonly URL = `${environment.baseApiUrl}/auth`;
 
     /** The signed-in user for this session, populated by login()/getCurrentUser(). */
     currentUser = signal<User | null>(null);
-
-    constructor(private http: HttpClient) {}
 
     /** Seeds the XSRF-TOKEN cookie the backend expects back as a header on state-changing requests. */
     private primeCsrfToken(): Observable<unknown> {

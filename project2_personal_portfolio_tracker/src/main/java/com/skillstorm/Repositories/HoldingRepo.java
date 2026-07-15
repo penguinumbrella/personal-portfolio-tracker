@@ -23,6 +23,10 @@ public interface HoldingRepo extends JpaRepository<Holding, HoldingPK> {
             """)
     Long totalInvestedCost(Long userId);
 
+    // calculate the total cost of holdings for a specific account
+    @Query("SELECT SUM(h.shares * h.costPerShare) FROM Holding h WHERE h.account.id = :accountId")
+    Long sumCostByAccountId(int accountId);
+
     Iterable<Holding> findById_AccountId(int accountId);
 
     Iterable<Holding> findById_SecurityId(int securityId);

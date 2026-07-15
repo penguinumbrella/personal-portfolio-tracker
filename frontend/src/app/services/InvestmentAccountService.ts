@@ -1,9 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { InvestmentAccount } from '../types/InvestmentAccounts';
 import { catchWithMessage, userIdParams } from '../shared/http.util';
+import { Holding } from '../types/Holding';
+import { HoldingService } from './HoldingService';
 
 @Injectable({ providedIn: 'root' })
 export class InvestmentAccountService {
@@ -16,9 +18,11 @@ export class InvestmentAccountService {
    *          - one central location for all your related requests
    */
 
+  private http = inject(HttpClient);
+
   private readonly URL = `${environment.baseApiUrl}/investments`;
 
-  constructor(private http: HttpClient) {}
+  // crud classics
 
   getAllInvestmentAccounts(userId?: number): Observable<InvestmentAccount[]> {
     let params = new HttpParams();
@@ -58,6 +62,14 @@ export class InvestmentAccountService {
     return this.http
       .delete<void>(`${this.URL}/${id}`)
       .pipe(catchWithMessage('Failed to delete InvestmentAccount.'));
+  }
+
+  // getting helpers for backend calculations
+
+  getInvestmentAccountTotalCost(accountId: number): Observable<number> {
+    return this.http
+      .get<number>(`${this.URL}/${accountId}/total-cost`)
+      .pipe(catchWithMessage('Failed to load total cost of InvestmentAccount.'));
   }
 
   getUserInvestmentAccountTotal(userId: number): Observable<number> {

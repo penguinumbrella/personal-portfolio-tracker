@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { DetailCard } from '../../components/detail-card/detail-card';
 import { HoldingTable } from '../../components/holding-table/holding-table';
@@ -26,6 +26,8 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './security-detail.css',
 })
 export class SecurityDetail extends BaseDetailDirective<Security> {
+  private securityService = inject(SecurityService);
+  private investmentAccountService = inject(InvestmentAccountService);
 
   security = signal<Security | null>(null);
 
@@ -57,8 +59,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   protected override readonly counterpartyFormKey = 'account' as const;
 
   constructor(
-    private securityService: SecurityService,
-    private investmentAccountService: InvestmentAccountService,
+
     private messageService: MessageService,
   ) { super(); }
 

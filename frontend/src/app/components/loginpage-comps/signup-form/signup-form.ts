@@ -33,15 +33,17 @@ export class SignupForm {
     this.errorMessage.set(null);
 
     const { username, email, password } = this.form.getRawValue();
-    this.authService.register({ username: username!, email: email!, passwordHash: password! }).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.switchToLogin.emit();
-      },
-      error: () => {
-        this.submitting.set(false);
-        this.errorMessage.set('Failed to create account. Please try again.');
-      },
-    });
+    this.authService
+      .register({ username: username!, email: email!, passwordHash: password! })
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.switchToLogin.emit();
+        },
+        error: () => {
+          this.submitting.set(false);
+          this.errorMessage.set('Failed to create account. Please try again.');
+        },
+      });
   }
 }

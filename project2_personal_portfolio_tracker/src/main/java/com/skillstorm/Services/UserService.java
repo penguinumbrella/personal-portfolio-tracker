@@ -2,7 +2,6 @@ package com.skillstorm.Services;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -15,12 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.skillstorm.Util.RepoUtils;
 
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
-import com.skillstorm.Util.RepoUtils;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -62,8 +61,7 @@ public class UserService implements UserDetailsService {
 
     public User viewProfileByUsername(String username) {
         return repo.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "User with username " + username + " does not exist in the database."));
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
     }
 
     // EDIT PROFILE
@@ -87,16 +85,10 @@ public class UserService implements UserDetailsService {
 
     // DELETE (sets enabled to false)
     public boolean deleteUser(int id) {
-        if (repo.existsById(id)) {
-            User user = repo.findById(id).get();
-            user.setEnabled(false);
-            repo.save(user);
-            return true;
-        }
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "User with id " + id + " does not exist in the database.");
-
+        User user = RepoUtils.findOrThrow(repo, id, "User");
+        user.setEnabled(false);
+        repo.save(user);
+        return true;
     }
 
     @Override
@@ -121,7 +113,6 @@ public class UserService implements UserDetailsService {
                 authorities);
     }
 
-    // LOGOUT (TODO)
     // DATA SCOPING?
 
 }

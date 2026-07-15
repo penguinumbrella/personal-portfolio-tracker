@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { environment } from "../../environments/environments";
 import { Observable } from "rxjs";
 import { User } from "../types/User";
@@ -7,9 +7,9 @@ import { catchWithMessage } from "../shared/http.util";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
-    private readonly URL = `${environment.baseApiUrl}/users`;
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) {}
+    private readonly URL = `${environment.baseApiUrl}/users`;
 
     getAllUsers(): Observable<User[]> {
         return this.http.get<User[]>(this.URL)

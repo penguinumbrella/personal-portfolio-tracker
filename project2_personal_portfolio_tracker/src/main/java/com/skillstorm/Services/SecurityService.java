@@ -1,12 +1,11 @@
 package com.skillstorm.Services;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
@@ -26,7 +25,6 @@ public class SecurityService {
 
     // ----- POST/CREATE METHODS -----
     public Security addSecurity(SecurityDto dto) {
-        // TODO what makes a security unique that could be checked for?
         User linkedUser = userRepo.findById(dto.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "Must assign security to a valid user"));
@@ -78,8 +76,7 @@ public class SecurityService {
         return repo.countByUser(user);
     }
 
-    public List<Security> getRecentSecurities(Long userId) {
-        return repo.findTop5ByUser_IdOrderByIdDesc(userId);
+    public Iterable<TopSecurityDto> getTop5SecurityValues(int userId) {
+        return repo.findTop5SecurityValues(userId);
     }
-
 }

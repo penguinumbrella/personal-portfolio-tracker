@@ -1,11 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MetricCard } from '../../components/metric-card/metric-card';
-import { DashboardTable } from '../../components/dashboard-table/dashboard-table';
+import { DashboardTable, TableColumn } from '../../components/dashboard-table/dashboard-table';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
-import { Security } from '../../types/Security';
+import { TopSecurity } from '../../types/Security';
 import { AuthService } from '../../services/AuthService';
 
 @Component({
@@ -15,21 +15,34 @@ import { AuthService } from '../../services/AuthService';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
-
   private authService = inject(AuthService);
+  private investmentAccountService = inject(InvestmentAccountService);
+  private holdingService = inject(HoldingService);
+  private securityService = inject(SecurityService);
 
   recentAccounts = signal<InvestmentAccount[]>([]);
-  recentSecurities = signal<Security[]>([]);
+  topSecurities = signal<TopSecurity[]>([]);
   totalAccounts = signal<number>(0);
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
   totalInvestedCost = signal<number>(0);
 
-  constructor(
-    private investmentAccountService: InvestmentAccountService,
-    private holdingService: HoldingService,
-    private securityService: SecurityService
-  ) {}
+  accountColumns: TableColumn[] = [
+    { header: 'Name', field: 'nickname' },
+    { header: 'Date', field: 'dateOpened' },
+    { header: 'Value', field: 'value' },
+  ];
+
+  securityColumns: TableColumn[] = [
+    {
+      header: 'Name',
+      field: 'name',
+    },
+    {
+      header: 'Value',
+      field: 'value',
+    },
+  ];
 
   ngOnInit(): void {
     // Always re-verify with the server rather than trusting a cached value, so switching
@@ -38,7 +51,7 @@ export class Dashboard {
       next: (user) => {
         this.loadTotals(user.id!);
         this.loadRecentAccounts(user.id!);
-        this.loadRecentSecurities(user.id!);
+        this.loadTopSecurities(user.id!);
       },
       error: (err) => console.error('Failed to resolve current user:', err),
     });
@@ -51,8 +64,8 @@ export class Dashboard {
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
 
     this.securityService.getUserSecurityTotal(userId).subscribe({
       next: (data) => {
@@ -60,8 +73,8 @@ export class Dashboard {
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
 
     this.holdingService.getUserHoldingTotal(userId).subscribe({
       next: (data) => {
@@ -69,8 +82,8 @@ export class Dashboard {
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
 
     this.holdingService.totalInvestedCost(userId).subscribe({
       next: (data) => {
@@ -78,29 +91,46 @@ export class Dashboard {
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
   }
 
   loadRecentAccounts(userId: number): void {
     this.investmentAccountService.getRecentAccounts(userId).subscribe({
       next: (data) => {
+        // add total cost to each account
+        data.forEach((account) => {
+          this.investmentAccountService.getInvestmentAccountTotalCost(account.id!).subscribe({
+            next: (cost) => {
+              // if an account has no holdings
+              if (cost === null) {
+                cost = 0;
+              }
+              account.value = cost;
+              // update the signal each time a cost comes back
+              this.recentAccounts.update((current) =>
+                current.map((a) => (a.id === account.id ? { ...a, value: cost } : a)),
+              );
+            },
+            error: (err) => console.error(err),
+          });
+        });
         this.recentAccounts.set(data);
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
   }
 
-  loadRecentSecurities(userId: number): void {
-    this.securityService.getRecentSecurities(userId).subscribe({
+  loadTopSecurities(userId: number): void {
+    this.securityService.getTopSecurities(userId).subscribe({
       next: (data) => {
-        this.recentSecurities.set(data);
+        this.topSecurities.set(data);
       },
       error: (err) => {
         console.error(err);
-      }
-    })
+      },
+    });
   }
 }

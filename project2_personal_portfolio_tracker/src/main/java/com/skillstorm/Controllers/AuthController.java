@@ -81,8 +81,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // persist the authenticated context into the session so later requests (carrying the
-        // session cookie) are recognized as logged in without needing to resend credentials
+        /**
+         * persist the authenticated context into the session so later requests (carrying the
+         * session cookie) are recognized as logged in without needing to resend credentials
+         */
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
