@@ -17,10 +17,10 @@
     </div>
 
     <div class="flex flex-row gap-4">
-        <app-dashboard-table class="flex-1" title="Recent Accounts" [data]="recentAccounts()">
+        <app-dashboard-table title="Recent Accounts" [data]="recentAccounts()" [columns]="accountColumns">
         </app-dashboard-table>
 
-        <app-dashboard-table class="flex-1" title="Recent Securities" [data]="recentSecurities()">
+        <app-dashboard-table title="Top Securities" [data]="topSecurities()" [columns]="securityColumns">
         </app-dashboard-table>
     </div>
 
