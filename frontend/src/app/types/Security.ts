@@ -15,7 +15,7 @@ export interface Security {
 }
 
 export interface TopSecurity {
-  id: number;
+  securityId: number;
   name: string;
   value: number;
 }

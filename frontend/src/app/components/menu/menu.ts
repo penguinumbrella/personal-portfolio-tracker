@@ -44,6 +44,7 @@ export class Menu {
 
   buildSecuritySubMenu(): MenuItem[] {
     const securities = this.dashboardStateService.topSecurities();
+    console.log(securities);
     return [
       {
         label: 'See all securities',
@@ -58,7 +59,7 @@ export class Menu {
       ...securities.map((s) => ({
         label: s.name,
         icon: 'pi pi-search-plus',
-        routerLink: `/security/${s.id}`,
+        routerLink: `/security/${s.securityId}`,
       })),
     ];
   }
