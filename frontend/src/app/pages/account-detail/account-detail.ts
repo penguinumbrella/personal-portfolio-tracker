@@ -82,7 +82,18 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
+      this.checkRouteForId();
     });
+  }
+
+  // work around to allow selection from menu bar
+  checkRouteForId(): void {
+    const idParam = this.actRoute.snapshot.paramMap.get('id');
+    if (idParam) {
+      const accountId = Number(idParam);
+      this.viewAccount(accountId);
+      this.location.replaceState('/account');
+    }
   }
 
   loadAccounts() {
@@ -125,7 +136,11 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
   // when an account is selected from the sidebar, load the holdings for that account
   onAccountSelect(item: SidebarItem): void {
-    this.investmentAccountService.getInvestmentAccountById(item.id).subscribe({
+    this.viewAccount(item.id);
+  }
+
+  viewAccount(id: number) {
+    this.investmentAccountService.getInvestmentAccountById(id).subscribe({
       next: (data) => {
         this.account.set(data);
         this.buildAccountFields();

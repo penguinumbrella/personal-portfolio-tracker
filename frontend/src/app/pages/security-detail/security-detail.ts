@@ -20,7 +20,16 @@ import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule, ToastModule],
+  imports: [
+    DetailCard,
+    HoldingTable,
+    MetricCard,
+    DetailSidebar,
+    ManageHoldingModal,
+    ManageSecurityModal,
+    ConfirmDialogModule,
+    ToastModule,
+  ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
@@ -53,15 +62,14 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: new FormControl('', Validators.required),
       sector: new FormControl('', Validators.required),
       securityType: new FormControl('', Validators.required),
-    })
+    }),
   );
 
   protected override readonly counterpartyFormKey = 'account' as const;
 
-  constructor(
-
-    private messageService: MessageService,
-  ) { super(); }
+  constructor(private messageService: MessageService) {
+    super();
+  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: formData.account.id, s_id: this.security()!.id! };
@@ -72,9 +80,19 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
+      this.checkRouteForId();
     });
   }
 
+  // work around to allow selection from menu bar
+  checkRouteForId(): void {
+    const idParam = this.actRoute.snapshot.paramMap.get('id');
+    if (idParam) {
+      const securitytId = Number(idParam);
+      this.viewSecurity(securitytId);
+      this.location.replaceState('/security');
+    }
+  }
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -114,7 +132,11 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // when a security is selected from sidebar, get security and load details, holdings
   onSecuritySelect(item: SidebarItem): void {
-    this.securityService.getSecurityById(item.id).subscribe({
+    this.viewSecurity(item.id);
+  }
+
+  viewSecurity(id: number) {
+    this.securityService.getSecurityById(id).subscribe({
       next: (data) => {
         this.security.set(data);
         this.buildSecurityFields();
@@ -173,7 +195,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: currentSecurity.name,
       tickerSymbol: currentSecurity.tickerSymbol,
       securityType: currentSecurity.type,
-      sector: currentSecurity.sector
+      sector: currentSecurity.sector,
     });
 
     this.isSecurityModalVisible.set(true);
@@ -181,13 +203,14 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   confirmDeleteSecurity(): void {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this security? This will also delete all holdings for this security.',
+      message:
+        'Are you sure you want to delete this security? This will also delete all holdings for this security.',
       header: 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.executeDeleteSecurity();
-      }
+      },
     });
   }
 
@@ -208,9 +231,9 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   onSecurityModalConfirm(formData: any) {
     if (this.securityForm().invalid) {
       this.messageService.add({
-        severity: 'warn', 
-        summary: 'Incomplete Form', 
-        detail: 'Please fill out all required fields correctly.'
+        severity: 'warn',
+        summary: 'Incomplete Form',
+        detail: 'Please fill out all required fields correctly.',
       });
       return;
     }
@@ -221,12 +244,12 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       tickerSymbol: formData.tickerSymbol,
       sector: formData.sector,
       type: formData.securityType,
-      generalNotes: formData.generalNotes || "",
-      userId: this.currentUserId()!
+      generalNotes: formData.generalNotes || '',
+      userId: this.currentUserId()!,
     };
 
     console.log('Attempting to save security:', payload);
-    
+
     if (this.editingSecurity()) {
       // UPDATE
       this.securityService.updateSecurity(payload.id!, payload).subscribe({
@@ -242,16 +265,17 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         },
         error: (err) => {
           console.log('Error block triggered', err);
-          const errorMessage = err.status === 409 
-            ? 'A security with this ticker symbol already exists.' 
-            : 'An unexpected error occurred. Please try again.';
-            
-          this.messageService.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: errorMessage 
+          const errorMessage =
+            err.status === 409
+              ? 'A security with this ticker symbol already exists.'
+              : 'An unexpected error occurred. Please try again.';
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage,
           });
-        }
+        },
       });
     } else {
       // CREATE
@@ -259,21 +283,26 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         next: (newSecurity) => {
           this.loadSecurities();
           this.isSecurityModalVisible.set(false);
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Security added successfully!' });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Security added successfully!',
+          });
         },
         error: (err) => {
           console.log('Error block triggered', err);
           // Check for specific status codes
-          const errorMessage = err.status === 409 
-            ? 'A security with this ticker symbol already exists.' 
-            : 'An unexpected error occurred. Please try again.';
-            
-          this.messageService.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: errorMessage 
+          const errorMessage =
+            err.status === 409
+              ? 'A security with this ticker symbol already exists.'
+              : 'An unexpected error occurred. Please try again.';
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage,
           });
-        }
+        },
       });
     }
   }

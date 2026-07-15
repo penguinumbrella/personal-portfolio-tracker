@@ -1,10 +1,9 @@
-<div class="card h-full p-4 bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-gray-700">
-  
-  <div class="text-2xl font-bold px-2 mb-6 text-gray-900 dark:text-gray-100">
-    PFolio
-  </div>
+<!--https://v17.primeng.org/panelmenu basic-->
 
-  <p-menu [model]="items" styleClass="w-full border-none bg-transparent">
+<div class="card flex-1 justify-content-center p-4">
+  <p-panelmenu [model]="items()"></p-panelmenu>
+  <!-- <div class="card flex-1 justify-content-center p-4">
+  <p-menu [model]="items">
     <ng-template #item let-item>
       <a [routerLink]="item.routerLink" 
          routerLinkActive="!border-blue-500 text-blue-500"
@@ -14,5 +13,5 @@
         <span class="ml-2 font-medium">{{ item.label }}</span>
       </a>
     </ng-template>
-  </p-menu>
+  </p-menu> -->
 </div>
