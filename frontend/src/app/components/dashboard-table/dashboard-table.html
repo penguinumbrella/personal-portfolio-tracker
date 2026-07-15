@@ -11,7 +11,7 @@
       <ng-template pTemplate="body" let-row>
         <tr>
           @for (col of columns(); track col.field) {
-          @if (col.field === 'totalCost' || col.field === 'value') {
+          @if (col.field === 'value') {
           <td>{{ row[col.field] | currency }}</td>
           } @else {
           <td>{{ row[col.field] }}</td>

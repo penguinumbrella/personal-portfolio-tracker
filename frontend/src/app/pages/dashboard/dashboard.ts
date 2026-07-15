@@ -30,7 +30,7 @@ export class Dashboard {
   accountColumns: TableColumn[] = [
     { header: 'Name', field: 'nickname' },
     { header: 'Date', field: 'dateOpened' },
-    { header: 'Amount', field: 'totalCost' },
+    { header: 'Value', field: 'value' },
   ];
 
   securityColumns: TableColumn[] = [
@@ -39,7 +39,7 @@ export class Dashboard {
       field: 'name',
     },
     {
-      header: 'Total Value',
+      header: 'Value',
       field: 'value',
     },
   ];
@@ -106,10 +106,10 @@ export class Dashboard {
               if (cost === null) {
                 cost = 0;
               }
-              account.totalCost = cost;
+              account.value = cost;
               // update the signal each time a cost comes back
               this.recentAccounts.update((current) =>
-                current.map((a) => (a.id === account.id ? { ...a, totalCost: cost } : a)),
+                current.map((a) => (a.id === account.id ? { ...a, value: cost } : a)),
               );
             },
             error: (err) => console.error(err),

@@ -9,5 +9,5 @@ export interface InvestmentAccount {
   dateOpened: Date;
 
   userId?: number;
-  totalCost?: number; // total cost of all holdings in this account
+  value?: number; // total cost of all holdings in this account
 }
