@@ -1,16 +1,24 @@
-<div class="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Your portfolio made simple</h1>
-            <p class="text-sm text-gray-500 mt-1">Please log in or sign up to continue.</p>
-        </div>
+<div class="min-h-screen w-full flex">
+    <div class="w-1/2 flex items-center justify-center bg-gray-50 p-8">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Your portfolio made simple</h1>
+                <p class="text-sm text-gray-500 mt-1">Please log in or sign up to continue.</p>
+            </div>
 
-        <p-card styleClass="shadow-sm">
-            @if (loginMode()) {
-            <app-login-form (switchToSignup)="loginMode.set(false)" />
-            } @else {
-            <app-signup-form (switchToLogin)="loginMode.set(true)" />
-            }
-        </p-card>
+            <p-card styleClass="shadow-sm">
+                @if (loginMode()) {
+                <app-login-form (switchToSignup)="loginMode.set(false)" />
+                } @else {
+                <app-signup-form (switchToLogin)="loginMode.set(true)" />
+                }
+            </p-card>
+        </div>
+    </div>
+
+    <div class="w-1/2 hidden md:block">
+        <img src="240px-Stonks_meme_4.jpg" 
+             alt="Portfolio illustration" 
+             class="h-full w-full object-cover">
     </div>
 </div>

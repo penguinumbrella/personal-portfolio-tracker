@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Menu } from './menu';
+import { provideRouter } from '@angular/router';
+import { it, expect, describe, beforeEach } from 'vitest';
 
 describe('Menu', () => {
   let component: Menu;
@@ -9,14 +10,25 @@ describe('Menu', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Menu],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Menu);
     component = fixture.componentInstance;
+    
+    // Trigger initial change detection and wait for stable state
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should render all menu items', async () => {
+    // Re-check after potential async rendering
+    await fixture.whenStable();
+    const links = fixture.nativeElement.querySelectorAll('a.p-menuitem-link');
+    expect(links.length).toBe(3);
   });
 });

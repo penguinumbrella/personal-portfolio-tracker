@@ -15,11 +15,13 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 import { BaseDetailDirective } from '../../base/base-detail.directive';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule],
-  providers: [ConfirmationService],
+  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule, ToastModule],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
 })
@@ -57,6 +59,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   constructor(
     private securityService: SecurityService,
     private investmentAccountService: InvestmentAccountService,
+    private messageService: MessageService,
   ) { super(); }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
@@ -203,6 +206,11 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   onSecurityModalConfirm(formData: any) {
     if (this.securityForm().invalid) {
+      this.messageService.add({
+        severity: 'warn', 
+        summary: 'Incomplete Form', 
+        detail: 'Please fill out all required fields correctly.'
+      });
       return;
     }
 
@@ -216,6 +224,8 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       userId: this.currentUserId()!
     };
 
+    console.log('Attempting to save security:', payload);
+    
     if (this.editingSecurity()) {
       // UPDATE
       this.securityService.updateSecurity(payload.id!, payload).subscribe({
@@ -230,18 +240,38 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
           this.isSecurityModalVisible.set(false);
         },
         error: (err) => {
-          console.error('Error updating security:', err);
+          console.log('Error block triggered', err);
+          const errorMessage = err.status === 409 
+            ? 'A security with this ticker symbol already exists.' 
+            : 'An unexpected error occurred. Please try again.';
+            
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Error', 
+            detail: errorMessage 
+          });
         }
       });
     } else {
       // CREATE
       this.securityService.createSecurity(payload).subscribe({
         next: (newSecurity) => {
-          this.loadSecurities(); // Refresh sidebar
+          this.loadSecurities();
           this.isSecurityModalVisible.set(false);
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Security added successfully!' });
         },
         error: (err) => {
-          console.error('Error:', err);
+          console.log('Error block triggered', err);
+          // Check for specific status codes
+          const errorMessage = err.status === 409 
+            ? 'A security with this ticker symbol already exists.' 
+            : 'An unexpected error occurred. Please try again.';
+            
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Error', 
+            detail: errorMessage 
+          });
         }
       });
     }

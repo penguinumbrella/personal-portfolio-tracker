@@ -24,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,9 +99,21 @@ public class AuthController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<User> updateCurrentUser(Authentication authentication, @Valid @RequestBody UserDto dto) {
+    public ResponseEntity<User> updateCurrentUser(Authentication authentication, @Valid @RequestBody UserDto dto,
+            HttpServletRequest request, HttpServletResponse response) {
         User currentUser = userService.viewProfileByUsername(authentication.getName());
         User updated = userService.updateProfile(currentUser.getId(), dto);
+
+        // the username may have changed, so the session's principal must be refreshed or
+        // subsequent requests will look up the old (now nonexistent) username and 404
+        UserDetails userDetails = userService.loadUserByUsername(updated.getUsername());
+        Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                userDetails, authentication.getCredentials(), userDetails.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(newAuthentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
+
         return ResponseEntity.ok(updated);
     }
 
