@@ -18,7 +18,15 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-security-detail',
-  imports: [DetailCard, HoldingTable, MetricCard, DetailSidebar, ManageHoldingModal, ManageSecurityModal, ConfirmDialogModule],
+  imports: [
+    DetailCard,
+    HoldingTable,
+    MetricCard,
+    DetailSidebar,
+    ManageHoldingModal,
+    ManageSecurityModal,
+    ConfirmDialogModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './security-detail.html',
   styleUrl: './security-detail.css',
@@ -51,7 +59,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: new FormControl('', Validators.required),
       sector: new FormControl('', Validators.required),
       securityType: new FormControl('', Validators.required),
-    })
+    }),
   );
 
   protected override readonly counterpartyFormKey = 'account' as const;
@@ -65,9 +73,19 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
+      this.checkRouteForId();
     });
   }
 
+  // work around to allow selection from menu bar
+  checkRouteForId(): void {
+    const idParam = this.actRoute.snapshot.paramMap.get('id');
+    if (idParam) {
+      const securitytId = Number(idParam);
+      this.viewSecurity(securitytId);
+      this.location.replaceState('/security');
+    }
+  }
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -107,7 +125,11 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // when a security is selected from sidebar, get security and load details, holdings
   onSecuritySelect(item: SidebarItem): void {
-    this.securityService.getSecurityById(item.id).subscribe({
+    this.viewSecurity(item.id);
+  }
+
+  viewSecurity(id: number) {
+    this.securityService.getSecurityById(id).subscribe({
       next: (data) => {
         this.security.set(data);
         this.buildSecurityFields();
@@ -166,7 +188,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       name: currentSecurity.name,
       tickerSymbol: currentSecurity.tickerSymbol,
       securityType: currentSecurity.type,
-      sector: currentSecurity.sector
+      sector: currentSecurity.sector,
     });
 
     this.isSecurityModalVisible.set(true);
@@ -174,13 +196,14 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   confirmDeleteSecurity(): void {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this security? This will also delete all holdings for this security.',
+      message:
+        'Are you sure you want to delete this security? This will also delete all holdings for this security.',
       header: 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.executeDeleteSecurity();
-      }
+      },
     });
   }
 
@@ -209,8 +232,8 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       tickerSymbol: formData.tickerSymbol,
       sector: formData.sector,
       type: formData.securityType,
-      generalNotes: formData.generalNotes || "",
-      userId: this.currentUserId()!
+      generalNotes: formData.generalNotes || '',
+      userId: this.currentUserId()!,
     };
 
     if (this.editingSecurity()) {
@@ -228,7 +251,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         },
         error: (err) => {
           console.error('Error updating security:', err);
-        }
+        },
       });
     } else {
       // CREATE
@@ -239,7 +262,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         },
         error: (err) => {
           console.error('Error:', err);
-        }
+        },
       });
     }
   }

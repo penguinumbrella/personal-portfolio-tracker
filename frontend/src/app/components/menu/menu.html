@@ -1,12 +1,5 @@
-<!--https://v17.primeng.org/menu router-->
+<!--https://v17.primeng.org/panelmenu basic-->
 
 <div class="card flex-1 justify-content-center p-4">
-  <p-menu [model]="items">
-    @for (item of items; track $index) {
-    <a [routerLink]="item.routerLink" class="p-menuitem-link">
-      <span [class]="item.icon"></span>
-      <span class="m-2">{{ item.label }}</span>
-    </a>
-    }
-  </p-menu>
+  <p-panelmenu [model]="items()"></p-panelmenu>
 </div>

@@ -4,6 +4,8 @@ import { ConfirmationService } from 'primeng/api';
 import { Holding } from '../types/Holding';
 import { HoldingService } from '../services/HoldingService';
 import { AuthService } from '../services/AuthService';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Directive()
 export abstract class BaseDetailDirective<T> {
@@ -22,6 +24,8 @@ export abstract class BaseDetailDirective<T> {
   protected holdingService = inject(HoldingService);
   protected confirmationService = inject(ConfirmationService);
   private authService = inject(AuthService);
+  protected actRoute = inject(ActivatedRoute);
+  protected location = inject(Location);
 
   /**
    * Resolves the signed-in user's id, then runs the callback (call from ngOnInit before loading any data).

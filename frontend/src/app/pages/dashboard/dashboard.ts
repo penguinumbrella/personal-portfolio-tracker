@@ -1,12 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { MetricCard } from '../../components/metric-card/metric-card';
 import { DashboardTable, TableColumn } from '../../components/dashboard-table/dashboard-table';
-import { InvestmentAccount } from '../../types/InvestmentAccounts';
+
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
 import { SecurityService } from '../../services/SecurityService';
-import { TopSecurity } from '../../types/Security';
 import { AuthService } from '../../services/AuthService';
+import { DashboardStateService } from '../../services/DashboardStateService';
+import { InvestmentAccount } from '../../types/InvestmentAccounts';
+import { TopSecurity } from '../../types/Security';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,9 +21,10 @@ export class Dashboard {
   private investmentAccountService = inject(InvestmentAccountService);
   private holdingService = inject(HoldingService);
   private securityService = inject(SecurityService);
+  private dashboardStateService = inject(DashboardStateService);
 
-  recentAccounts = signal<InvestmentAccount[]>([]);
-  topSecurities = signal<TopSecurity[]>([]);
+  recentAccounts = computed<InvestmentAccount[]>(() => this.dashboardStateService.recentAccounts());
+  topSecurities = computed<TopSecurity[]>(() => this.dashboardStateService.topSecurities());
   totalAccounts = signal<number>(0);
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
@@ -108,14 +111,14 @@ export class Dashboard {
               }
               account.value = cost;
               // update the signal each time a cost comes back
-              this.recentAccounts.update((current) =>
+              this.dashboardStateService.recentAccounts.update((current) =>
                 current.map((a) => (a.id === account.id ? { ...a, value: cost } : a)),
               );
             },
             error: (err) => console.error(err),
           });
         });
-        this.recentAccounts.set(data);
+        this.dashboardStateService.recentAccounts.set(data);
       },
       error: (err) => {
         console.error(err);
@@ -126,7 +129,7 @@ export class Dashboard {
   loadTopSecurities(userId: number): void {
     this.securityService.getTopSecurities(userId).subscribe({
       next: (data) => {
-        this.topSecurities.set(data);
+        this.dashboardStateService.topSecurities.set(data);
       },
       error: (err) => {
         console.error(err);
