@@ -2,4 +2,13 @@
 
 <div class="card flex-1 justify-content-center p-4">
   <p-panelmenu [model]="items()"></p-panelmenu>
+  <!-- <div class="card flex-1 justify-content-center p-4">
+  <p-menu [model]="items">
+    <ng-template #item let-item>
+      <a [routerLink]="item.routerLink" class="p-menuitem-link flex align-items-center">
+        <span [class]="item.icon"></span>
+        <span class="m-2">{{ item.label }}</span>
+      </a>
+    </ng-template>
+  </p-menu> -->
 </div>

@@ -16,6 +16,10 @@ import { BaseDetailDirective } from '../../base/base-detail.directive';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
+
 @Component({
   selector: 'app-account-detail',
   imports: [
@@ -26,8 +30,9 @@ import { ConfirmationService } from 'primeng/api';
     ManageHoldingModal,
     ManageAccountModal,
     ConfirmDialogModule,
+    ToastModule,
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './account-detail.html',
   styleUrl: './account-detail.css',
 })
@@ -61,6 +66,12 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   );
 
   protected override readonly counterpartyFormKey = 'security' as const;
+
+  constructor(
+    private messageService: MessageService,
+  ) {
+    super();
+  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: this.account()!.id!, s_id: formData.security.id };
@@ -219,9 +230,13 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       error: (err) => console.error('Delete failed:', err),
     });
   }
-
   onAccountModalConfirm(formData: any) {
     if (this.accountForm().invalid) {
+      this.messageService.add({
+        severity: 'warn', 
+        summary: 'Incomplete Form', 
+        detail: 'Please fill out all required fields correctly.'
+      });
       return;
     }
 
@@ -233,31 +248,35 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     };
 
     if (this.editingAccount()) {
-      // UPDATE
       this.investmentAccountService.updateInvestmentAccount(payload.id!, payload).subscribe({
         next: (updatedAccount) => {
-          // Update sidebar list
           this.loadAccounts();
-
           if (this.account()?.id === updatedAccount.id) {
             this.account.set(updatedAccount);
             this.buildAccountFields();
           }
           this.isAccountModalVisible.set(false);
+          this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Account updated successfully.' });
         },
         error: (err) => {
-          console.error('Error updating account:', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update account.' });
         },
       });
     } else {
-      // CREATE
       this.investmentAccountService.createInvestmentAccount(payload).subscribe({
         next: (newAccount) => {
-          this.loadAccounts(); // Refresh sidebar
+          this.loadAccounts();
           this.isAccountModalVisible.set(false);
+          this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Account created successfully.' });
         },
         error: (err) => {
-          console.error('Error:', err);
+          const detail = err.error?.message || err.error || 'Failed to update account.';
+  
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: `Error ${err.status || ''}`, 
+            detail: detail 
+          });
         },
       });
     }

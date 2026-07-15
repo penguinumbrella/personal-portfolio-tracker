@@ -6,8 +6,10 @@
     "outDir": "./out-tsc/spec",
     "rootDir": "./src",
     "types": [
-      "vitest/globals"
-    ]
+      "vitest/globals",
+      "node"
+    ],
+    "moduleResolution": "bundler" 
   },
   "include": [
     "src/**/*.d.ts",

@@ -38,7 +38,7 @@ public class Security {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ticker_symbol", nullable = false)
+    @Column(name = "ticker_symbol", nullable = false, unique = true)
     private String tickerSymbol;
 
     @Column(name = "security_name", nullable = false)

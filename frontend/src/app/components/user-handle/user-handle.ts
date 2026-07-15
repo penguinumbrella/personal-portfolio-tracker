@@ -51,7 +51,8 @@ export class UserHandle {
   }
 
   saveUser(formData: any) {
-    const updatedUser: User = { ...this.currentUser(), ...formData };
+    const { password, ...rest } = formData;
+    const updatedUser: User = { ...this.currentUser(), ...rest, passwordHash: password };
 
     this.authService.updateCurrentUser(updatedUser).subscribe({
       next: () => {

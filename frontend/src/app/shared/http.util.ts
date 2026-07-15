@@ -5,7 +5,7 @@ import { catchError, OperatorFunction, throwError } from 'rxjs';
 export function catchWithMessage<T>(message: string): OperatorFunction<T, T> {
   return catchError((err) => {
     console.error(`[http] ${message} — raw error:`, err, 'status:', err?.status, 'body:', err?.error);
-    return throwError(() => new Error(message));
+    return throwError(() => err);
   });
 }
 

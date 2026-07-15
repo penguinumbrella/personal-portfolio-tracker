@@ -156,4 +156,6 @@ export abstract class BaseDetailDirective<T> {
       error: (err) => console.error('Delete failed:', err),
     });
   }
+
+  
 }

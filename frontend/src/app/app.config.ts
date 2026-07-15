@@ -9,7 +9,10 @@ import Aura from '@primeuix/themes/aura';
 import { definePreset } from '@primeng/themes';
 import { credentialsInterceptor } from './shared/credentials.interceptor';
 
+import Stonks from '../assets/themes/stonks-preset';
+
 const MyCustomTheme = definePreset(Aura, {
+    fontFamily: 'Montserrat, sans-serif',
     semantic: {
         primary: {
             50: '{zinc.50}',
@@ -27,7 +30,11 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([credentialsInterceptor])),
     providePrimeNG({
       theme: {
-        preset: MyCustomTheme
+        preset: MyCustomTheme,
+        options: {
+          css: Stonks.css,
+          darkModeSelector: '.my-app-dark'
+        }
       },
       ripple: true,
     })
