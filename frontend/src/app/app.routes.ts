@@ -14,11 +14,11 @@ export const routes: Routes = [
     component: MainLayout,
     canActivate: [authGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
-      { path: 'account', component: AccountDetail },
-      { path: 'account/:id', component: AccountDetail },
-      { path: 'security', component: SecurityDetail },
-      { path: 'security/:id', component: SecurityDetail },
+      { path: 'dashboard', component: Dashboard, data: { title: 'Dashboard' } },
+      { path: 'account', component: AccountDetail, data: { title: 'Accounts' } },
+      { path: 'account/:id', component: AccountDetail, data: { title: 'Accounts' } },
+      { path: 'security', component: SecurityDetail, data: { title: 'Securities' } },
+      { path: 'security/:id', component: SecurityDetail, data: { title: 'Securities' } },
     ],
   },
 ];

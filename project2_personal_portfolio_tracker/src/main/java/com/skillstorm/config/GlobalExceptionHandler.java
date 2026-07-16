@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,6 +67,18 @@ public class GlobalExceptionHandler {
         response.put("errors", errors);
 
         return ResponseEntity.status(400).body(response);
+    }
+
+    // DB-level unique constraint violations that slip past service-layer duplicate checks
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        log.warn("Data integrity violation", e);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.CONFLICT.value());
+        response.put("reason", "A record with this value already exists.");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     // generic handler for any other exception

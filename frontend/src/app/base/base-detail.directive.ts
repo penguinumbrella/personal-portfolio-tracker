@@ -1,11 +1,12 @@
 import { Directive, computed, inject, signal, WritableSignal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Holding } from '../types/Holding';
 import { HoldingService } from '../services/HoldingService';
 import { AuthService } from '../services/AuthService';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { extractErrorMessage } from '../shared/http.util';
 
 @Directive()
 export abstract class BaseDetailDirective<T> {
@@ -23,6 +24,7 @@ export abstract class BaseDetailDirective<T> {
 
   protected holdingService = inject(HoldingService);
   protected confirmationService = inject(ConfirmationService);
+  protected messageService = inject(MessageService);
   private authService = inject(AuthService);
   protected actRoute = inject(ActivatedRoute);
   protected location = inject(Location);
@@ -115,18 +117,41 @@ export abstract class BaseDetailDirective<T> {
       this.holdingService.updateHolding(id!, payload).subscribe({
         next: (updatedHolding) => {
           this.holdings.update((current) => current.map((h) => (h.id === id ? updatedHolding : h)));
+          this.isHoldingModalVisible.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Holding updated successfully.',
+          });
         },
-        error: (err) => console.error('[holding] update failed:', err),
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: extractErrorMessage(err, 'Failed to update holding.'),
+          });
+        },
       });
     } else {
       this.holdingService.createHolding(payload).subscribe({
         next: (newHolding) => {
           this.holdings.update((current) => [...current, newHolding]);
+          this.isHoldingModalVisible.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: 'Holding added successfully.',
+          });
         },
-        error: (err) => console.error('[holding] create failed:', err),
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: extractErrorMessage(err, 'Failed to create holding.'),
+          });
+        },
       });
     }
-    this.isHoldingModalVisible.set(false);
   }
 
   confirmDeleteHolding(holding: Holding, event: Event): void {
@@ -152,8 +177,19 @@ export abstract class BaseDetailDirective<T> {
               h.id?.securityId !== holding.id?.securityId,
           ),
         );
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Holding deleted successfully.',
+        });
       },
-      error: (err) => console.error('Delete failed:', err),
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: extractErrorMessage(err, 'Failed to delete holding.'),
+        });
+      },
     });
   }
 }

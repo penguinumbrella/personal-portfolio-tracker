@@ -28,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.skillstorm.DTOs.AccountTypeBreakdownDto;
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.Holding;
@@ -200,6 +201,36 @@ public class InvestmentAccountServiceTest {
 
             assertEquals(1, result.size());
             verify(investmentAccountRepo).findTop5ByUserIdOrderByDateOpenedDesc(1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("getAccountTypeBreakdown()")
+    class getAccountTypeBreakdown {
+
+        @Test
+        @DisplayName("returns the breakdown for the user")
+        void getAccountTypeBreakdownSuccess() {
+            AccountTypeBreakdownDto breakdown = new AccountTypeBreakdownDto(InvestmentType.BROKERAGE, 2L);
+            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            when(investmentAccountRepo.countByAccountTypeForUser(1)).thenReturn(List.of(breakdown));
+
+            Iterable<AccountTypeBreakdownDto> result = service.getAccountTypeBreakdown(1);
+
+            assertEquals(1, ((List<AccountTypeBreakdownDto>) result).size());
+            verify(investmentAccountRepo).countByAccountTypeForUser(1);
+        }
+
+        @Test
+        @DisplayName("throws when the user doesn't exist")
+        void getAccountTypeBreakdownUserNotFound() {
+            when(userRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException result = assertThrows(ResponseStatusException.class,
+                    () -> service.getAccountTypeBreakdown(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+            verify(investmentAccountRepo, never()).countByAccountTypeForUser(anyInt());
         }
     }
 

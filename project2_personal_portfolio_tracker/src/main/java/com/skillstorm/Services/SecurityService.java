@@ -1,10 +1,14 @@
 package com.skillstorm.Services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.skillstorm.DTOs.SectorBreakdownDto;
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.SecurityTypeBreakdownDto;
 import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.Security;
 import com.skillstorm.Models.User;
@@ -46,6 +50,11 @@ public class SecurityService {
         return repo.findByUser_Id(userId);
     }
 
+    // Read all per User, paginated and searchable by name
+    public Page<Security> getSecuritiesPerUserPaged(int userId, String search, Pageable pageable) {
+        return repo.findByUser_IdAndNameContainingIgnoreCase(userId, search == null ? "" : search, pageable);
+    }
+
     // Read one
     public Security getSecurity(int id) {
         return RepoUtils.findOrThrow(repo, id, "Security");
@@ -78,5 +87,15 @@ public class SecurityService {
 
     public Iterable<TopSecurityDto> getTop5SecurityValues(int userId) {
         return repo.findTop5SecurityValues(userId);
+    }
+
+    public Iterable<SecurityTypeBreakdownDto> getSecurityTypeBreakdown(int userId) {
+        RepoUtils.findOrThrow(userRepo, userId, "User");
+        return repo.countByTypeForUser(userId);
+    }
+
+    public Iterable<SectorBreakdownDto> getSectorBreakdown(int userId) {
+        RepoUtils.findOrThrow(userRepo, userId, "User");
+        return repo.countBySectorForUser(userId);
     }
 }

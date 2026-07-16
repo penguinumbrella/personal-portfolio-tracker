@@ -17,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { extractErrorMessage } from '../../shared/http.util';
 
 @Component({
   selector: 'app-security-detail',
@@ -38,10 +39,15 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   private securityService = inject(SecurityService);
   private investmentAccountService = inject(InvestmentAccountService);
 
+  private readonly sidebarPageSize = 10;
+
   security = signal<Security | null>(null);
 
   securityFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
+  sidebarSearch = signal<string>('');
+  sidebarPage = signal<number>(0);
+  sidebarTotalPages = signal<number>(1);
 
   editingSecurity = signal<Security | null>(null);
   allAccounts = signal<InvestmentAccount[]>([]);
@@ -66,10 +72,6 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
   );
 
   protected override readonly counterpartyFormKey = 'account' as const;
-
-  constructor(private messageService: MessageService) {
-    super();
-  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: formData.account.id, s_id: this.security()!.id! };
@@ -111,20 +113,34 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     const userId = this.currentUserId();
     if (userId == null) return;
 
-    this.securityService.getAllSecuritiesByUser(userId).subscribe({
-      next: (data) => {
-        this.sidebarItems.set(
-          data.map((s) => ({
-            id: s.id!,
-            label: s.name,
-            subtitle: s.type,
-          })),
-        );
-      },
-      error: (error) => {
-        console.error('Error loading securities:', error);
-      },
-    });
+    this.securityService
+      .getSecuritiesPageForUser(userId, this.sidebarPage(), this.sidebarPageSize, this.sidebarSearch())
+      .subscribe({
+        next: (data) => {
+          this.sidebarItems.set(
+            data.content.map((s) => ({
+              id: s.id!,
+              label: s.name,
+              subtitle: s.type,
+            })),
+          );
+          this.sidebarTotalPages.set(data.totalPages);
+        },
+        error: (error) => {
+          console.error('Error loading securities:', error);
+        },
+      });
+  }
+
+  onSidebarSearch(term: string): void {
+    this.sidebarSearch.set(term);
+    this.sidebarPage.set(0);
+    this.loadSecurities();
+  }
+
+  onSidebarPageChange(page: number): void {
+    this.sidebarPage.set(page);
+    this.loadSecurities();
   }
 
   filteredAccounts = computed(() => this.excludeHeld(this.allAccounts(), (h) => h.id?.accountId));
@@ -221,8 +237,19 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
         this.security.set(null);
         this.holdings.set([]);
         this.loadSecurities();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Security deleted successfully.',
+        });
       },
-      error: (err) => console.error('Delete failed:', err),
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: extractErrorMessage(err, 'Failed to delete security.'),
+        });
+      },
     });
   }
 
@@ -260,18 +287,17 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
             this.buildSecurityFields();
           }
           this.isSecurityModalVisible.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Security updated successfully.',
+          });
         },
         error: (err) => {
-          console.log('Error block triggered', err);
-          const errorMessage =
-            err.status === 409
-              ? 'A security with this ticker symbol already exists.'
-              : 'An unexpected error occurred. Please try again.';
-
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: errorMessage,
+            detail: extractErrorMessage(err, 'Failed to update security.'),
           });
         },
       });
@@ -288,17 +314,10 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
           });
         },
         error: (err) => {
-          console.log('Error block triggered', err);
-          // Check for specific status codes
-          const errorMessage =
-            err.status === 409
-              ? 'A security with this ticker symbol already exists.'
-              : 'An unexpected error occurred. Please try again.';
-
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: errorMessage,
+            detail: extractErrorMessage(err, 'Failed to create security.'),
           });
         },
       });

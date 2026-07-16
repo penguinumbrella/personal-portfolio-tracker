@@ -2,10 +2,13 @@ package com.skillstorm.Services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.skillstorm.DTOs.AccountTypeBreakdownDto;
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.Models.InvestmentAccount;
 import com.skillstorm.Models.User;
@@ -36,6 +39,11 @@ public class InvestmentAccountService {
         return investmentAccountRepo.findByUserId(userId);
     }
 
+    public Page<InvestmentAccount> getAccountsPaged(Long userId, String search, Pageable pageable) {
+        return investmentAccountRepo.findByUserIdAndNicknameContainingIgnoreCase(userId, search == null ? "" : search,
+                pageable);
+    }
+
     public InvestmentAccount getAccount(int id) {
         return RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
     }
@@ -51,6 +59,11 @@ public class InvestmentAccountService {
 
     public List<InvestmentAccount> getRecentAccounts(Long userId) {
         return investmentAccountRepo.findTop5ByUserIdOrderByDateOpenedDesc(userId);
+    }
+
+    public Iterable<AccountTypeBreakdownDto> getAccountTypeBreakdown(int userId) {
+        RepoUtils.findOrThrow(userRepo, userId, "User");
+        return investmentAccountRepo.countByAccountTypeForUser(userId);
     }
 
     // ----- POST/CREATE METHODS -----

@@ -1,5 +1,6 @@
+<p-toast></p-toast>
 <mat-sidenav-container class="flex app-container h-screen">
-  <mat-sidenav #sidenav mode="side" opened style="width: 200px;">
+  <mat-sidenav #sidenav mode="side" opened style="width: 200px;" class="bg-gray-100 dark:bg-zinc-900">
     <!-- nav links here -->
     <app-menu></app-menu>
   </mat-sidenav>
@@ -7,20 +8,26 @@
 
   <mat-sidenav-content>
     <div class="flex flex-col h-full">
-      <div class="flex flex-row justify-between p-6">
-        <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
-          <i class="pi pi-bars"></i>
-        </button>
-        <div class="flex align-items-center gap-3">
-          <button mat-icon-button (click)="themeService.toggle()" aria-label="Toggle dark mode">
-            <i class="pi" [class.pi-sun]="themeService.theme() === 'dark'" [class.pi-moon]="themeService.theme() === 'light'"></i>
+      <div class="flex flex-row justify-between items-center p-6">
+        <div class="flex items-center gap-3">
+          <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
+            <i class="pi pi-bars"></i>
           </button>
-          <app-user-handle></app-user-handle>
+          <span class="text-xl font-semibold">{{ title() }}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            mat-icon-button
+            (click)="themeService.toggle()"
+            aria-label="Toggle dark mode"
+            class="bg-blue-500 hover:bg-blue-600 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors">
+              <i class="pi" [class.pi-sun]="themeService.theme() === 'dark'" [class.pi-moon]="themeService.theme() === 'light'"></i>
+          </button>
         </div>
 
 
       </div>
-      <div class="flex-1 min-h-0">
+      <div class="flex-1 min-h-0 overflow-y-auto">
         <router-outlet />
       </div>
     </div>

@@ -18,6 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { extractErrorMessage } from '../../shared/http.util';
 
 @Component({
   selector: 'app-account-detail',
@@ -39,9 +40,14 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   private investmentAccountService = inject(InvestmentAccountService);
   private securityService = inject(SecurityService);
 
+  private readonly sidebarPageSize = 10;
+
   account = signal<InvestmentAccount | null>(null);
   accountFields = signal<{ label: string; value: any }[]>([]);
   sidebarItems = signal<SidebarItem[]>([]);
+  sidebarSearch = signal<string>('');
+  sidebarPage = signal<number>(0);
+  sidebarTotalPages = signal<number>(1);
 
   editingAccount = signal<InvestmentAccount | null>(null);
   allSecurities = signal<Security[]>([]);
@@ -65,10 +71,6 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   );
 
   protected override readonly counterpartyFormKey = 'security' as const;
-
-  constructor(private messageService: MessageService) {
-    super();
-  }
 
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: this.account()!.id!, s_id: formData.security.id };
@@ -95,20 +97,34 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     const userId = this.currentUserId();
     if (userId == null) return;
 
-    this.investmentAccountService.getAllInvestmentAccounts(userId).subscribe({
-      next: (data) => {
-        this.sidebarItems.set(
-          data.map((a) => ({
-            id: a.id!,
-            label: a.nickname,
-            subtitle: a.institutionName,
-          })),
-        );
-      },
-      error: (error) => {
-        console.error('Error loading accounts:', error);
-      },
-    });
+    this.investmentAccountService
+      .getAccountsPage(userId, this.sidebarPage(), this.sidebarPageSize, this.sidebarSearch())
+      .subscribe({
+        next: (data) => {
+          this.sidebarItems.set(
+            data.content.map((a) => ({
+              id: a.id!,
+              label: a.nickname,
+              subtitle: a.institutionName,
+            })),
+          );
+          this.sidebarTotalPages.set(data.totalPages);
+        },
+        error: (error) => {
+          console.error('Error loading accounts:', error);
+        },
+      });
+  }
+
+  onSidebarSearch(term: string): void {
+    this.sidebarSearch.set(term);
+    this.sidebarPage.set(0);
+    this.loadAccounts();
+  }
+
+  onSidebarPageChange(page: number): void {
+    this.sidebarPage.set(page);
+    this.loadAccounts();
   }
 
   loadSecurities() {
@@ -220,8 +236,19 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
         this.account.set(null);
         this.holdings.set([]);
         this.loadAccounts();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Account deleted successfully.',
+        });
       },
-      error: (err) => console.error('Delete failed:', err),
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: extractErrorMessage(err, 'Failed to delete account.'),
+        });
+      },
     });
   }
   onAccountModalConfirm(formData: any) {
@@ -260,7 +287,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to update account.',
+            detail: extractErrorMessage(err, 'Failed to update account.'),
           });
         },
       });
@@ -276,12 +303,10 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
           });
         },
         error: (err) => {
-          const detail = err.error?.message || err.error || 'Failed to update account.';
-
           this.messageService.add({
             severity: 'error',
-            summary: `Error ${err.status || ''}`,
-            detail: detail,
+            summary: 'Error',
+            detail: extractErrorMessage(err, 'Failed to create account.'),
           });
         },
       });

@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.skillstorm.DTOs.SectorBreakdownDto;
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.SecurityTypeBreakdownDto;
 import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -287,6 +290,68 @@ public class SecurityServiceTest {
             assertNotNull(result);
             assertEquals(1, ((List<TopSecurityDto>) result).size());
             verify(repo).findTop5SecurityValues(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("getSecurityTypeBreakdown()")
+    class getSecurityTypeBreakdown {
+
+        @Test
+        @DisplayName("Success, breakdown returned")
+        void getSecurityTypeBreakdownSuccess() {
+            SecurityTypeBreakdownDto breakdown = new SecurityTypeBreakdownDto(SecurityType.BOND, 2L);
+            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            when(repo.countByTypeForUser(1)).thenReturn(List.of(breakdown));
+
+            Iterable<SecurityTypeBreakdownDto> result = service.getSecurityTypeBreakdown(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<SecurityTypeBreakdownDto>) result).size());
+            verify(repo).countByTypeForUser(1);
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND user not found")
+        void getSecurityTypeBreakdownUserNotFound() {
+            when(userRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException except = assertThrows(ResponseStatusException.class,
+                    () -> service.getSecurityTypeBreakdown(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
+            verify(repo, never()).countByTypeForUser(anyInt());
+        }
+    }
+
+    @Nested
+    @DisplayName("getSectorBreakdown()")
+    class getSectorBreakdown {
+
+        @Test
+        @DisplayName("Success, breakdown returned")
+        void getSectorBreakdownSuccess() {
+            SectorBreakdownDto breakdown = new SectorBreakdownDto(SectorType.CONSUMER, 2L);
+            when(userRepo.findById(1)).thenReturn(Optional.of(testUser1));
+            when(repo.countBySectorForUser(1)).thenReturn(List.of(breakdown));
+
+            Iterable<SectorBreakdownDto> result = service.getSectorBreakdown(1);
+
+            assertNotNull(result);
+            assertEquals(1, ((List<SectorBreakdownDto>) result).size());
+            verify(repo).countBySectorForUser(1);
+        }
+
+        @Test
+        @DisplayName("404 NOT FOUND user not found")
+        void getSectorBreakdownUserNotFound() {
+            when(userRepo.findById(99)).thenReturn(Optional.empty());
+
+            ResponseStatusException except = assertThrows(ResponseStatusException.class,
+                    () -> service.getSectorBreakdown(99));
+
+            assertEquals(HttpStatus.NOT_FOUND, except.getStatusCode());
+            verify(repo, never()).countBySectorForUser(anyInt());
         }
     }
 }

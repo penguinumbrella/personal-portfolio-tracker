@@ -2,5 +2,8 @@
 
 @import 'tailwindcss';
 @import "primeicons/primeicons.css";
-/*@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');*/
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}

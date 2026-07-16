@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 
 import { DashboardStateService } from '../../services/DashboardStateService';
+import { UserHandle } from '../user-handle/user-handle';
 
 @Component({
   selector: 'app-menu',
-  imports: [PanelMenuModule, RouterModule],
+  imports: [PanelMenuModule, RouterModule, UserHandle],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })

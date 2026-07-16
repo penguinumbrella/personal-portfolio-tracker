@@ -1,3 +1,8 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
 /**
  * found this on the internet to stop menu from having horizontal scroll bar
  * nothing else worked so i guess this stays???

@@ -1,24 +1,39 @@
-<div class="min-h-screen w-full flex">
-    <div class="w-1/2 flex items-center justify-center bg-gray-50 dark:bg-zinc-900 p-8">
-        <div class="w-full max-w-md">
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-100">Your portfolio made simple</h1>
-                <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Please log in or sign up to continue.</p>
-            </div>
+<!-- Outer Wrapper with dynamic background (light/dark mode) -->
+<div class="min-h-screen w-full flex p-4 bg-[url('/bg.png')] bg-repeat">
+    <!-- Main Content Container with dynamic backdrop -->
+    <div class="w-full flex flex-col md:flex-row bg-white/50 dark:bg-zinc-900/50 rounded-3xl shadow-xl overflow-hidden my-4 md:my-8 max-w-7xl mx-auto border border-black/5 dark:border-white/5">
+        
+        <!-- Left Content Area -->
+<div class="w-full md:w-1/2 flex items-center justify-center p-8 md:p-12 backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-zinc-100">Welcome to Maneki</h1>
+            <p class="text-gray-600 dark:text-zinc-400 mt-2">Log in or sign up to get started.</p>
+        </div>
 
-            <p-card styleClass="shadow-sm">
-                @if (loginMode()) {
-                <app-login-form (switchToSignup)="loginMode.set(false)" />
-                } @else {
-                <app-signup-form (switchToLogin)="loginMode.set(true)" />
-                }
-            </p-card>
+        <!-- Form area with dark mode adjustments -->
+        <div class="bg-white/80 dark:bg-zinc-800/80 p-6 rounded-2xl border border-black/10 dark:border-zinc-700/50 shadow-sm">
+            @if (loginMode()) {
+            <app-login-form (switchToSignup)="loginMode.set(false)" />
+            } @else {
+            <app-signup-form (switchToLogin)="loginMode.set(true)" />
+            }
         </div>
     </div>
+</div>
 
-    <div class="w-1/2 hidden md:block">
-        <img src="240px-Stonks_meme_4.jpg" 
-             alt="Portfolio illustration" 
-             class="h-full w-full object-cover">
+        <!-- Right Content Area -->
+        <div class="hidden md:flex w-1/2 flex-col items-center justify-center bg-[#fff7b0] dark:bg-[#ffe59f] p-12 text-[#7e655e] dark:text-[#292929]">
+            <img src="catblack.png" 
+                 alt="Maneki Neko" 
+                 class="w-full max-w-lg h-auto object-contain mb-8 transition-all duration-300">
+            
+            <div class="text-center max-w-sm">
+                <h2 class="text-4xl font-extrabold mb-4">Maneki</h2>
+                <p class="text-lg font-medium opacity-90">
+                    Track, catalog, and manage your portfolio.
+                </p>
+            </div>
+        </div>
     </div>
 </div>

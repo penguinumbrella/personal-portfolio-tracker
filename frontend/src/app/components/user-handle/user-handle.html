@@ -1,11 +1,21 @@
 @if (currentUser(); as user) {
 
-<div class="flex align-items-center gap-3 cursor-pointer" (click)="openModal()">
+<div
+    class="flex items-center gap-3 -mx-2 -my-1.5 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-gray-200 dark:hover:bg-zinc-700"
+    (click)="openModal()"
+>
+    <p-avatar
+        [label]="user.username.charAt(0).toUpperCase()"
+        shape="circle"
+        styleClass="bg-zinc-700 dark:bg-zinc-600 text-white shrink-0"
+    />
 
-    <div class="flex flex-col">
-        <span class="font-bold text-900">@{{user.username}}</span>
-
+    <div class="flex flex-col min-w-0">
+        <span class="font-semibold text-sm text-gray-900 dark:text-zinc-100 truncate">{{ user.username }}</span>
+        <span class="text-xs text-gray-500 dark:text-zinc-400 truncate">{{ user.email }}</span>
     </div>
+
+    <i class="pi pi-cog text-gray-400 dark:text-zinc-500 ml-auto shrink-0"></i>
 
     <app-user-modal
         [(visible)]="isModalVisible"
@@ -19,5 +29,5 @@
     </app-user-modal>
 </div>
 } @else {
-    <p>Loading user profile...</p>
+    <p class="text-sm text-gray-400 dark:text-zinc-500">Loading user profile...</p>
 }
