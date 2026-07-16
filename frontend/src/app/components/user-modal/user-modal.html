@@ -4,43 +4,27 @@
     [visible]="visible()"
     (visibleChange)="visible.set($event)"
     [appendTo]="'body'"
-    [styleClass]="'w-full max-w-2xl min-h-[500px] flex flex-col'"
+    [styleClass]="'w-full max-w-md h-auto flex flex-col'"
     class="w-full max-w-lg"
 >
-  <form [formGroup]="form()" class="flex flex-col gap-6 mt-5">
+  <form [formGroup]="form()" class="flex flex-col gap-4 mt-4">
 
     <div class="relative">
-      <input
-        pInputText
-        id="username"
-        formControlName="username"
-        class="w-full peer"
-      />
+      <input pInputText id="username" formControlName="username" class="w-full peer" />
       <label for="username" class="absolute left-3 -top-2.5 px-1 bg-white dark:bg-zinc-900 text-xs text-gray-500 dark:text-zinc-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:dark:text-zinc-500 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700 peer-focus:dark:text-zinc-300">
         Username
       </label>
     </div>
 
     <div class="relative">
-      <input
-        pInputText
-        id="password"
-        type="password"
-        formControlName="password"
-        class="w-full peer"
-      />
+      <input pInputText id="password" type="password" formControlName="password" class="w-full peer" />
       <label for="password" class="absolute left-3 -top-2.5 px-1 bg-white dark:bg-zinc-900 text-xs text-gray-500 dark:text-zinc-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:dark:text-zinc-500 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700 peer-focus:dark:text-zinc-300">
         Password
       </label>
     </div>
 
     <div class="relative">
-      <input
-        pInputText
-        id="email"
-        formControlName="email"
-        class="w-full peer"
-      />
+      <input pInputText id="email" formControlName="email" class="w-full peer" />
       <label for="email" class="absolute left-3 -top-2.5 px-1 bg-white dark:bg-zinc-900 text-xs text-gray-500 dark:text-zinc-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:dark:text-zinc-500 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-zinc-700 peer-focus:dark:text-zinc-300">
         Email
       </label>
@@ -48,23 +32,26 @@
   </form>
 
   <ng-template #footer>
-    <div class="flex justify-between mt-4">
+    <div class="flex justify-between items-center w-full">
       <p-button
         label="Log Out"
         severity="danger"
         [outlined]="true"
+        [rounded]="true"
         (onClick)="loggedOut.emit()"
       />
-      <div class="flex justify-end gap-2">
+      <div class="flex items-center gap-1">
         <p-button
           label="Cancel"
           severity="secondary"
           [outlined]="true"
+          [rounded]="true"
           (onClick)="cancelled.emit()"
         />
         <p-button
           label="Update"
           severity="primary"
+          [rounded]="true"
           (onClick)="onUpdate()"
         />
       </div>

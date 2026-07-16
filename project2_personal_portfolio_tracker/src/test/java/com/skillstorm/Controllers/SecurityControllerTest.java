@@ -13,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skillstorm.DTOs.SectorBreakdownDto;
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.SecurityTypeBreakdownDto;
 import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.SectorType;
@@ -240,6 +242,40 @@ public class SecurityControllerTest {
             mockMvc.perform(get("/v1/securities/top").param("userId", "1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].name").value("Security One"));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/securities/breakdown/type")
+    class getSecurityTypeBreakdown {
+
+        @Test
+        @DisplayName("200 OK breakdown returned")
+        void getSecurityTypeBreakdownSuccess200() throws Exception {
+            SecurityTypeBreakdownDto breakdown = new SecurityTypeBreakdownDto(SecurityType.BOND, 2L);
+            when(service.getSecurityTypeBreakdown(1)).thenReturn(List.of(breakdown));
+
+            mockMvc.perform(get("/v1/securities/breakdown/type").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].type").value("Bond"))
+                    .andExpect(jsonPath("$[0].count").value(2));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/securities/breakdown/sector")
+    class getSectorBreakdown {
+
+        @Test
+        @DisplayName("200 OK breakdown returned")
+        void getSectorBreakdownSuccess200() throws Exception {
+            SectorBreakdownDto breakdown = new SectorBreakdownDto(SectorType.CONSUMER, 2L);
+            when(service.getSectorBreakdown(1)).thenReturn(List.of(breakdown));
+
+            mockMvc.perform(get("/v1/securities/breakdown/sector").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].sector").value("Consumer"))
+                    .andExpect(jsonPath("$[0].count").value(2));
         }
     }
 }

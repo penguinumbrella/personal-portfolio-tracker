@@ -11,6 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skillstorm.DTOs.AccountTypeBreakdownDto;
 import com.skillstorm.DTOs.InvestmentAccountDto;
 import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.InvestmentAccount;
@@ -179,6 +180,22 @@ public class InvestmentAccountControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))
                     .andExpect(jsonPath("$[0].nickname").value("test1"));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /v1/investments/breakdown/type")
+    class getAccountTypeBreakdown {
+        @Test
+        @DisplayName("200 OK with the user's account type breakdown")
+        void getAccountTypeBreakdownSuccess200() throws Exception {
+            AccountTypeBreakdownDto breakdown = new AccountTypeBreakdownDto(InvestmentType.BROKERAGE, 2L);
+            when(service.getAccountTypeBreakdown(1)).thenReturn(List.of(breakdown));
+
+            mockMvc.perform(get("/v1/investments/breakdown/type").param("userId", "1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].type").value("Brokerage"))
+                    .andExpect(jsonPath("$[0].count").value(2));
         }
     }
 

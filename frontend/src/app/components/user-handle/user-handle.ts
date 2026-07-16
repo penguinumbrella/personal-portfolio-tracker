@@ -1,10 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
+import { MessageService } from 'primeng/api';
 import { User } from '../../types/User';
 import { AuthService } from '../../services/AuthService';
 import { UserModal } from '../user-modal/user-modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { extractErrorMessage } from '../../shared/http.util';
 
 
 @Component({
@@ -18,6 +20,7 @@ export class UserHandle {
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   currentUser = this.authService.currentUser;
   isModalVisible = signal<boolean>(false);
@@ -57,9 +60,18 @@ export class UserHandle {
     this.authService.updateCurrentUser(updatedUser).subscribe({
       next: () => {
         this.isModalVisible.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Profile updated successfully.',
+        });
       },
       error: (err) => {
-        console.error(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: extractErrorMessage(err, 'Failed to update profile.'),
+        });
       }
     });
   }
@@ -71,7 +83,11 @@ export class UserHandle {
         this.router.navigateByUrl('/login');
       },
       error: (err) => {
-        console.error(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: extractErrorMessage(err, 'Failed to log out.'),
+        });
       }
     });
   }

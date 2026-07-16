@@ -3,9 +3,11 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environments';
 import { Observable } from 'rxjs';
 import { InvestmentAccount } from '../types/InvestmentAccounts';
-import { catchWithMessage, userIdParams } from '../shared/http.util';
+import { Page } from '../types/Page';
+import { catchWithMessage, pageParams, userIdParams } from '../shared/http.util';
 import { Holding } from '../types/Holding';
 import { HoldingService } from './HoldingService';
+import { AccountTypeSlice } from '../components/charts/account-type-chart/account-type-chart';
 
 @Injectable({ providedIn: 'root' })
 export class InvestmentAccountService {
@@ -34,6 +36,18 @@ export class InvestmentAccountService {
 
     return this.http
       .get<InvestmentAccount[]>(this.URL, { params })
+      .pipe(catchWithMessage('Failed to load InvestmentAccounts.'));
+  }
+
+  getAccountsPage(
+    userId: number,
+    page: number,
+    size: number,
+    search: string,
+  ): Observable<Page<InvestmentAccount>> {
+    const params = pageParams(page, size, search).set('userId', userId);
+    return this.http
+      .get<Page<InvestmentAccount>>(`${this.URL}/page`, { params })
       .pipe(catchWithMessage('Failed to load InvestmentAccounts.'));
   }
 
@@ -82,5 +96,11 @@ export class InvestmentAccountService {
     return this.http
       .get<InvestmentAccount[]>(`${this.URL}/recent`, { params: userIdParams(userId) })
       .pipe(catchWithMessage("Failed to load user's recent investment accounts."));
+  }
+
+  getAccountTypeBreakdown(userId: number): Observable<AccountTypeSlice[]> {
+    return this.http
+      .get<AccountTypeSlice[]>(`${this.URL}/breakdown/type`, { params: userIdParams(userId) })
+      .pipe(catchWithMessage("Failed to load user's account type breakdown."));
   }
 }

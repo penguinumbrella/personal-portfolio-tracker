@@ -1,11 +1,11 @@
-<p-card class="shadow-sm">
+<p-card class="shadow-sm border border-gray-200 dark:border-zinc-700">
     <ng-template pTemplate="header">
-        <div class="flex items-center justify-between p-4">
+        <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-zinc-800">
             <span class="text-xl font-bold text-gray-900 dark:text-zinc-100">{{ title }}</span>
             <div class="flex gap-1">
-                <p-button icon="pi pi-pencil" label="Edit" [text]="true" severity="secondary"
+                <p-button icon="pi pi-pencil" [text]="true" severity="secondary"
                     (onClick)="onEdit.emit()" />
-                <p-button icon="pi pi-trash" label="Delete" [text]="true" severity="danger"
+                <p-button icon="pi pi-trash" [text]="true" severity="danger"
                     (onClick)="onDelete.emit()" />
             </div>
         </div>

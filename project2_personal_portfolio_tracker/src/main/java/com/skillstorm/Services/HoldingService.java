@@ -43,7 +43,7 @@ public class HoldingService {
         HoldingPK id = new HoldingPK(dto.a_id(), dto.s_id());
 
         if (repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Holding already exists in the database.");
         }
 

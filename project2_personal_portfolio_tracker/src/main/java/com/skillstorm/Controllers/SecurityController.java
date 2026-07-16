@@ -1,5 +1,8 @@
 package com.skillstorm.Controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.skillstorm.DTOs.SectorBreakdownDto;
 import com.skillstorm.DTOs.SecurityDto;
+import com.skillstorm.DTOs.SecurityTypeBreakdownDto;
 import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Services.SecurityService;
 import com.skillstorm.Models.Security;
@@ -47,6 +52,18 @@ public class SecurityController {
         return ResponseEntity.ok(service.getAllSecuritiesPerUser(userId));
     }
 
+    // Read all per User, paginated and searchable by name
+    @GetMapping("/u/{userId}/page")
+    public ResponseEntity<Page<Security>> getSecuritiesPerUserPaged(
+            @PathVariable int userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String search) {
+        Page<Security> result = service.getSecuritiesPerUserPaged(userId, search,
+                PageRequest.of(page, size, Sort.by("name")));
+        return ResponseEntity.ok(result);
+    }
+
     // Read one
     @GetMapping("/{id}")
     public ResponseEntity<Security> getSecurity(@PathVariable int id) {
@@ -79,6 +96,18 @@ public class SecurityController {
     public ResponseEntity<Iterable<TopSecurityDto>> getTopSecurities(
             @RequestParam(required = true) int userId) {
         return ResponseEntity.status(200).body(service.getTop5SecurityValues((int) userId));
+    }
+
+    @GetMapping("breakdown/type")
+    public ResponseEntity<Iterable<SecurityTypeBreakdownDto>> getSecurityTypeBreakdown(
+            @RequestParam(required = true) int userId) {
+        return ResponseEntity.ok(service.getSecurityTypeBreakdown(userId));
+    }
+
+    @GetMapping("breakdown/sector")
+    public ResponseEntity<Iterable<SectorBreakdownDto>> getSectorBreakdown(
+            @RequestParam(required = true) int userId) {
+        return ResponseEntity.ok(service.getSectorBreakdown(userId));
     }
 
 }

@@ -1,31 +1,33 @@
 <div class="flex h-[90vh] overflow-hidden gap-4 p-4 bg-gray-50 dark:bg-zinc-950">
     <div class="w-1/4 min-w-60 h-full overflow-y-auto rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 shadow-sm">
-        <app-detail-sidebar [items]="sidebarItems()" (selected)="onAccountSelect($event)"
-            (onAddItem)="onOpenAddAccountModal()" />
+        <app-detail-sidebar [items]="sidebarItems()" [page]="sidebarPage()" [totalPages]="sidebarTotalPages()"
+            (selected)="onAccountSelect($event)" (onAddItem)="onOpenAddAccountModal()"
+            (searchChange)="onSidebarSearch($event)" (pageChange)="onSidebarPageChange($event)" />
     </div>
 
     @if (account()) {
-    <div
-        class="flex-1 h-full overflow-y-auto rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6 shadow-sm flex flex-col gap-4">
-        <div class="flex justify-between gap-4">
+    <div class="flex-1 h-full overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6 shadow-sm flex flex-col gap-6">
+        
+        <div class="grid grid-cols-2 gap-6 shrink-0 items-stretch">
+            <div class="col-span-1">
+                <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
+                    (onDelete)="confirmDeleteAccount()" class="block h-full" />
+            </div>
 
-            <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy"
-                class="flex-1" />
-
-            <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" class="flex-1">
-            </app-metric-card>
+            <div class="col-span-1 flex flex-row gap-4">
+                <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy" class="flex-1 flex" />
+                <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" class="flex-1 flex" />
+            </div>
         </div>
 
-        <app-detail-card title="Account Details" [fields]="accountFields()" (onEdit)="editAccount()"
-            (onDelete)="confirmDeleteAccount()" />
-
-        <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
-            (onEdit)="editHolding($event)" (onDelete)="confirmDeleteHolding($event.holding, $event.originalEvent)">
-        </app-holding-table>
+        <div class="flex-1 overflow-hidden">
+            <app-holding-table [holdings]="holdings()" [tableMode]="'byAccount'" (onAdd)="addHolding()"
+                (onEdit)="editHolding($event)" (onDelete)="confirmDeleteHolding($event.holding, $event.originalEvent)" 
+                class="h-full block overflow-y-auto" />
+        </div>
     </div>
     } @else {
-    <div
-        class="flex-1 h-full flex items-center justify-center rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-400 dark:text-zinc-500 shadow-sm">
+    <div class="flex-1 h-full flex items-center justify-center rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-400 dark:text-zinc-500 shadow-sm">
         <p>Please select an account to view details.</p>
     </div>
     }
@@ -40,5 +42,4 @@
 
     <p-confirmDialog></p-confirmDialog>
     <p-toast></p-toast>
-
 </div>

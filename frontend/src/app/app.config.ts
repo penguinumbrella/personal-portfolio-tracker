@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
 import Aura from '@primeuix/themes/aura';
 import { definePreset } from '@primeng/themes';
 import { credentialsInterceptor } from './shared/credentials.interceptor';
@@ -36,6 +37,7 @@ export const appConfig: ApplicationConfig = {
         }
       },
       ripple: true,
-    })
+    }),
+    MessageService,
   ]
 };

@@ -1,6 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { MetricCard } from '../../components/metric-card/metric-card';
 import { DashboardTable, TableColumn } from '../../components/dashboard-table/dashboard-table';
+import { SecurityTypeChart, SecurityTypeSlice } from '../../components/charts/security-type-chart/security-type-chart';
+import { AccountTypeChart, AccountTypeSlice } from '../../components/charts/account-type-chart/account-type-chart';
+import { SecuritySectorChart, SectorSlice } from '../../components/charts/security-sector-chart/security-sector-chart';
+import { PortfolioValueChart, PortfolioValuePoint } from '../../components/charts/portfolio-value-chart/portfolio-value-chart';
 
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
@@ -9,10 +14,14 @@ import { AuthService } from '../../services/AuthService';
 import { DashboardStateService } from '../../services/DashboardStateService';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 import { TopSecurity } from '../../types/Security';
+import { SecurityType } from '../../types/SecurityType';
+import { InvestmentType } from '../../types/InvestmentType';
+import { Sector } from '../../types/Sector';
+import { Holding } from '../../types/Holding';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MetricCard, DashboardTable],
+  imports: [MetricCard, DashboardTable, SecurityTypeChart, AccountTypeChart, SecuritySectorChart, PortfolioValueChart],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -29,6 +38,21 @@ export class Dashboard {
   totalSecurities = signal<number>(0);
   totalHoldings = signal<number>(0);
   totalInvestedCost = signal<number>(0);
+  securityTypeBreakdown = signal<SecurityTypeSlice[]>([]);
+  accountTypeBreakdown = signal<AccountTypeSlice[]>([]);
+  securitySectorBreakdown = signal<SectorSlice[]>([]);
+  portfolioValueHistory = signal<PortfolioValuePoint[]>([]);
+
+  private readonly BREAKDOWN_COUNT = 3;
+  activeBreakdownIndex = signal<number>(0);
+
+  nextBreakdown(): void {
+    this.activeBreakdownIndex.update((i) => (i + 1) % this.BREAKDOWN_COUNT);
+  }
+
+  previousBreakdown(): void {
+    this.activeBreakdownIndex.update((i) => (i - 1 + this.BREAKDOWN_COUNT) % this.BREAKDOWN_COUNT);
+  }
 
   accountColumns: TableColumn[] = [
     { header: 'Name', field: 'nickname' },
@@ -55,6 +79,8 @@ export class Dashboard {
         this.loadTotals(user.id!);
         this.loadRecentAccounts(user.id!);
         this.loadTopSecurities(user.id!);
+        this.loadSecurityBreakdowns(user.id!);
+        this.loadAccountTypeBreakdown(user.id!);
       },
       error: (err) => console.error('Failed to resolve current user:', err),
     });
@@ -135,5 +161,86 @@ export class Dashboard {
         console.error(err);
       },
     });
+  }
+
+  loadSecurityBreakdowns(userId: number): void {
+    this.securityService.getSecurityTypeBreakdown(userId).subscribe({
+      next: (breakdown) => {
+        const counts = new Map(breakdown.map((slice) => [slice.type, slice.count]));
+        this.securityTypeBreakdown.set(
+          Object.values(SecurityType).map((type) => ({ type, count: counts.get(type) ?? 0 })),
+        );
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+
+    this.securityService.getSectorBreakdown(userId).subscribe({
+      next: (breakdown) => {
+        const counts = new Map(breakdown.map((slice) => [slice.sector, slice.count]));
+        this.securitySectorBreakdown.set(
+          Object.values(Sector).map((sector) => ({ sector, count: counts.get(sector) ?? 0 })),
+        );
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  loadAccountTypeBreakdown(userId: number): void {
+    this.investmentAccountService.getAccountTypeBreakdown(userId).subscribe({
+      next: (breakdown) => {
+        const counts = new Map(breakdown.map((slice) => [slice.type, slice.count]));
+        this.accountTypeBreakdown.set(
+          Object.values(InvestmentType).map((type) => ({ type, count: counts.get(type) ?? 0 })),
+        );
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+
+    this.investmentAccountService.getAllInvestmentAccounts(userId).subscribe({
+      next: (accounts) => this.loadPortfolioValueHistory(accounts),
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  loadPortfolioValueHistory(accounts: InvestmentAccount[]): void {
+    if (accounts.length === 0) {
+      this.portfolioValueHistory.set([]);
+      return;
+    }
+
+    forkJoin(accounts.map((account) => this.holdingService.getAllHoldingsPerAccount(account.id!))).subscribe({
+      next: (holdingsPerAccount) => {
+        this.portfolioValueHistory.set(this.buildCumulativeValueSeries(holdingsPerAccount.flat()));
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  // No historical market prices are tracked, so "value over time" is the running
+  // total of cost basis (shares * costPerShare) as of each purchase date.
+  private buildCumulativeValueSeries(holdings: Holding[]): PortfolioValuePoint[] {
+    const costByDate = new Map<string, number>();
+    for (const holding of holdings) {
+      const dateKey = new Date(holding.purchaseDate).toISOString().slice(0, 10);
+      costByDate.set(dateKey, (costByDate.get(dateKey) ?? 0) + holding.shares * holding.costPerShare);
+    }
+
+    let runningTotal = 0;
+    return Array.from(costByDate.keys())
+      .sort()
+      .map((date) => {
+        runningTotal += costByDate.get(date)!;
+        return { date, value: runningTotal };
+      });
   }
 }

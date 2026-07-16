@@ -10,26 +10,30 @@
     
     @if (!editingHolding()) {
       <div class="relative">
-        <div class="relative">
-          @if (viewMode() === 'byAccount') {
-            <p-select 
-              id="security"
-              formControlName="security" 
-              [options]="filteredSecurities()" 
-              optionLabel="name" 
-              class="w-full" />
-            <label>Security</label>
-            } 
-            @else {
-            <p-select 
-              id="account"
-              formControlName="account" 
-              [options]="filteredAccounts()" 
-              optionLabel="nickname" 
-              class="w-full" />
-            <label>Account</label>
-            }
-            </div>
+        @if (viewMode() === 'byAccount') {
+          <p-select
+            id="security"
+            formControlName="security"
+            [options]="filteredSecurities()"
+            optionLabel="name"
+            [appendTo]="'body'"
+            class="w-full peer" />
+          <label for="security" class="absolute left-3 -top-2.5 px-1 bg-white dark:bg-zinc-900 text-xs text-gray-500 dark:text-zinc-400">
+            Security
+          </label>
+          }
+          @else {
+          <p-select
+            id="account"
+            formControlName="account"
+            [options]="filteredAccounts()"
+            optionLabel="nickname"
+            [appendTo]="'body'"
+            class="w-full peer" />
+          <label for="account" class="absolute left-3 -top-2.5 px-1 bg-white dark:bg-zinc-900 text-xs text-gray-500 dark:text-zinc-400">
+            Account
+          </label>
+          }
       </div>
     }
 
@@ -71,17 +75,19 @@
   </form>
 
   <ng-template #footer>
-    <div class="flex justify-end gap-2 mt-4">
-      <p-button 
-        label="Cancel" 
-        severity="secondary" 
-        [outlined]="true" 
-        (onClick)="cancelled.emit()" 
+    <div class="flex justify-end gap-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [rounded]="true"
+        (onClick)="cancelled.emit()"
       />
-      <p-button 
-        [label]="editingHolding() ? 'Update' : 'Add'" 
-        severity="primary" 
-        (onClick)="onUpdate()" 
+      <p-button
+        [label]="editingHolding() ? 'Update' : 'Add'"
+        severity="primary"
+        [rounded]="true"
+        (onClick)="onUpdate()"
       />
     </div>
   </ng-template>
