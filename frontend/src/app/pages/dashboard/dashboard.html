@@ -14,7 +14,7 @@
             <app-metric-card class="min-w-0" title="Total Holdings" [data]="totalHoldings()" icon="pi pi-briefcase">
             </app-metric-card>
 
-            <app-metric-card class="min-w-0" title="Total Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar">
+            <app-metric-card class="min-w-0" title="Total Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" [isCurrency]="true">
             </app-metric-card>
         </div>
     </div>
@@ -43,10 +43,10 @@
 
     <!-- Bottom-right: recent accounts / top securities -->
     <div class="flex flex-row gap-4 min-w-0 min-h-0">
-        <app-dashboard-table class="flex-1 min-w-0 overflow-y-auto" title="Recent Accounts" [data]="recentAccounts()" [columns]="accountColumns" link="/account">
+        <app-dashboard-table class="flex-1 min-w-0" title="Recent Accounts" [data]="recentAccounts()" [columns]="accountColumns" link="/account">
         </app-dashboard-table>
 
-        <app-dashboard-table class="flex-1 min-w-0 overflow-y-auto" title="Top Securities" [data]="topSecurities()" [columns]="securityColumns" link="/security">
+        <app-dashboard-table class="flex-1 min-w-0" title="Top Securities" [data]="topSecurities()" [columns]="securityColumns" link="/security">
         </app-dashboard-table>
     </div>
 

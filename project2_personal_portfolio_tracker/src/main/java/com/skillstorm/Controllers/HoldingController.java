@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.DTOs.HoldingDto;
+import com.skillstorm.DTOs.PortfolioValuePointDto;
 import com.skillstorm.Models.Holding;
 import com.skillstorm.Services.HoldingService;
+
+import java.util.List;
 
 /**
  * Retrieves POJOs from Service class
@@ -89,5 +92,11 @@ public class HoldingController {
     @GetMapping("totalInvestedCost")
     public ResponseEntity<Long> totalInvestedCost(@RequestParam(required = true) Long userId) {
         return ResponseEntity.status(200).body(service.totalInvestedCost(userId));
+    }
+
+    @GetMapping("valueHistory")
+    public ResponseEntity<List<PortfolioValuePointDto>> getPortfolioValueHistory(
+            @RequestParam(required = true) Long userId) {
+        return ResponseEntity.ok(service.getPortfolioValueHistory(userId));
     }
 }

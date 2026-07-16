@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { Holding } from '../types/Holding';
 import { HoldingId } from '../types/HoldingId';
 import { catchWithMessage, userIdParams } from '../shared/http.util';
+import { PortfolioValuePoint } from '../components/charts/portfolio-value-chart/portfolio-value-chart';
 
 @Injectable({ providedIn: 'root' })
 export class HoldingService {
@@ -52,5 +53,11 @@ export class HoldingService {
     return this.http
       .get<number>(`${this.URL}/totalInvestedCost`, { params: userIdParams(userId) })
       .pipe(catchWithMessage('Failed to load total invested cost for specified User.'));
+  }
+
+  getPortfolioValueHistory(userId: number): Observable<PortfolioValuePoint[]> {
+    return this.http
+      .get<PortfolioValuePoint[]>(`${this.URL}/valueHistory`, { params: userIdParams(userId) })
+      .pipe(catchWithMessage('Failed to load portfolio value history.'));
   }
 }

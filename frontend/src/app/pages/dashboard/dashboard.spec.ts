@@ -15,9 +15,10 @@ describe('Dashboard Component', () => {
     getUserInvestmentAccountTotal: () => of(5),
     getRecentAccounts: () => of([]) 
   };
-  const mockHoldingService = { 
+  const mockHoldingService = {
     getUserHoldingTotal: () => of(10),
-    totalInvestedCost: () => of(1000) 
+    totalInvestedCost: () => of(1000),
+    getPortfolioValueHistory: () => of([])
   };
   const mockSecurityService = { 
     getUserSecurityTotal: () => of(3),

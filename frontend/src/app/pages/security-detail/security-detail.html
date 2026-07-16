@@ -16,7 +16,7 @@
 
     <div class="col-span-1 flex flex-row gap-4">
         <app-metric-card title="Total Holdings" [data]="this.holdings().length" icon="pi pi-trophy" class="flex-1 flex" />
-        <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" class="flex-1 flex" />
+        <app-metric-card title="Invested Cost" [data]="totalInvestedCost()" icon="pi pi-dollar" [isCurrency]="true" class="flex-1 flex" />
     </div>
 </div>
 

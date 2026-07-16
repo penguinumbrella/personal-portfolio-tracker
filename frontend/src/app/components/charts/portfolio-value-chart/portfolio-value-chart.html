@@ -1,14 +1,13 @@
 <p-card styleClass="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-zinc-800">
-  <div class="flex items-center justify-between mb-4">
-    <div class="flex items-center gap-2 text-zinc-800 dark:text-zinc-100 font-semibold">
-      <i class="pi pi-chart-line text-yellow-500"></i>
+  <div class="flex items-center justify-between mb-4 shrink-0">
+    <div class="flex items-center gap-2 text-zinc-800 dark:text-zinc-100 font-semibold text-xl">
       <span>{{ title() }}</span>
     </div>
-    
+
     <div class="flex p-1 bg-gray-100 dark:bg-zinc-900 rounded-full w-fit">
       @for (opt of rangeOptions; track opt.key) {
-        <button 
-          type="button" 
+        <button
+          type="button"
           (click)="setRange(opt.key)"
           class="px-5 py-1.5 text-sm font-medium rounded-full transition-all duration-200"
           [class.bg-white]="activeRange() === opt.key"
@@ -24,9 +23,11 @@
     </div>
   </div>
 
-  @if (chartData().labels.length > 0) {
-    <p-chart type="line" [data]="chartData()" [options]="chartOptions()" [style]="{ width: '100%', height: '300px' }" />
-  } @else {
-    <p class="text-sm text-500 dark:text-gray-400 text-center py-8">No holdings to display.</p>
-  }
+  <div class="flex-1 min-h-0">
+    @if (chartData().labels.length > 0) {
+      <p-chart type="line" [data]="chartData()" [options]="chartOptions()" [style]="{ width: '100%', height: '100%' }" />
+    } @else {
+      <p class="text-sm text-500 dark:text-gray-400 text-center py-8">No holdings to display.</p>
+    }
+  </div>
 </p-card>

@@ -1,11 +1,12 @@
 <div class="card flex-1 p-4 flex flex-col h-full rounded-l-lg">
-  <div class="flex flex-row items-center gap-4 mb-10 text-yellow-100">
-    <img src="/cat.jpg" alt="Portfolio logo" class="w-10 h-10" />
+  <div class="flex flex-row items-center gap-4 mb-10 text-black dark:text-yellow-100">
+    <img src="/catblack.png" alt="Portfolio logo" class="w-10 h-10 dark:hidden" />
+    <img src="/cat.jpg" alt="Portfolio logo" class="w-10 h-10 hidden dark:block" />
     <h2 class="text-2xl m-0">Maneki</h2>
   </div>
   
   <div class="flex flex-col gap-2">
-    <p-panelmenu [model]="items()"></p-panelmenu>
+    <p-panelmenu [model]="items() " class="text-sm"> </p-panelmenu>
   </div>
   
   <div class="mt-auto rounded-lg bg-gray-100 dark:bg-zinc-800 px-3 py-2">

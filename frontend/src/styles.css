@@ -7,3 +7,27 @@
 @theme {
   --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+/* Toasts share a z-index layer with PrimeNG dialogs, so a toast fired while a
+   modal is open can end up stacked behind it. Force toasts above all overlays. */
+.p-toast {
+  z-index: 9999 !important;
+}
+
+/* Every app component fades in whenever it's mounted (initial render, route
+   change, or conditional re-render e.g. the breakdown carousel switching charts).
+   Opacity-only so it's safe regardless of each component's own display type. */
+@media (prefers-reduced-motion: no-preference) {
+  app-root, app-main-layout, app-menu, app-dashboard, app-metric-card, app-portfolio-value-chart,
+  app-breakdown-carousel, app-security-type-chart, app-account-type-chart, app-security-sector-chart,
+  app-dashboard-table, app-account-detail, app-security-detail, app-holding-table, app-detail-sidebar,
+  app-detail-card, app-sidebar-card, app-loginpage, app-login-form, app-signup-form, app-user-modal,
+  app-user-handle, app-manage-security-modal, app-manage-account-modal, app-manage-holding-modal {
+    animation: app-fade-in 0.35s ease-out both;
+  }
+}
+
+@keyframes app-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

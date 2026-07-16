@@ -1,10 +1,14 @@
 package com.skillstorm.Services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.skillstorm.DTOs.HoldingDto;
+import com.skillstorm.DTOs.PortfolioValuePointDto;
 import com.skillstorm.Models.Holding;
 import com.skillstorm.Models.HoldingPK;
 import com.skillstorm.Models.InvestmentAccount;
@@ -139,6 +143,21 @@ public class HoldingService {
         RepoUtils.requireExists(userRepo, userId.intValue(), "User");
         Long total = repo.totalInvestedCost(userId);
         return total != null ? total : 0L;
+    }
+
+    // No historical market prices are tracked, so "value over time" is the running
+    // total of cost basis (shares * costPerShare) as of each purchase date.
+    public List<PortfolioValuePointDto> getPortfolioValueHistory(Long userId) {
+        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
+        List<PortfolioValuePointDto> perDate = repo.sumCostByPurchaseDateForUser(userId);
+
+        List<PortfolioValuePointDto> cumulative = new ArrayList<>();
+        long runningTotal = 0;
+        for (PortfolioValuePointDto point : perDate) {
+            runningTotal += point.value();
+            cumulative.add(new PortfolioValuePointDto(point.date(), runningTotal));
+        }
+        return cumulative;
     }
 
 }

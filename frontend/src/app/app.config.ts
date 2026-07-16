@@ -16,7 +16,7 @@ const MyCustomTheme = definePreset(Aura, {
     fontFamily: 'Montserrat, sans-serif',
     semantic: {
 primary: {
-            50: '#FFFDF0',  // Very soft cream
+            50: '#ffde82',  // Very soft cream
             100: '#FFF9D6', // Light pastel yellow
             200: '#FFF5B0', 
             300: '#FFF08A', 

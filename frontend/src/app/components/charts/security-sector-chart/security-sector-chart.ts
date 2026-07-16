@@ -45,7 +45,6 @@ export class SecuritySectorChart {
       datasets: [
         buildPieChartDataset(
           slices.map((slice) => slice.count),
-          slices.map((slice) => SECTOR_COLORS[slice.sector][mode]),
           mode,
         ),
       ],

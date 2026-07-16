@@ -19,8 +19,8 @@ const RANGE_OPTIONS: { key: RangeKey; label: string }[] = [
 
 const RANGE_DAYS: Partial<Record<RangeKey, number>> = { '1W': 7, '1M': 30, '1Y': 365 };
 
-const LINE_COLOR = { light: '#2a78d6', dark: '#3987e5' };
-const FILL_COLOR = { light: 'rgba(42, 120, 214, 0.12)', dark: 'rgba(57, 135, 229, 0.16)' };
+const LINE_COLOR = { light: '#eab308', dark: '#fde047' };
+const FILL_COLOR = { light: 'rgba(234, 179, 8, 0.12)', dark: 'rgba(253, 224, 71, 0.16)' };
 const GRID_COLOR = { light: '#e5e7eb', dark: '#3f3f46' };
 const INK_SECONDARY = { light: '#52514e', dark: '#c3c2b7' };
 
@@ -30,6 +30,15 @@ const CURRENCY_FORMATTER_COMPACT = new Intl.NumberFormat('en-US', {
   currency: 'USD',
   maximumFractionDigits: 0,
 });
+
+const DAY_FORMATTER = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+// "2024-01-15" parsed via `new Date()` is read as UTC midnight, which can roll back
+// a day once formatted in a west-of-UTC timezone. Build the date from local parts instead.
+function parseISODate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
 
 @Component({
   selector: 'app-portfolio-value-chart',
@@ -56,7 +65,7 @@ export class PortfolioValueChart {
   // Refactored to include gradient creation
   private createGradient(ctx: CanvasRenderingContext2D, chartArea: any, mode: 'light' | 'dark') {
     const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-    const color = mode === 'light' ? 'rgba(42, 120, 214, 0.3)' : 'rgba(57, 135, 229, 0.3)';
+    const color = mode === 'light' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(253, 224, 71, 0.3)';
     gradient.addColorStop(0, color);
     gradient.addColorStop(1, 'transparent');
     return gradient;
@@ -92,6 +101,7 @@ export class PortfolioValueChart {
 
   chartOptions = computed(() => {
     const mode = this.themeService.theme();
+    const points = this.filteredPoints();
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -107,7 +117,19 @@ export class PortfolioValueChart {
         },
       },
       scales: {
-        x: { ticks: { color: INK_SECONDARY[mode] }, grid: { display: false } },
+        x: {
+          ticks: {
+            color: INK_SECONDARY[mode],
+            autoSkip: true,
+            maxTicksLimit: 8,
+            maxRotation: 0,
+            callback: (value: number, index: number) => {
+              const point = points[index];
+              return point ? DAY_FORMATTER.format(parseISODate(point.date)) : '';
+            },
+          },
+          grid: { display: false },
+        },
         y: {
           ticks: {
             color: INK_SECONDARY[mode],

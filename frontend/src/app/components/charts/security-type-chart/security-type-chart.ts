@@ -16,7 +16,7 @@ export interface SecurityTypeSlice {
 const SECURITY_TYPE_COLORS: Record<SecurityType, { light: string; dark: string }> = {
   [SecurityType.STOCK]: { light: '#2a78d6', dark: '#3987e5' },
   [SecurityType.ETF]: { light: '#008300', dark: '#008300' },
-  [SecurityType.MUTUAL_BOND]: { light: '#e87ba4', dark: '#d55181' },
+  [SecurityType.MUTUAL_FUND]: { light: '#e87ba4', dark: '#d55181' },
   [SecurityType.BOND]: { light: '#eda100', dark: '#c98500' },
 };
 
@@ -41,7 +41,6 @@ export class SecurityTypeChart {
       datasets: [
         buildPieChartDataset(
           slices.map((slice) => slice.count),
-          slices.map((slice) => SECURITY_TYPE_COLORS[slice.type][mode]),
           mode,
         ),
       ],

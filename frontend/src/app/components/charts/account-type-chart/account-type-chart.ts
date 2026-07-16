@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { InvestmentType } from '../../../types/InvestmentType';
 import { ThemeService } from '../../../services/ThemeService';
-import { CHART_INK_SECONDARY, filterPositive } from '../pie-chart.utils';
+import { buildPieChartDataset, buildPieChartOptions, CHART_INK_SECONDARY, filterPositive } from '../pie-chart.utils';
 
 export interface AccountTypeSlice {
   type: InvestmentType;
@@ -40,39 +40,14 @@ export class AccountTypeChart {
     return {
       labels: slices.map((slice) => slice.type),
       datasets: [
-        {
-          data: slices.map((slice) => slice.count),
-          backgroundColor: slices.map((slice) => ACCOUNT_TYPE_COLORS[slice.type][mode]),
-          borderColor: 'transparent',
-          borderWidth: 0,
-          hoverOffset: 15,
-          spacing: 5,     // Adds the gap between segments
-          borderRadius: 10 // Rounds the edges
-        },
+        buildPieChartDataset(
+            slices.map((slice) => slice.count),
+            mode,
+          ),
       ],
     };
   });
 
-  chartOptions = computed(() => {
-    const mode = this.themeService.theme();
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '40%',
-      plugins: {
-        legend: {
-          position: 'bottom', // Sets the legend to the bottom
-          align: 'center',
-          labels: {
-            color: CHART_INK_SECONDARY[mode],
-            usePointStyle: true,
-            pointStyle: 'circle',
-            font: {
-                family: "'Inter', sans-serif"
-            }
-          },
-        },
-      },
-    };
-  });
+
+  chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

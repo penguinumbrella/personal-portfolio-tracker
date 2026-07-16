@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, afterNextRender, inject, viewChild } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
@@ -18,6 +18,17 @@ import { ThemeService } from '../../services/ThemeService';
 export class MainLayout {
   themeService = inject(ThemeService);
   private router = inject(Router);
+
+  // Toast and Dialog fight over the same dynamic z-index layer and mat-sidenav-container forms
+  // its own stacking context around any dialog rendered inside it, so a toast can end up trapped
+  // behind an open modal. Moving the toast to be a direct child of <body> sidesteps both issues.
+  private toastHost = viewChild.required('toastHost', { read: ElementRef });
+
+  constructor() {
+    afterNextRender(() => {
+      document.body.appendChild(this.toastHost().nativeElement);
+    });
+  }
 
   title = toSignal(
     this.router.events.pipe(

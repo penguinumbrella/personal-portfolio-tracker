@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { MetricCard } from '../../components/metric-card/metric-card';
 import { DashboardTable, TableColumn } from '../../components/dashboard-table/dashboard-table';
 import { SecurityTypeChart, SecurityTypeSlice } from '../../components/charts/security-type-chart/security-type-chart';
@@ -18,7 +17,6 @@ import { TopSecurity } from '../../types/Security';
 import { SecurityType } from '../../types/SecurityType';
 import { InvestmentType } from '../../types/InvestmentType';
 import { Sector } from '../../types/Sector';
-import { Holding } from '../../types/Holding';
 
 @Component({
   selector: 'app-dashboard',
@@ -73,6 +71,7 @@ export class Dashboard {
         this.loadTopSecurities(user.id!);
         this.loadSecurityBreakdowns(user.id!);
         this.loadAccountTypeBreakdown(user.id!);
+        this.loadPortfolioValueHistory(user.id!);
       },
       error: (err) => console.error('Failed to resolve current user:', err),
     });
@@ -193,46 +192,16 @@ export class Dashboard {
         console.error(err);
       },
     });
-
-    this.investmentAccountService.getAllInvestmentAccounts(userId).subscribe({
-      next: (accounts) => this.loadPortfolioValueHistory(accounts),
-      error: (err) => {
-        console.error(err);
-      },
-    });
   }
 
-  loadPortfolioValueHistory(accounts: InvestmentAccount[]): void {
-    if (accounts.length === 0) {
-      this.portfolioValueHistory.set([]);
-      return;
-    }
-
-    forkJoin(accounts.map((account) => this.holdingService.getAllHoldingsPerAccount(account.id!))).subscribe({
-      next: (holdingsPerAccount) => {
-        this.portfolioValueHistory.set(this.buildCumulativeValueSeries(holdingsPerAccount.flat()));
+  loadPortfolioValueHistory(userId: number): void {
+    this.holdingService.getPortfolioValueHistory(userId).subscribe({
+      next: (data) => {
+        this.portfolioValueHistory.set(data);
       },
       error: (err) => {
         console.error(err);
       },
     });
-  }
-
-  // No historical market prices are tracked, so "value over time" is the running
-  // total of cost basis (shares * costPerShare) as of each purchase date.
-  private buildCumulativeValueSeries(holdings: Holding[]): PortfolioValuePoint[] {
-    const costByDate = new Map<string, number>();
-    for (const holding of holdings) {
-      const dateKey = new Date(holding.purchaseDate).toISOString().slice(0, 10);
-      costByDate.set(dateKey, (costByDate.get(dateKey) ?? 0) + holding.shares * holding.costPerShare);
-    }
-
-    let runningTotal = 0;
-    return Array.from(costByDate.keys())
-      .sort()
-      .map((date) => {
-        runningTotal += costByDate.get(date)!;
-        return { date, value: runningTotal };
-      });
   }
 }

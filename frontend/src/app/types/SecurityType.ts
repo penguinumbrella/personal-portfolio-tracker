@@ -1,6 +1,6 @@
 export enum SecurityType {
     STOCK = "Stock",
     ETF = "ETF",
-    MUTUAL_BOND = "Mutual Bond",
+    MUTUAL_FUND = "Mutual Fund",
     BOND = "Bond"
 }
