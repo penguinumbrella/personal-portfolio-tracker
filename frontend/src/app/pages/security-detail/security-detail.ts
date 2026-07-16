@@ -80,19 +80,18 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
-      this.checkRouteForId();
+      // allows selections from menu bar
+      this.actRoute.paramMap.subscribe((params) => {
+        const idParam = params.get('id');
+        if (idParam) {
+          this.viewSecurity(Number(idParam));
+          // fixes url from menu bar selection (that passes account id)
+          this.location.replaceState('/security');
+        }
+      });
     });
   }
 
-  // work around to allow selection from menu bar
-  checkRouteForId(): void {
-    const idParam = this.actRoute.snapshot.paramMap.get('id');
-    if (idParam) {
-      const securitytId = Number(idParam);
-      this.viewSecurity(securitytId);
-      this.location.replaceState('/security');
-    }
-  }
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -159,7 +158,6 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     // show loading spinner while request to backend is being made
     this.loading.set(true);
 
-    //TODO make this paginated??
     this.holdingService.getAllHoldingsPerSecurity(securityId).subscribe({
       next: (data) => {
         this.holdings.set(data);

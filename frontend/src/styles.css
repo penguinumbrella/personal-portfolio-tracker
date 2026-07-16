@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
-@custom-variant dark (&:where(.dark, .dark *));
 @import "primeicons/primeicons.css";
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@custom-variant dark (&:where(.dark, .dark *));
