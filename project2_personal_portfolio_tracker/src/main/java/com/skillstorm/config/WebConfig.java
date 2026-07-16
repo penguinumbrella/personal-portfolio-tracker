@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private static final String[] ALLOWED_ORIGINS = {
             "https://d13to6rck5cj2.cloudfront.net",
-            "https://d1jcki4jtvzqdz.cloudfront.net",
+            "https://d1jcki4jtvzqdz.cloudfront.net", // only one needed for production
             "http://127.0.0.1:5500",
             "http://localhost:4200"
     };
