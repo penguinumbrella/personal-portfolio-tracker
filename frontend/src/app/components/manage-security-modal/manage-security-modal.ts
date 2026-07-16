@@ -21,6 +21,7 @@ import { SecurityType } from '../../types/SecurityType';
 })
 export class ManageSecurityModal {
 
+  // Build dropdown options from the Sector / SecurityType enum values
   readonly sectorTypes = Object.values(Sector).map(value => ({ name: value, value }));
   readonly securityTypes = Object.values(SecurityType).map(value => ({ name: value, value }));
 
@@ -32,6 +33,7 @@ export class ManageSecurityModal {
   cancelled = output<void>();
 
   onUpdate() {
+    // Hand the raw form value up to the parent, which owns validation/persistence
     this.confirmed.emit(this.form().value);
   }
 }

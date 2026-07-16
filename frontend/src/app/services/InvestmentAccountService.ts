@@ -5,21 +5,10 @@ import { Observable } from 'rxjs';
 import { InvestmentAccount } from '../types/InvestmentAccounts';
 import { Page } from '../types/Page';
 import { catchWithMessage, pageParams, userIdParams } from '../shared/http.util';
-import { Holding } from '../types/Holding';
-import { HoldingService } from './HoldingService';
 import { AccountTypeSlice } from '../components/charts/account-type-chart/account-type-chart';
 
 @Injectable({ providedIn: 'root' })
 export class InvestmentAccountService {
-  /**
-   * SERVICES
-   *      - handle the business logic of your application
-   *      - primarilly used for logic that will be reused across components
-   *
-   *      - biggest example: HTTP requests
-   *          - one central location for all your related requests
-   */
-
   private http = inject(HttpClient);
 
   private readonly URL = `${environment.baseApiUrl}/investments`;
@@ -29,7 +18,7 @@ export class InvestmentAccountService {
   getAllInvestmentAccounts(userId?: number): Observable<InvestmentAccount[]> {
     let params = new HttpParams();
 
-    // set the rating param if a value was given
+    // userId is optional here. only scope the request to a user if one was given.
     if (userId != null) {
       params = params.set('userId', userId);
     }
@@ -39,6 +28,7 @@ export class InvestmentAccountService {
       .pipe(catchWithMessage('Failed to load InvestmentAccounts.'));
   }
 
+  // Paginated + searchable listing scoped to a user, for table views.
   getAccountsPage(
     userId: number,
     page: number,
@@ -80,24 +70,28 @@ export class InvestmentAccountService {
 
   // getting helpers for backend calculations
 
+  // Backend-computed cost basis (sum of shares * costPerShare) for one account's holdings.
   getInvestmentAccountTotalCost(accountId: number): Observable<number> {
     return this.http
       .get<number>(`${this.URL}/${accountId}/total-cost`)
       .pipe(catchWithMessage('Failed to load total cost of InvestmentAccount.'));
   }
 
+  // Count of investment accounts belonging to a user (dashboard summary).
   getUserInvestmentAccountTotal(userId: number): Observable<number> {
     return this.http
       .get<number>(`${this.URL}/total`, { params: userIdParams(userId) })
       .pipe(catchWithMessage("Failed to load total count of a user's investment accounts."));
   }
 
+  // Most recently created/updated accounts for a user, for the dashboard's recent-activity widget.
   getRecentAccounts(userId: number): Observable<InvestmentAccount[]> {
     return this.http
       .get<InvestmentAccount[]>(`${this.URL}/recent`, { params: userIdParams(userId) })
       .pipe(catchWithMessage("Failed to load user's recent investment accounts."));
   }
 
+  // Aggregated breakdown by account type, for the account-type chart.
   getAccountTypeBreakdown(userId: number): Observable<AccountTypeSlice[]> {
     return this.http
       .get<AccountTypeSlice[]>(`${this.URL}/breakdown/type`, { params: userIdParams(userId) })

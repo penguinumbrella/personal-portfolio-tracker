@@ -13,12 +13,15 @@ export function buildPieChartDataset(values: number[], colors: string[], mode: T
   return {
     data: values,
     backgroundColor: colors,
+    // Border matches the page background so slices appear visually separated.
     borderColor: CHART_SURFACE[mode],
     borderWidth: 2,
     hoverOffset: 4,
   };
 }
 
+// Shared Chart.js display options: responsive sizing plus a bottom legend
+// colored for the current theme.
 export function buildPieChartOptions(mode: Theme) {
   return {
     responsive: true,

@@ -31,8 +31,11 @@ export class SecurityTypeChart {
 
   data = input<SecurityTypeSlice[]>([]);
 
+  // Drop zero-count security types before charting/legend rendering.
   private slices = computed(() => filterPositive(this.data()));
 
+  // Builds the pie dataset: one slice per security type, colored by the fixed
+  // per-type palette (re-evaluated when the theme changes).
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();

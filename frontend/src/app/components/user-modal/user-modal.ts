@@ -21,6 +21,7 @@ export class UserModal {
   loggedOut = output<void>();
 
   onUpdate() {
+    // Only emit if the form passes validation; parent owns persistence
     if (this.form().valid) {
       this.confirmed.emit(this.form().value);
     }

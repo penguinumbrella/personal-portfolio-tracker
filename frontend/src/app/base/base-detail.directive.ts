@@ -18,6 +18,7 @@ export abstract class BaseDetailDirective<T> {
   /** The signed-in user's id, resolved once via resolveCurrentUserId() before any data loads. */
   currentUserId = signal<number | null>(null);
 
+  // Derived total cost basis across all currently loaded holdings.
   totalInvestedCost = computed(() =>
     this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0),
   );
@@ -63,6 +64,7 @@ export abstract class BaseDetailDirective<T> {
   }
 
   addHolding(): void {
+    // No editingHolding means the modal is in "create" mode; reset form to blank defaults.
     this.editingHolding.set(null);
     this.modalForm().reset({
       [this.counterpartyFormKey]: null,
@@ -82,8 +84,10 @@ export abstract class BaseDetailDirective<T> {
   }
 
   editHolding(holding: Holding): void {
+    // Presence of editingHolding puts the modal in "edit" mode.
     this.editingHolding.set(holding);
 
+    // purchaseDate may arrive as an epoch number (from the backend) or already a Date; normalize to Date.
     const dateValue =
       typeof holding.purchaseDate === 'number'
         ? new Date(holding.purchaseDate)
@@ -100,8 +104,10 @@ export abstract class BaseDetailDirective<T> {
   }
 
   onHoldingModalConfirm(formData: any): void {
+    // Bail out silently if the form isn't valid; PrimeNG form validation messages handle the UI feedback.
     if (this.modalForm().invalid) return;
 
+    // Subclasses know which raw form fields map to account/security ids.
     const { a_id, s_id } = this.resolveHoldingIds(formData);
     const payload = {
       id: this.editingHolding()?.id,
@@ -109,13 +115,16 @@ export abstract class BaseDetailDirective<T> {
       s_id,
       shares: formData.shares,
       costPerShare: formData.costPerShare,
+      // Convert the form's Date back to epoch millis for the API.
       purchaseDate: new Date(formData.purchaseDate).getTime(),
     };
 
+    // Branch on whether we're editing an existing holding or creating a new one.
     if (this.editingHolding()) {
       const id = payload.id;
       this.holdingService.updateHolding(id!, payload).subscribe({
         next: (updatedHolding) => {
+          // Swap the updated holding into local state in place.
           this.holdings.update((current) => current.map((h) => (h.id === id ? updatedHolding : h)));
           this.isHoldingModalVisible.set(false);
           this.messageService.add({
@@ -135,6 +144,7 @@ export abstract class BaseDetailDirective<T> {
     } else {
       this.holdingService.createHolding(payload).subscribe({
         next: (newHolding) => {
+          // Append the newly created holding to local state.
           this.holdings.update((current) => [...current, newHolding]);
           this.isHoldingModalVisible.set(false);
           this.messageService.add({
@@ -155,6 +165,7 @@ export abstract class BaseDetailDirective<T> {
   }
 
   confirmDeleteHolding(holding: Holding, event: Event): void {
+    // Show a PrimeNG confirm popup anchored to the triggering element; only deletes on accept.
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Are you sure you want to delete this holding?',
@@ -170,6 +181,7 @@ export abstract class BaseDetailDirective<T> {
   private executeDeleteHolding(holding: Holding): void {
     this.holdingService.deleteHolding(holding.id!).subscribe({
       next: () => {
+        // Remove the deleted holding from local state by its composite (account, security) id.
         this.holdings.update((current) =>
           current.filter(
             (h) =>

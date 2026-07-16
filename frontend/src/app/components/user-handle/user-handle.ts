@@ -28,6 +28,7 @@ export class UserHandle {
   form!: FormGroup;
 
   ngOnInit(): void {
+    // Refresh the current user from the server, then set up the edit-profile form
     this.loadUser();
 
     this.form = this.formBuilder.group({
@@ -38,6 +39,8 @@ export class UserHandle {
   }
 
   loadUser(): void {
+    // Side-effecting call: AuthService updates its own currentUser signal on success,
+    // so there's nothing to do here besides logging failures
     this.authService.getCurrentUser().subscribe({
       error: (err) => {
         console.error(err);
@@ -54,6 +57,8 @@ export class UserHandle {
   }
 
   saveUser(formData: any) {
+    // Rename the form's "password" field to "passwordHash" (what the API expects) and
+    // merge it over the existing user record
     const { password, ...rest } = formData;
     const updatedUser: User = { ...this.currentUser(), ...rest, passwordHash: password };
 
@@ -77,6 +82,7 @@ export class UserHandle {
   }
 
   logout(): void {
+    // Close the modal and redirect to login on success; show a toast on failure
     this.authService.logout().subscribe({
       next: () => {
         this.isModalVisible.set(false);

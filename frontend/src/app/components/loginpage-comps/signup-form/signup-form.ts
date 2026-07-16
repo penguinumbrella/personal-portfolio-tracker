@@ -27,12 +27,15 @@ export class SignupForm {
   });
 
   signup(): void {
+    // Bail out if required fields are missing/invalid
     if (this.form.invalid) return;
 
     this.submitting.set(true);
     this.errorMessage.set(null);
 
     const { username, email, password } = this.form.getRawValue();
+    // Register the new user; on success hand control back to the login form,
+    // on failure surface an inline error
     this.authService
       .register({ username: username!, email: email!, passwordHash: password! })
       .subscribe({

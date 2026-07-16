@@ -60,6 +60,27 @@ public class SecurityService {
         return RepoUtils.findOrThrow(repo, id, "Security");
     }
 
+    // Aggregate helpers
+
+    public Long getUserSecurityAccountTotal(int userId) {
+        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
+        return repo.countByUser(user);
+    }
+
+    public Iterable<TopSecurityDto> getTop5SecurityValues(int userId) {
+        return repo.findTop5SecurityValues(userId);
+    }
+
+    public Iterable<SecurityTypeBreakdownDto> getSecurityTypeBreakdown(int userId) {
+        RepoUtils.findOrThrow(userRepo, userId, "User");
+        return repo.countByTypeForUser(userId);
+    }
+
+    public Iterable<SectorBreakdownDto> getSectorBreakdown(int userId) {
+        RepoUtils.findOrThrow(userRepo, userId, "User");
+        return repo.countBySectorForUser(userId);
+    }
+
     // ----- PUT/UPDATE METHODS -----
     public Security updateSecurity(int id, SecurityDto dto) {
         RepoUtils.requireExists(repo, id, "Security");
@@ -80,22 +101,4 @@ public class SecurityService {
         return true;
     }
 
-    public Long getUserSecurityAccountTotal(int userId) {
-        User user = RepoUtils.findOrThrow(userRepo, userId, "User");
-        return repo.countByUser(user);
-    }
-
-    public Iterable<TopSecurityDto> getTop5SecurityValues(int userId) {
-        return repo.findTop5SecurityValues(userId);
-    }
-
-    public Iterable<SecurityTypeBreakdownDto> getSecurityTypeBreakdown(int userId) {
-        RepoUtils.findOrThrow(userRepo, userId, "User");
-        return repo.countByTypeForUser(userId);
-    }
-
-    public Iterable<SectorBreakdownDto> getSectorBreakdown(int userId) {
-        RepoUtils.findOrThrow(userRepo, userId, "User");
-        return repo.countBySectorForUser(userId);
-    }
 }

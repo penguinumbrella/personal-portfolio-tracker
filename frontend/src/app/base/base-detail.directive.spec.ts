@@ -4,7 +4,8 @@ import { BaseDetailDirective } from './base-detail.directive';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HoldingService } from '../services/HoldingService';
 import { AuthService } from '../services/AuthService';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { fakeAsync, tick } from '@angular/core/testing';
@@ -41,7 +42,8 @@ class TestDetail extends BaseDetailDirective<any> {
         deleteHolding: () => of({}) 
     }},
     { provide: AuthService, useValue: { getCurrentUser: () => of({ id: 1 }) } },
-    ConfirmationService
+    ConfirmationService,
+    MessageService,
   ]
 })
 class TestHarnessComponent extends TestDetail {}
@@ -52,7 +54,8 @@ describe('BaseDetailDirective Comprehensive', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, TestHarnessComponent]
+      imports: [ReactiveFormsModule, TestHarnessComponent],
+      providers: [provideRouter([])],
     });
 
     const fixture = TestBed.createComponent(TestHarnessComponent);

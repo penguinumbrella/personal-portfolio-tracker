@@ -48,6 +48,8 @@ public class InvestmentAccountService {
         return RepoUtils.findOrThrow(investmentAccountRepo, id, "Investment account");
     }
 
+    // Aggregate helpers
+
     public Long getAccountTotalCost(int accountId) {
         return holdingRepo.sumCostByAccountId(accountId);
     }

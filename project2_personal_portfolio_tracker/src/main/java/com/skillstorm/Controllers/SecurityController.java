@@ -64,28 +64,7 @@ public class SecurityController {
         return ResponseEntity.ok(result);
     }
 
-    // Read one
-    @GetMapping("/{id}")
-    public ResponseEntity<Security> getSecurity(@PathVariable int id) {
-        return ResponseEntity.ok(service.getSecurity(id));
-    }
-
-    // ----- PUT/UPDATE METHODS -----
-    @PutMapping("/{id}")
-    public ResponseEntity<Security> updateSecurity(
-            @PathVariable int id,
-            @RequestBody SecurityDto dto) {
-        return ResponseEntity.ok(service.updateSecurity(id, dto));
-    }
-
-    // ----- DELETE METHODS -----
-    // Delete one
-    // Service either returns true or throws, so no need to check bool returned
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSecurity(@PathVariable int id) {
-        service.deleteSecurity(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    // Aggregate helpers
 
     @GetMapping("total")
     public ResponseEntity<Long> getUserSecurityAccountTotal(@RequestParam(required = true) int userId) {
@@ -108,6 +87,29 @@ public class SecurityController {
     public ResponseEntity<Iterable<SectorBreakdownDto>> getSectorBreakdown(
             @RequestParam(required = true) int userId) {
         return ResponseEntity.ok(service.getSectorBreakdown(userId));
+    }
+
+    // Read one
+    @GetMapping("/{id}")
+    public ResponseEntity<Security> getSecurity(@PathVariable int id) {
+        return ResponseEntity.ok(service.getSecurity(id));
+    }
+
+    // ----- PUT/UPDATE METHODS -----
+    @PutMapping("/{id}")
+    public ResponseEntity<Security> updateSecurity(
+            @PathVariable int id,
+            @RequestBody SecurityDto dto) {
+        return ResponseEntity.ok(service.updateSecurity(id, dto));
+    }
+
+    // ----- DELETE METHODS -----
+    // Delete one
+    // Service either returns true or throws, so no need to check bool returned
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSecurity(@PathVariable int id) {
+        service.deleteSecurity(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

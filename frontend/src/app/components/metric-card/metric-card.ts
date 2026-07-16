@@ -7,12 +7,10 @@ import { CardModule } from 'primeng/card';
   templateUrl: './metric-card.html',
   styleUrl: './metric-card.css',
 })
+// Simple card for a single metric (title/icon + numeric value)
 export class MetricCard {
-  @Input() title: string ='';
-  //@Input() value: string = '';
-  @Input() icon: string = '';
+  title = input<string>('');
+  icon = input<string>('');
 
   data = input<number>(0);
-
-
 }

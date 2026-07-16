@@ -64,6 +64,28 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = repo.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
+
+        /**
+         * Need to convert role into authorities
+         */
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPasswordHash(),
+                user.isEnabled(),
+                true, // accountNonExpired
+                true, // credentialsNonExpired
+                true, // accountNonLocked
+                authorities);
+    }
+
     // EDIT PROFILE
     public User updateProfile(int id, UserDto dto) {
         User user = RepoUtils.findOrThrow(repo, id, "User");
@@ -90,29 +112,5 @@ public class UserService implements UserDetailsService {
         repo.save(user);
         return true;
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = repo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
-
-        /**
-         * Need to convert role into authorities
-         */
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPasswordHash(),
-                user.isEnabled(),
-                true, // accountNonExpired
-                true, // credentialsNonExpired
-                true, // accountNonLocked
-                authorities);
-    }
-
-    // DATA SCOPING?
 
 }

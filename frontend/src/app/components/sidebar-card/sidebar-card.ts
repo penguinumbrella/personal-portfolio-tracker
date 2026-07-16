@@ -6,6 +6,8 @@ import { Component, input } from '@angular/core';
   templateUrl: './sidebar-card.html',
   styleUrl: './sidebar-card.css',
 })
+// Presentational card for a single row in the detail sidebar list; highlighting is
+// driven entirely by the `selected` input (parent decides which item is active)
 export class SidebarCard {
   title = input<string>('');
   data = input<string>('');

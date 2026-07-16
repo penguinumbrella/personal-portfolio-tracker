@@ -32,8 +32,11 @@ export class AccountTypeChart {
 
   data = input<AccountTypeSlice[]>([]);
 
+  // Drop zero-count account types before charting/legend rendering.
   private slices = computed(() => filterPositive(this.data()));
 
+  // Builds the doughnut dataset: one slice per account type, colored by the
+  // fixed per-type palette (re-evaluated when the theme changes).
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();
@@ -53,6 +56,8 @@ export class AccountTypeChart {
     };
   });
 
+  // Chart.js display options: doughnut cutout size and bottom legend styling,
+  // recomputed whenever the theme changes so legend text stays legible.
   chartOptions = computed(() => {
     const mode = this.themeService.theme();
     return {

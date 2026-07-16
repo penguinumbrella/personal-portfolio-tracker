@@ -14,6 +14,8 @@ export interface DetailField {
   templateUrl: './detail-card.html',
   styleUrl: './detail-card.css',
 })
+// Generic card that renders a title plus a list of label/value fields, with edit/delete actions
+// delegated to the parent via outputs (this component holds no edit/delete logic itself)
 export class DetailCard {
   fields = input<DetailField[]>([]);
 

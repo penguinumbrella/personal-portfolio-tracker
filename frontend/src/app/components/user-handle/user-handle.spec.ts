@@ -6,6 +6,8 @@ import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('UserHandle', () => {
   let component: UserHandle;
@@ -24,7 +26,8 @@ describe('UserHandle', () => {
       imports: [UserHandle, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
-        provideRouter([])
+        provideRouter([]),
+        MessageService
       ]
     }).compileComponents();
 

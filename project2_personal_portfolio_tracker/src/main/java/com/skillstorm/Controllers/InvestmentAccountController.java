@@ -29,6 +29,8 @@ public class InvestmentAccountController {
         this.service = service;
     }
 
+    // ----- GET/READ METHODS -----
+
     @GetMapping
     public ResponseEntity<Iterable<InvestmentAccount>> getAccounts(
             @RequestParam(required = false) Long userId) {
@@ -46,15 +48,35 @@ public class InvestmentAccountController {
         return ResponseEntity.ok(result);
     }
 
+    // Get one
     @GetMapping("/{id}")
     public ResponseEntity<InvestmentAccount> getAccount(
             @PathVariable int id) {
         return ResponseEntity.status(200).body(service.getAccount(id));
     }
 
+    // Aggregate helpers
+
     @GetMapping("/{id}/total-cost")
     public ResponseEntity<Long> getAccountTotalCost(@PathVariable int id) {
         return ResponseEntity.ok(service.getAccountTotalCost(id));
+    }
+
+    @GetMapping("total")
+    public ResponseEntity<Long> getUserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
+        return ResponseEntity.status(200).body(service.getUserInvestmentAccountTotal(userId));
+    }
+
+    @GetMapping("recent")
+    public ResponseEntity<Iterable<InvestmentAccount>> getRecentAccounts(
+            @RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.getRecentAccounts(userId));
+    }
+
+    @GetMapping("breakdown/type")
+    public ResponseEntity<Iterable<AccountTypeBreakdownDto>> getAccountTypeBreakdown(
+            @RequestParam(required = true) int userId) {
+        return ResponseEntity.ok(service.getAccountTypeBreakdown(userId));
     }
 
     // POST (ADD ACCOUNT)
@@ -84,22 +106,4 @@ public class InvestmentAccountController {
         service.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("total")
-    public ResponseEntity<Long> getUserInvestmentAccountTotal(@RequestParam(required = true) int userId) {
-        return ResponseEntity.status(200).body(service.getUserInvestmentAccountTotal(userId));
-    }
-
-    @GetMapping("recent")
-    public ResponseEntity<Iterable<InvestmentAccount>> getRecentAccounts(
-            @RequestParam(required = true) Long userId) {
-        return ResponseEntity.status(200).body(service.getRecentAccounts(userId));
-    }
-
-    @GetMapping("breakdown/type")
-    public ResponseEntity<Iterable<AccountTypeBreakdownDto>> getAccountTypeBreakdown(
-            @RequestParam(required = true) int userId) {
-        return ResponseEntity.ok(service.getAccountTypeBreakdown(userId));
-    }
-
 }

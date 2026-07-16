@@ -4,6 +4,7 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 import { SecurityService } from '../../services/SecurityService';
 import { AuthService } from '../../services/AuthService';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,6 +23,13 @@ describe('AccountDetail', () => {
 
   const mockAccountService = {
     getAllInvestmentAccounts: () => of([{ id: 1, nickname: 'Brokerage', institutionName: 'Bank' }]),
+    getAccountsPage: () => of({
+      content: [{ id: 1, nickname: 'Brokerage', institutionName: 'Bank' }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+      size: 10,
+    }),
     getInvestmentAccountById: () => of({ id: 1, nickname: 'Brokerage', institutionName: 'Bank' })
   };
 
@@ -36,6 +44,7 @@ describe('AccountDetail', () => {
         { provide: InvestmentAccountService, useValue: mockAccountService },
         { provide: SecurityService, useValue: mockSecurityService },
         { provide: AuthService, useValue: mockAuthService },
+        provideRouter([]),
         MessageService,
         ConfirmationService
       ]
