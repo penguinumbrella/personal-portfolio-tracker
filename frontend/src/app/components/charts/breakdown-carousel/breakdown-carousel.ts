@@ -6,6 +6,7 @@ import { CardModule } from 'primeng/card';
   selector: 'app-breakdown-carousel',
   imports: [CardModule],
   templateUrl: './breakdown-carousel.html',
+  styleUrl: './breakdown-carousel.css',
 })
 export class BreakdownCarousel {
   titles = input.required<string[]>();
