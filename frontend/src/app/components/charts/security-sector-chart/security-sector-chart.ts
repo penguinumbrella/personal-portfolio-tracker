@@ -35,8 +35,11 @@ export class SecuritySectorChart {
 
   data = input<SectorSlice[]>([]);
 
+  // Drop zero-count sectors before charting/legend rendering.
   private slices = computed(() => filterPositive(this.data()));
 
+  // Builds the pie dataset: one slice per sector, colored by the fixed
+  // per-sector palette (re-evaluated when the theme changes).
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();

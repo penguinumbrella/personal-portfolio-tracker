@@ -6,6 +6,7 @@ import { TopSecurity } from '../types/Security';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardStateService {
+  // Shared across dashboard widgets and the menu so both read the same cached data instead of re-fetching.
   recentAccounts = signal<InvestmentAccount[]>([]);
   topSecurities = signal<TopSecurity[]>([]);
 }

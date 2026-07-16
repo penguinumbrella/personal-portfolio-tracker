@@ -10,5 +10,6 @@ import { SignupForm } from '../../components/loginpage-comps/signup-form/signup-
   styleUrl: './loginpage.css',
 })
 export class Loginpage {
+  // Toggles which form is shown: true = login form, false = signup form.
   loginMode = signal<boolean>(true);
 }

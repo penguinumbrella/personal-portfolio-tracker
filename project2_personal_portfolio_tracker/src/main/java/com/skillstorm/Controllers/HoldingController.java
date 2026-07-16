@@ -65,6 +65,18 @@ public class HoldingController {
         return ResponseEntity.ok(service.getHolding(accountId, securityId));
     }
 
+    // Helpers to retrieve aggregate data
+
+    @GetMapping("total")
+    public ResponseEntity<Long> getUserHoldingTotal(@RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.getUserHoldingTotal(userId));
+    }
+
+    @GetMapping("totalInvestedCost")
+    public ResponseEntity<Long> totalInvestedCost(@RequestParam(required = true) Long userId) {
+        return ResponseEntity.status(200).body(service.totalInvestedCost(userId));
+    }
+
     // ----- PUT/UPDATE METHODS -----
     @PutMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> updateHolding(
@@ -82,16 +94,6 @@ public class HoldingController {
             @PathVariable int securityId) {
         service.deleteHolding(accountId, securityId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping("total")
-    public ResponseEntity<Long> getUserHoldingTotal(@RequestParam(required = true) Long userId) {
-        return ResponseEntity.status(200).body(service.getUserHoldingTotal(userId));
-    }
-
-    @GetMapping("totalInvestedCost")
-    public ResponseEntity<Long> totalInvestedCost(@RequestParam(required = true) Long userId) {
-        return ResponseEntity.status(200).body(service.totalInvestedCost(userId));
     }
 
     @GetMapping("valueHistory")

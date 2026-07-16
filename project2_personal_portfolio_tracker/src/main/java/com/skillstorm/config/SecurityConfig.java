@@ -19,23 +19,43 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * BCrypt is the password encoder. It auto generates a unique
+     * salt for each password and stores it as part of the resulting hash. 
+     * Used strength 12 to balance security with speed
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
+    /**
+     * Uses Spring Security's DaoAuthenticationProvider to authenticate users
+     * against the application's UserDetailsService and verify passwords using
+     * the configured PasswordEncoder.
+     */
     @Bean
-    AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder);
         provider.setUserDetailsService(userDetailsService);
         return provider::authenticate;
     }
 
+    /**
+     * Stores the authenticated SecurityContext in the user's HTTP session.
+     *
+     * This allows users to remain authenticated across multiple requests
+     * without needing to reauth
+     * */
     @Bean
     SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
 
+    /**
+     * Allows for specified endpoint permissions 
+     */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //specify which endpoints require authentication and which don't
@@ -59,14 +79,14 @@ public class SecurityConfig {
 
                 // get the CSRF token from the cookie and send it back in the header for all requests
                 .csrf(csrf -> csrf
-                        // write the token into a readable XSRF-TOKEN cookie
-                        // SameSite=None is required since the frontend (localhost:4200) and backend
-                        // (localhost:8080) are different ports/origins - a same-site-default cookie
-                        // never reaches the server on the cross-origin POST, which surfaces as a
-                        // confusing 401 (browser Basic-auth popup) instead of a normal CSRF failure
+                        // Store the CSRF token in the XSRF-TOKEN cookie
+                        // SameSite=None is required since the frontend backend are different ports/origins
+                        //  -a same-site-default cookie never reaches the server on the cross-origin POST
+                        //      -which creates error 401 (browser Basic-auth popup) instead of a normal CSRF failure
                         .csrfTokenRepository(csrfTokenRepository())
 
-                        // tell spring security to look for the CSRF token in the XSRF-TOKEN cookie and send it back in the X-XSRF-TOKEN header
+                        // tell spring security to look for the CSRF token in the XSRF-TOKEN cookie 
+                        // and send it back in the X-XSRF-TOKEN header
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
 
                 // use basic auth for all requests

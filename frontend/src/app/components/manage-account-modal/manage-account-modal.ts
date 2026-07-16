@@ -20,6 +20,7 @@ import { InvestmentType } from '../../types/InvestmentType';
 })
 export class ManageAccountModal {
 
+  // Build dropdown options from the InvestmentType enum values
   readonly accountTypes = Object.values(InvestmentType).map(value => ({
     name: value,
     value: value
@@ -33,6 +34,7 @@ export class ManageAccountModal {
   cancelled = output<void>();
 
   onUpdate() {
+    // Hand the raw form value up to the parent, which owns validation/persistence
     this.confirmed.emit(this.form().value);
   }
 }

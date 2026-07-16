@@ -72,6 +72,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
   protected override readonly counterpartyFormKey = 'security' as const;
 
+  // Maps the holding modal's raw form data to the account/security id pair the API expects.
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: this.account()!.id!, s_id: formData.security.id };
   }
@@ -93,6 +94,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
+  // Fetch a page of accounts (search + pagination aware) and map them into sidebar list items.
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -116,6 +118,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       });
   }
 
+  // Reset back to page 0 whenever the search term changes, then reload.
   onSidebarSearch(term: string): void {
     this.sidebarSearch.set(term);
     this.sidebarPage.set(0);
@@ -127,6 +130,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     this.loadAccounts();
   }
 
+  // Load all securities for the user, used as candidates for the "add holding" modal.
   loadSecurities() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -141,6 +145,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
+  // Securities not yet held in this account, so the add-holding dropdown only offers valid choices.
   filteredSecurities = computed(() =>
     this.excludeHeld(this.allSecurities(), (h) => h.id?.securityId),
   );
@@ -150,6 +155,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     this.viewAccount(item.id);
   }
 
+  // Fetch a single account by id, then rebuild its detail-card fields and load its holdings.
   viewAccount(id: number) {
     this.investmentAccountService.getInvestmentAccountById(id).subscribe({
       next: (data) => {
@@ -163,6 +169,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
+  // Clear any editing state and open the account modal in "create" mode.
   onOpenAddAccountModal(): void {
     this.editingAccount.set(null);
     this.accountForm().reset();
@@ -197,23 +204,26 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     ]);
   }
 
+  // Populate the account modal with the currently viewed account's data and open it in "edit" mode.
   editAccount() {
     this.editingAccount.set(this.account());
     const currentAccount = this.account();
     if (!currentAccount) return;
 
+    // Normalize dateOpened to yyyy-MM-dd for the date input.
     const dateString = new Date(currentAccount.dateOpened).toISOString().split('T')[0];
 
     this.accountForm().patchValue({
       nickname: currentAccount.nickname,
       institutionName: currentAccount.institutionName,
       accountType: currentAccount.accountType,
-      dateOpened: dateString,
+      dateOpened: currentAccount.dateOpened,
     });
 
     this.isAccountModalVisible.set(true);
   }
 
+  // Ask for confirmation before deleting, since it cascades to the account's holdings.
   confirmDeleteAccount(): void {
     this.confirmationService.confirm({
       message:
@@ -233,6 +243,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
     this.investmentAccountService.deleteInvestmentAccount(account.id).subscribe({
       next: () => {
+        // Clear the currently viewed account/holdings and refresh the sidebar list.
         this.account.set(null);
         this.holdings.set([]);
         this.loadAccounts();
@@ -251,6 +262,8 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       },
     });
   }
+
+  // Handles both create and update submissions from the account modal.
   onAccountModalConfirm(formData: any) {
     if (this.accountForm().invalid) {
       this.messageService.add({
@@ -261,6 +274,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       return;
     }
 
+    // Merge form data over the existing account (if editing), preserving the original dateOpened.
     const payload: InvestmentAccount = {
       ...this.editingAccount(),
       ...formData,
@@ -268,10 +282,12 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       userId: this.currentUserId()!,
     };
 
+    // Branch on whether we're updating an existing account or creating a new one.
     if (this.editingAccount()) {
       this.investmentAccountService.updateInvestmentAccount(payload.id!, payload).subscribe({
         next: (updatedAccount) => {
           this.loadAccounts();
+          // If the account being edited is the one currently on screen, refresh its display too.
           if (this.account()?.id === updatedAccount.id) {
             this.account.set(updatedAccount);
             this.buildAccountFields();

@@ -4,6 +4,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { it, expect, describe, beforeEach } from 'vitest';
 import { AuthService } from '../../services/AuthService';
+import { MessageService } from 'primeng/api';
 import { signal } from '@angular/core';
 
 describe('MainLayout', () => {
@@ -21,7 +22,8 @@ describe('MainLayout', () => {
       imports: [MainLayout, NoopAnimationsModule],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: mockAuthService }
+        { provide: AuthService, useValue: mockAuthService },
+        MessageService
       ]
     }).compileComponents();
 

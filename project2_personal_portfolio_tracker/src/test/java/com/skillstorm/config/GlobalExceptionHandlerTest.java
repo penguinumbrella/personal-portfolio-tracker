@@ -7,6 +7,7 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -92,6 +93,23 @@ class GlobalExceptionHandlerTest {
             @SuppressWarnings("unchecked")
             Map<String, String> errors = (Map<String, String>) result.getBody().get("errors");
             assertEquals("must be a valid email", errors.get("email"));
+        }
+    }
+
+    @Nested
+    @DisplayName("handleDataIntegrityViolation()")
+    class handleDataIntegrityViolation {
+
+        @Test
+        @DisplayName("maps a DataIntegrityViolationException to a 409 response")
+        void mapsToConflict() {
+            DataIntegrityViolationException ex = new DataIntegrityViolationException("duplicate key");
+
+            ResponseEntity<Map<String, Object>> result = handler.handleDataIntegrityViolation(ex);
+
+            assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+            assertEquals(HttpStatus.CONFLICT.value(), result.getBody().get("status"));
+            assertEquals("A record with this value already exists.", result.getBody().get("reason"));
         }
     }
 

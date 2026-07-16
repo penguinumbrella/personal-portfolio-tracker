@@ -28,12 +28,14 @@ export class LoginForm {
   });
 
   login(): void {
+    // Bail out if required fields are missing/invalid
     if (this.form.invalid) return;
 
     this.submitting.set(true);
     this.errorMessage.set(null);
 
     const { username, password } = this.form.getRawValue();
+    // Call auth API; on success redirect into the app, on failure surface an inline error
     this.authService.login(username!, password!).subscribe({
       next: () => {
         this.submitting.set(false);

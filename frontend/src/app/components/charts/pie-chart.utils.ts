@@ -23,8 +23,8 @@ export function buildPieChartDataset(values: number[], mode: Theme) {
     borderColor: 'transparent',
     borderWidth: 0,
     hoverOffset: 15,
-    spacing: 5,     // Adds the gap between segments
-    borderRadius: 10 // Rounds the edges
+    spacing: 5, // Adds the gap between segments
+    borderRadius: 10, // Rounds the edges
   };
 }
 

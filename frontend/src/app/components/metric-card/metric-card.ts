@@ -8,6 +8,7 @@ import { CurrencyPipe } from '@angular/common';
   templateUrl: './metric-card.html',
   styleUrl: './metric-card.css',
 })
+// Simple card for a single metric (title/icon + numeric value)
 export class MetricCard {
   @Input() title: string ='';
   //@Input() value: string = '';
@@ -15,6 +16,4 @@ export class MetricCard {
   @Input() isCurrency: boolean = false;
 
   data = input<number>(0);
-
-
 }

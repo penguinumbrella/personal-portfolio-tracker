@@ -48,6 +48,16 @@ public class AuthController {
         this.securityContextRepository = securityContextRepository;
     }
 
+    /**
+     * Returns the current CSRF token information.
+     *
+     * token  requested by frontend apps and included in 
+     * state-changing requests (POST, PUT, DELETE) to protect
+     * against Cross-Site Request Forgery attacks
+     *
+     * @param csrf the CSRF token automatically injected by Spring Security
+     * @return a map containing the header name and token value
+     */
     @GetMapping("/csrf")
     public ResponseEntity<Map<String, String>> getCsrfToken(CsrfToken csrf) {
         Map<String, String> body = new LinkedHashMap<>();
@@ -70,6 +80,18 @@ public class AuthController {
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
+    /**
+    * Authenticates a user and creates a session-based login.
+    *
+    * If auth succeeds, the authenticated SecurityContext
+    * is stored in the HTTP session so future requests can be recognized as
+    * authenticated without resending credentials
+    *
+    * @param credentials username and password supplied by client
+    * @param request the current HTTP request
+    * @param response the current HTTP response
+    * @return the authenticated user's profile, or HTTP 401 if auth fails
+    */
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody LoginRequest credentials, HttpServletRequest request,
             HttpServletResponse response) {
@@ -119,6 +141,15 @@ public class AuthController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * Logs out the current user.
+     *
+     * Invalidates the HTTP session and clears the Spring
+     * Security context so user is no longer authenticated
+     *
+     * @param request the current HTTP request
+     * @return HTTP 204 No Content
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);

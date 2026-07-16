@@ -12,6 +12,7 @@ export class ThemeService {
     theme = signal<Theme>(this.resolveInitialTheme());
 
     constructor() {
+        // Apply the resolved theme to the DOM on startup, but only in the browser (SSR has no document).
         if (this.isBrowser) {
             this.applyTheme(this.theme());
         }
@@ -24,17 +25,21 @@ export class ThemeService {
     setTheme(theme: Theme): void {
         this.theme.set(theme);
         if (this.isBrowser) {
+            // Persist the choice so it survives reloads, then reflect it in the DOM immediately.
             localStorage.setItem(STORAGE_KEY, theme);
             this.applyTheme(theme);
         }
     }
 
     private resolveInitialTheme(): Theme {
+        // No DOM/localStorage during SSR; default to dark.
         if (!this.isBrowser) return 'dark';
 
+        // Prefer a previously saved user choice...
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored === 'light' || stored === 'dark') return stored;
 
+        // ...otherwise fall back to the OS/browser color-scheme preference.
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 

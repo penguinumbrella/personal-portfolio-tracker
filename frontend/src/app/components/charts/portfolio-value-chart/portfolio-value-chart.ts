@@ -48,9 +48,6 @@ function parseISODate(dateStr: string): Date {
 })
 export class PortfolioValueChart {
   private themeService = inject(ThemeService);
-  
-  // Need reference to chart to update gradients
-  private chartRef: any; 
 
   title = input<string>('Portfolio Value Over Time');
   data = input<PortfolioValuePoint[]>([]);
@@ -58,11 +55,15 @@ export class PortfolioValueChart {
   rangeOptions = RANGE_OPTIONS;
   activeRange = signal<RangeKey>('ALL');
 
+  // Switches the active time-range filter (1W/1M/1Y/All) applied to the series.
   setRange(range: RangeKey): void {
     this.activeRange.set(range);
   }
 
   // Refactored to include gradient creation
+  // Builds a top-to-bottom fade (theme-tinted color -> transparent) used as the
+  // area fill under the line; must run inside a Chart.js backgroundColor callback
+  // because it needs the live canvas ctx/chartArea.
   private createGradient(ctx: CanvasRenderingContext2D, chartArea: any, mode: 'light' | 'dark') {
     const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
     const color = mode === 'light' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(253, 224, 71, 0.3)';
@@ -71,6 +72,8 @@ export class PortfolioValueChart {
     return gradient;
   }
 
+  // Builds the line dataset from the range-filtered points, with a gradient
+  // fill recomputed per-render (backgroundColor callback) and per theme.
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const points = this.filteredPoints();
@@ -84,6 +87,7 @@ export class PortfolioValueChart {
           backgroundColor: (context: any) => {
             const chart = context.chart;
             const { ctx, chartArea } = chart;
+            // chartArea isn't available until the chart has done its first layout pass.
             if (!chartArea) return null;
             return this.createGradient(ctx, chartArea, mode);
           },
@@ -99,6 +103,8 @@ export class PortfolioValueChart {
     };
   });
 
+  // Chart.js display options: hides the legend (single series), formats
+  // tooltips/axis ticks as currency, and styles axes/gridlines per theme.
   chartOptions = computed(() => {
     const mode = this.themeService.theme();
     const points = this.filteredPoints();
@@ -111,6 +117,7 @@ export class PortfolioValueChart {
         tooltip: {
           mode: 'index',
           intersect: false,
+          // Full currency format (e.g. $1,234.56) in the hover tooltip.
           callbacks: {
             label: (context: any) => CURRENCY_FORMATTER.format(context.parsed.y),
           },
@@ -133,6 +140,7 @@ export class PortfolioValueChart {
         y: {
           ticks: {
             color: INK_SECONDARY[mode],
+            // Compact currency format (no cents) for y-axis tick labels.
             callback: (value: number) => CURRENCY_FORMATTER_COMPACT.format(value),
           },
           grid: { color: GRID_COLOR[mode] },
@@ -148,25 +156,29 @@ export class PortfolioValueChart {
     const points = this.data();
     const range = this.activeRange();
     const days = RANGE_DAYS[range];
+    // 'ALL' (no day count) or no data: show everything, unfiltered.
     if (!days || points.length === 0) {
       return points;
     }
 
+    // Cutoff date = N days back from the latest data point (not from "today").
     const cutoff = new Date(points[points.length - 1].date);
     cutoff.setDate(cutoff.getDate() - days);
     const cutoffKey = cutoff.toISOString().slice(0, 10);
 
     const before = points.filter((point) => point.date < cutoffKey);
     const within = points.filter((point) => point.date >= cutoffKey);
+    // Last known value before the window starts, used to seed the window's start.
     const carriedValue = before.length > 0 ? before[before.length - 1].value : 0;
 
     if (before.length === 0) {
       return within;
     }
+    // Already have a point exactly at the cutoff date; no need to synthesize one.
     if (within.length > 0 && within[0].date === cutoffKey) {
       return within;
     }
+    // Prepend a synthetic point at the cutoff carrying the prior value forward.
     return [{ date: cutoffKey, value: carriedValue }, ...within];
   });
-
 }

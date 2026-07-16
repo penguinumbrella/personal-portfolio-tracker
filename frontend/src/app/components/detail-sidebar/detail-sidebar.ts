@@ -43,16 +43,20 @@ export class DetailSidebar implements OnDestroy {
   private searchInput$ = new Subject<string>();
 
   constructor() {
+    // Pipe raw keystrokes through a debounce + distinct filter so searchChange only
+    // fires 300ms after typing stops, and only when the term actually changed
     this.searchInput$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
       this.searchChange.emit(term);
     });
   }
 
   ngOnDestroy(): void {
+    // Clean up the subject's subscription when the component is destroyed
     this.searchInput$.complete();
   }
 
   onSelect(item: SidebarItem): void {
+    // Track locally-selected item for styling, and notify parent of the selection
     this.selectedId.set(item.id);
     this.selected.emit(item);
   }
@@ -62,16 +66,19 @@ export class DetailSidebar implements OnDestroy {
   }
 
   onSearchInput(value: string): void {
+    // Push raw input into the debounce pipeline set up in the constructor
     this.searchInput$.next(value);
   }
 
   onPrevPage(): void {
+    // Guard against paging before the first page
     if (this.page() > 0) {
       this.pageChange.emit(this.page() - 1);
     }
   }
 
   onNextPage(): void {
+    // Guard against paging past the last page
     if (this.page() < this.totalPages() - 1) {
       this.pageChange.emit(this.page() + 1);
     }

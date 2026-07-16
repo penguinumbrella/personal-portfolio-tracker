@@ -83,6 +83,19 @@ public class HoldingService {
         return RepoUtils.findOrThrow(repo, id, "Holding");
     }
 
+    // Aggregates 
+
+    public Long getUserHoldingTotal(Long userId) {
+        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
+        return repo.countByAccountUserId(userId);
+    }
+
+    public Long totalInvestedCost(Long userId) {
+        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
+        Long total = repo.totalInvestedCost(userId);
+        return total != null ? total : 0L;
+    }
+
     // ----- PUT/UPDATE METHODS -----
     public Holding updateHolding(int accountId, int securityId, HoldingDto dto) {
         HoldingPK id = new HoldingPK(accountId, securityId);
@@ -132,17 +145,6 @@ public class HoldingService {
         Object[] links = { linkedAccount, linkedSecurity };
 
         return links;
-    }
-
-    public Long getUserHoldingTotal(Long userId) {
-        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
-        return repo.countByAccountUserId(userId);
-    }
-
-    public Long totalInvestedCost(Long userId) {
-        RepoUtils.requireExists(userRepo, userId.intValue(), "User");
-        Long total = repo.totalInvestedCost(userId);
-        return total != null ? total : 0L;
     }
 
     // No historical market prices are tracked, so "value over time" is the running

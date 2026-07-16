@@ -11,11 +11,13 @@ export class UserService {
 
     private readonly URL = `${environment.baseApiUrl}/users`;
 
+    // Fetch every user (admin-style listing).
     getAllUsers(): Observable<User[]> {
         return this.http.get<User[]>(this.URL)
             .pipe(catchWithMessage("Failed to load users"));
     }
 
+    // Fetch a single user's profile by id.
     viewProfile(id: number): Observable<User> {
         return this.http.get<User>(`${this.URL}/${id}`)
             .pipe(catchWithMessage("Failed to load user"));

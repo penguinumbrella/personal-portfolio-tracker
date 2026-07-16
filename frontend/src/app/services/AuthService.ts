@@ -21,6 +21,7 @@ export class AuthService {
     }
 
     register(user: User): Observable<User> {
+        // Ensure a CSRF cookie exists first, then chain into the actual state-changing POST.
         return this.primeCsrfToken().pipe(
             switchMap(() => this.http.post<User>(`${this.URL}/register`, user)
                 .pipe(catchWithMessage("Failed to create user"))),
@@ -31,6 +32,7 @@ export class AuthService {
         return this.primeCsrfToken().pipe(
             switchMap(() => this.http.post<User>(`${this.URL}/login`, { username, password })
                 .pipe(catchWithMessage("Failed to log in"))),
+            // On success, cache the logged-in user for the rest of the app to read via currentUser().
             tap((user) => this.currentUser.set(user)),
         );
     }
@@ -40,6 +42,7 @@ export class AuthService {
         return this.http.get<User>(`${this.URL}/me`)
             .pipe(
                 catchWithMessage("Failed to load current user"),
+                // Keep the cached currentUser signal in sync with whatever the session actually holds.
                 tap((user) => this.currentUser.set(user)),
             );
     }
@@ -48,6 +51,7 @@ export class AuthService {
         return this.primeCsrfToken().pipe(
             switchMap(() => this.http.put<User>(`${this.URL}/me`, user)
                 .pipe(catchWithMessage("Failed to update user"))),
+            // Refresh the cached user with the server's updated copy.
             tap((updated) => this.currentUser.set(updated)),
         );
     }
@@ -56,6 +60,7 @@ export class AuthService {
         return this.primeCsrfToken().pipe(
             switchMap(() => this.http.post<void>(`${this.URL}/logout`, {})
                 .pipe(catchWithMessage("Failed to log out"))),
+            // Clear the cached user so the rest of the app treats the session as signed out.
             tap(() => this.currentUser.set(null)),
         );
     }

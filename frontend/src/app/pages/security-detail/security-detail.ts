@@ -73,6 +73,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   protected override readonly counterpartyFormKey = 'account' as const;
 
+  // Maps the holding modal's raw form data to the account/security id pair the API expects.
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: formData.account.id, s_id: this.security()!.id! };
   }
@@ -94,6 +95,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
+  // Load all accounts for the user, used as candidates for the "add holding" modal.
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -114,7 +116,12 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     if (userId == null) return;
 
     this.securityService
-      .getSecuritiesPageForUser(userId, this.sidebarPage(), this.sidebarPageSize, this.sidebarSearch())
+      .getSecuritiesPageForUser(
+        userId,
+        this.sidebarPage(),
+        this.sidebarPageSize,
+        this.sidebarSearch(),
+      )
       .subscribe({
         next: (data) => {
           this.sidebarItems.set(
@@ -132,6 +139,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       });
   }
 
+  // Reset back to page 0 whenever the search term changes, then reload.
   onSidebarSearch(term: string): void {
     this.sidebarSearch.set(term);
     this.sidebarPage.set(0);
@@ -143,6 +151,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.loadSecurities();
   }
 
+  // Accounts not yet holding this security, so the add-holding dropdown only offers valid choices.
   filteredAccounts = computed(() => this.excludeHeld(this.allAccounts(), (h) => h.id?.accountId));
 
   // when a security is selected from sidebar, get security and load details, holdings
@@ -150,6 +159,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.viewSecurity(item.id);
   }
 
+  // Fetch a single security by id, then rebuild its detail-card fields and load its holdings.
   viewSecurity(id: number) {
     this.securityService.getSecurityById(id).subscribe({
       next: (data) => {
@@ -163,6 +173,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
+  // Clear any editing state and open the security modal in "create" mode.
   onOpenAddSecurityModal(): void {
     this.editingSecurity.set(null);
     this.securityForm().reset();
@@ -200,6 +211,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   // CRUDS BELOW
 
+  // Populate the security modal with the currently viewed security's data and open it in "edit" mode.
   editSecurity() {
     this.editingSecurity.set(this.security());
     const currentSecurity = this.security();
@@ -215,6 +227,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.isSecurityModalVisible.set(true);
   }
 
+  // Ask for confirmation before deleting, since it cascades to the security's holdings.
   confirmDeleteSecurity(): void {
     this.confirmationService.confirm({
       message:
@@ -234,6 +247,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
     this.securityService.deleteSecurity(security.id).subscribe({
       next: () => {
+        // Clear the currently viewed security/holdings and refresh the sidebar list.
         this.security.set(null);
         this.holdings.set([]);
         this.loadSecurities();
@@ -253,6 +267,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
+  // Handles both create and update submissions from the security modal.
   onSecurityModalConfirm(formData: any) {
     if (this.securityForm().invalid) {
       this.messageService.add({
@@ -273,8 +288,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       userId: this.currentUserId()!,
     };
 
-    console.log('Attempting to save security:', payload);
-
+    // Branch on whether we're updating an existing security or creating a new one.
     if (this.editingSecurity()) {
       // UPDATE
       this.securityService.updateSecurity(payload.id!, payload).subscribe({

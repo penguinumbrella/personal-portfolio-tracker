@@ -23,6 +23,10 @@ import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.SecurityRepo;
 import com.skillstorm.Repositories.UserRepo;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -139,6 +143,39 @@ public class SecurityServiceTest {
             assertNotNull(result);
             assertEquals(1, ((List<Security>) result).size());
             verify(repo).findByUser_Id(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("getSecuritiesPerUserPaged()")
+    class getSecuritiesPerUserPaged {
+
+        @Test
+        @DisplayName("Success, uses the given search term")
+        void getSecuritiesPerUserPagedWithSearch() {
+            Pageable pageable = Pageable.ofSize(10);
+            Page<Security> page = new PageImpl<>(List.of(testSecurity1));
+            when(repo.findByUser_IdAndNameContainingIgnoreCase(1, "abc", pageable)).thenReturn(page);
+
+            Page<Security> result = service.getSecuritiesPerUserPaged(1, "abc", pageable);
+
+            assertNotNull(result);
+            assertEquals(1, result.getContent().size());
+            verify(repo).findByUser_IdAndNameContainingIgnoreCase(1, "abc", pageable);
+        }
+
+        @Test
+        @DisplayName("Success, null search defaults to an empty string")
+        void getSecuritiesPerUserPagedNullSearch() {
+            Pageable pageable = Pageable.ofSize(10);
+            Page<Security> page = new PageImpl<>(List.of(testSecurity1, testSecurity2));
+            when(repo.findByUser_IdAndNameContainingIgnoreCase(1, "", pageable)).thenReturn(page);
+
+            Page<Security> result = service.getSecuritiesPerUserPaged(1, null, pageable);
+
+            assertNotNull(result);
+            assertEquals(2, result.getContent().size());
+            verify(repo).findByUser_IdAndNameContainingIgnoreCase(1, "", pageable);
         }
     }
 

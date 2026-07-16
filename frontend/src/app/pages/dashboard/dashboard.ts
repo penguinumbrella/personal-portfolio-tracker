@@ -31,6 +31,7 @@ export class Dashboard {
   private securityService = inject(SecurityService);
   private dashboardStateService = inject(DashboardStateService);
 
+  // Mirror shared dashboard state (kept in a service so it can survive navigation/reuse) as local computed signals.
   recentAccounts = computed<InvestmentAccount[]>(() => this.dashboardStateService.recentAccounts());
   topSecurities = computed<TopSecurity[]>(() => this.dashboardStateService.topSecurities());
   totalAccounts = signal<number>(0);
@@ -77,6 +78,7 @@ export class Dashboard {
     });
   }
 
+  // Fetches the four top-line metric card totals independently (each is its own request/subscription).
   loadTotals(userId: number): void {
     this.investmentAccountService.getUserInvestmentAccountTotal(userId).subscribe({
       next: (data) => {
@@ -115,6 +117,8 @@ export class Dashboard {
     });
   }
 
+  // Loads the recent-accounts list, then fires a separate request per account to fill in its
+  // current cost/value, updating the shared state signal incrementally as each cost resolves.
   loadRecentAccounts(userId: number): void {
     this.investmentAccountService.getRecentAccounts(userId).subscribe({
       next: (data) => {
@@ -135,6 +139,7 @@ export class Dashboard {
             error: (err) => console.error(err),
           });
         });
+        // Seed the signal with the base account data immediately; values are patched in as costs arrive above.
         this.dashboardStateService.recentAccounts.set(data);
       },
       error: (err) => {
@@ -154,6 +159,8 @@ export class Dashboard {
     });
   }
 
+  // Loads security type/sector breakdowns and normalizes them against the full enum so every
+  // type/sector is represented in the chart (count 0 if the backend returned no slice for it).
   loadSecurityBreakdowns(userId: number): void {
     this.securityService.getSecurityTypeBreakdown(userId).subscribe({
       next: (breakdown) => {
@@ -180,6 +187,8 @@ export class Dashboard {
     });
   }
 
+  // Loads account type breakdown (same enum-normalization approach as security breakdowns above),
+  // then separately fetches all accounts to build the portfolio value history chart.
   loadAccountTypeBreakdown(userId: number): void {
     this.investmentAccountService.getAccountTypeBreakdown(userId).subscribe({
       next: (breakdown) => {

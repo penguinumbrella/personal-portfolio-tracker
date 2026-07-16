@@ -11,18 +11,23 @@ describe('Dashboard Component', () => {
   let component: Dashboard;
 
   const mockAuthService = { getCurrentUser: () => of({ id: 123 }) };
-  const mockAccountService = { 
+  const mockAccountService = {
     getUserInvestmentAccountTotal: () => of(5),
-    getRecentAccounts: () => of([]) 
+    getRecentAccounts: () => of([]),
+    getInvestmentAccountTotalCost: () => of(0),
+    getAccountTypeBreakdown: () => of([]),
+    getAllInvestmentAccounts: () => of([]),
   };
   const mockHoldingService = {
     getUserHoldingTotal: () => of(10),
     totalInvestedCost: () => of(1000),
     getPortfolioValueHistory: () => of([])
   };
-  const mockSecurityService = { 
+  const mockSecurityService = {
     getUserSecurityTotal: () => of(3),
-    getRecentSecurities: () => of([]) 
+    getTopSecurities: () => of([]),
+    getSecurityTypeBreakdown: () => of([]),
+    getSectorBreakdown: () => of([]),
   };
 
   beforeEach(() => {

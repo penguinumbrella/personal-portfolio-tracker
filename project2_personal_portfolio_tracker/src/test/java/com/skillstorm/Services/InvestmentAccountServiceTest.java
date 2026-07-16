@@ -25,6 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -113,6 +116,39 @@ public class InvestmentAccountServiceTest {
             verify(investmentAccountRepo, never()).findAll();
         }
 
+    }
+
+    @Nested
+    @DisplayName("getAccountsPaged()")
+    class getAccountsPaged {
+
+        @Test
+        @DisplayName("Success, uses the given search term")
+        void getAccountsPagedWithSearch() {
+            Pageable pageable = Pageable.ofSize(10);
+            Page<InvestmentAccount> page = new PageImpl<>(List.of(testInvestmentAccount1));
+            when(investmentAccountRepo.findByUserIdAndNicknameContainingIgnoreCase(1L, "test1", pageable))
+                    .thenReturn(page);
+
+            Page<InvestmentAccount> result = service.getAccountsPaged(1L, "test1", pageable);
+
+            assertEquals(1, result.getContent().size());
+            verify(investmentAccountRepo).findByUserIdAndNicknameContainingIgnoreCase(1L, "test1", pageable);
+        }
+
+        @Test
+        @DisplayName("Success, null search defaults to an empty string")
+        void getAccountsPagedNullSearch() {
+            Pageable pageable = Pageable.ofSize(10);
+            Page<InvestmentAccount> page = new PageImpl<>(List.of(testInvestmentAccount1, testInvestmentAccount2));
+            when(investmentAccountRepo.findByUserIdAndNicknameContainingIgnoreCase(1L, "", pageable))
+                    .thenReturn(page);
+
+            Page<InvestmentAccount> result = service.getAccountsPaged(1L, null, pageable);
+
+            assertEquals(2, result.getContent().size());
+            verify(investmentAccountRepo).findByUserIdAndNicknameContainingIgnoreCase(1L, "", pageable);
+        }
     }
 
     @Nested

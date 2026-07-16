@@ -5,6 +5,7 @@ import { InvestmentAccountService } from '../../services/InvestmentAccountServic
 import { AuthService } from '../../services/AuthService';
 import { HoldingService } from '../../services/HoldingService'; // Ensure this path is correct
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,6 +23,13 @@ describe('SecurityDetail', () => {
 
   const mockSecurityService = {
     getAllSecuritiesByUser: () => of([{ id: 1, name: 'Apple', tickerSymbol: 'AAPL', type: 'Stock' }]),
+    getSecuritiesPageForUser: () => of({
+      content: [{ id: 1, name: 'Apple', tickerSymbol: 'AAPL', type: 'Stock' }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+      size: 10,
+    }),
     getSecurityById: () => of({ id: 1, name: 'Apple', tickerSymbol: 'AAPL', type: 'Stock', sector: 'Tech' })
   };
 
@@ -41,6 +49,7 @@ describe('SecurityDetail', () => {
         { provide: InvestmentAccountService, useValue: mockAccountService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: HoldingService, useValue: mockHoldingService },
+        provideRouter([]),
         MessageService,
         ConfirmationService
       ]

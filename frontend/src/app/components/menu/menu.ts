@@ -15,6 +15,8 @@ import { UserHandle } from '../user-handle/user-handle';
 export class Menu {
   private dashboardStateService = inject(DashboardStateService);
 
+  // Recomputes the whole nav tree whenever the underlying dashboard state (recent accounts /
+  // top securities) changes, since those feed the submenu builders below
   items = computed<MenuItem[]>(() => [
     { label: 'Dashboard', icon: 'pi pi-home', routerLink: '/dashboard' },
     { label: 'Accounts', icon: 'pi pi-user', items: this.buildAccountSubMenu() },
@@ -22,6 +24,7 @@ export class Menu {
   ]);
 
   // ... is spreader operater. takes array and spreads it to indiv items in array
+  // Builds the "Accounts" submenu: static links plus a dynamic list of recently viewed accounts
   buildAccountSubMenu(): MenuItem[] {
     const recentAccounts = this.dashboardStateService.recentAccounts();
     return [
@@ -43,9 +46,9 @@ export class Menu {
     ];
   }
 
+  // Builds the "Securities" submenu: static links plus the top securities by value
   buildSecuritySubMenu(): MenuItem[] {
     const securities = this.dashboardStateService.topSecurities();
-    console.log(securities);
     return [
       {
         label: 'See all securities',
