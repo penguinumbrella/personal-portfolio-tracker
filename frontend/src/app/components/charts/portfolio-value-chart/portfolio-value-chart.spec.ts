@@ -71,9 +71,19 @@ describe('PortfolioValueChart', () => {
     expect(formatted).toBe('$1,200');
   });
 
+  it('formats x-axis ticks as a short month/day label for the point at that index', () => {
+    const formatted = component.chartOptions().scales.x.ticks.callback(0, 0);
+    expect(formatted).toBe('Jan 1');
+  });
+
+  it('formats x-axis ticks as an empty string when there is no point at that index', () => {
+    const formatted = component.chartOptions().scales.x.ticks.callback(0, 99);
+    expect(formatted).toBe('');
+  });
+
   it('uses the theme-appropriate line color', () => {
-    expect(component.chartData().datasets[0].borderColor).toBe('#2a78d6');
+    expect(component.chartData().datasets[0].borderColor).toBe('#eab308');
     mockThemeService.theme.set('dark');
-    expect(component.chartData().datasets[0].borderColor).toBe('#3987e5');
+    expect(component.chartData().datasets[0].borderColor).toBe('#fde047');
   });
 });

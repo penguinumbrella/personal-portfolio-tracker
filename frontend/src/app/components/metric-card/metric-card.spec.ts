@@ -31,15 +31,33 @@ describe('MetricCard', () => {
     fixture.componentRef.setInput('data', 500);
     // 2. Set other inputs
     fixture.componentRef.setInput('title', 'Total Revenue');
-    
+
     // 3. Trigger Change Detection
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    
+
     // Assert value
     expect(compiled.querySelector('.text-2xl')?.textContent).toBe('500');
     // Assert title
     expect(compiled.querySelector('.text-sm')?.textContent).toBe('Total Revenue');
+  });
+
+  it('should render the plain number when isCurrency is false', () => {
+    fixture.componentRef.setInput('data', 500);
+    component.isCurrency = false;
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.text-2xl')?.textContent).toBe('500');
+  });
+
+  it('should render the value through the currency pipe when isCurrency is true', () => {
+    fixture.componentRef.setInput('data', 500);
+    component.isCurrency = true;
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.text-2xl')?.textContent).toBe('$500.00');
   });
 });

@@ -54,8 +54,16 @@ describe('MainLayout', () => {
   it('should contain the menu and user handle components', () => {
     const menu = fixture.nativeElement.querySelector('app-menu');
     const userHandle = fixture.nativeElement.querySelector('app-user-handle');
-    
+
     expect(menu).toBeTruthy();
     expect(userHandle).toBeTruthy();
+  });
+
+  it('should move the toast host to document.body so it never gets clipped by the sidenav stacking context', async () => {
+    await fixture.whenStable();
+
+    const toastInBody = document.body.querySelector('p-toast');
+    expect(toastInBody).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('p-toast')).toBeFalsy();
   });
 });

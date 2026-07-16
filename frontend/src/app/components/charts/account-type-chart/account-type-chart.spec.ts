@@ -3,6 +3,7 @@ import { signal } from '@angular/core';
 import { AccountTypeChart } from './account-type-chart';
 import { ThemeService } from '../../../services/ThemeService';
 import { InvestmentType } from '../../../types/InvestmentType';
+import { CHART_PALETTE } from '../pie-chart.utils';
 import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('AccountTypeChart', () => {
@@ -31,15 +32,16 @@ describe('AccountTypeChart', () => {
     expect(component.chartData().datasets[0].data).toEqual([3, 1]);
   });
 
-  it('uses the light-mode color for each account type', () => {
+  it('colors slices positionally from the shared palette', () => {
     const colors = component.chartData().datasets[0].backgroundColor;
-    expect(colors).toEqual(['#2a78d6', '#7a5cd6']);
+    expect(colors).toEqual(CHART_PALETTE.slice(0, 2));
   });
 
-  it('switches to dark-mode colors when the theme changes', () => {
+  it('keeps the same colors when the theme changes (palette is not theme-dependent)', () => {
+    const lightColors = component.chartData().datasets[0].backgroundColor;
     mockThemeService.theme.set('dark');
-    const colors = component.chartData().datasets[0].backgroundColor;
-    expect(colors).toEqual(['#3987e5', '#8f74e0']);
+    const darkColors = component.chartData().datasets[0].backgroundColor;
+    expect(darkColors).toEqual(lightColors);
   });
 
   it('builds chart options with the current theme legend color', () => {
