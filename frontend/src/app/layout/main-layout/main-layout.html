@@ -8,14 +8,14 @@
 
   <mat-sidenav-content>
     <div class="flex flex-col h-full">
-      <div class="flex flex-row justify-between align-items-center p-6">
-        <div class="flex align-items-center gap-3">
+      <div class="flex flex-row justify-between items-center p-6">
+        <div class="flex items-center gap-3">
           <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidebar">
             <i class="pi pi-bars"></i>
           </button>
           <span class="text-xl font-semibold">{{ title() }}</span>
         </div>
-        <div class="flex align-items-center gap-3">
+        <div class="flex items-center gap-3">
           <button
             mat-icon-button
             (click)="themeService.toggle()"

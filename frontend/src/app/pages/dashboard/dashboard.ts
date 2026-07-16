@@ -6,6 +6,7 @@ import { SecurityTypeChart, SecurityTypeSlice } from '../../components/charts/se
 import { AccountTypeChart, AccountTypeSlice } from '../../components/charts/account-type-chart/account-type-chart';
 import { SecuritySectorChart, SectorSlice } from '../../components/charts/security-sector-chart/security-sector-chart';
 import { PortfolioValueChart, PortfolioValuePoint } from '../../components/charts/portfolio-value-chart/portfolio-value-chart';
+import { BreakdownCarousel } from '../../components/charts/breakdown-carousel/breakdown-carousel';
 
 import { InvestmentAccountService } from '../../services/InvestmentAccountService';
 import { HoldingService } from '../../services/HoldingService';
@@ -21,7 +22,7 @@ import { Holding } from '../../types/Holding';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MetricCard, DashboardTable, SecurityTypeChart, AccountTypeChart, SecuritySectorChart, PortfolioValueChart],
+  imports: [MetricCard, DashboardTable, SecurityTypeChart, AccountTypeChart, SecuritySectorChart, PortfolioValueChart, BreakdownCarousel],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -43,16 +44,7 @@ export class Dashboard {
   securitySectorBreakdown = signal<SectorSlice[]>([]);
   portfolioValueHistory = signal<PortfolioValuePoint[]>([]);
 
-  private readonly BREAKDOWN_COUNT = 3;
-  activeBreakdownIndex = signal<number>(0);
-
-  nextBreakdown(): void {
-    this.activeBreakdownIndex.update((i) => (i + 1) % this.BREAKDOWN_COUNT);
-  }
-
-  previousBreakdown(): void {
-    this.activeBreakdownIndex.update((i) => (i - 1 + this.BREAKDOWN_COUNT) % this.BREAKDOWN_COUNT);
-  }
+  breakdownTitles = ['Securities by Type', 'Accounts by Type', 'Securities by Sector'];
 
   accountColumns: TableColumn[] = [
     { header: 'Name', field: 'nickname' },

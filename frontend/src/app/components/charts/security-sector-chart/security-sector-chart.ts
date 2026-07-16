@@ -1,8 +1,8 @@
-import { Component, computed, inject, input, output } from '@angular/core';
-import { CardModule } from 'primeng/card';
+import { Component, computed, inject, input } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { Sector } from '../../../types/Sector';
 import { ThemeService } from '../../../services/ThemeService';
+import { buildPieChartDataset, buildPieChartOptions, filterPositive } from '../pie-chart.utils';
 
 export interface SectorSlice {
   sector: Sector;
@@ -24,24 +24,18 @@ const SECTOR_COLORS: Record<Sector, { light: string; dark: string }> = {
   [Sector.REAL_ESTATE]: { light: '#8a8a29', dark: '#a3a334' },
 };
 
-const SURFACE = { light: '#ffffff', dark: '#27272a' };
-const INK_SECONDARY = { light: '#52514e', dark: '#c3c2b7' };
-
 @Component({
   selector: 'app-security-sector-chart',
-  imports: [CardModule, ChartModule],
+  imports: [ChartModule],
   templateUrl: './security-sector-chart.html',
   styleUrl: './security-sector-chart.css',
 })
 export class SecuritySectorChart {
   private themeService = inject(ThemeService);
 
-  title = input<string>('Securities by Sector');
   data = input<SectorSlice[]>([]);
-  previous = output<void>();
-  next = output<void>();
 
-  private slices = computed(() => this.data().filter((slice) => slice.count > 0));
+  private slices = computed(() => filterPositive(this.data()));
 
   chartData = computed(() => {
     const mode = this.themeService.theme();
@@ -49,28 +43,14 @@ export class SecuritySectorChart {
     return {
       labels: slices.map((slice) => slice.sector),
       datasets: [
-        {
-          data: slices.map((slice) => slice.count),
-          backgroundColor: slices.map((slice) => SECTOR_COLORS[slice.sector][mode]),
-          borderColor: SURFACE[mode],
-          borderWidth: 2,
-          hoverOffset: 4,
-        },
+        buildPieChartDataset(
+          slices.map((slice) => slice.count),
+          slices.map((slice) => SECTOR_COLORS[slice.sector][mode]),
+          mode,
+        ),
       ],
     };
   });
 
-  chartOptions = computed(() => {
-    const mode = this.themeService.theme();
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { color: INK_SECONDARY[mode] },
-        },
-      },
-    };
-  });
+  chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

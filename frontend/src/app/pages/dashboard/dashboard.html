@@ -26,17 +26,19 @@
 
     <!-- Bottom-left: breakdown pie chart carousel -->
     <div class="min-w-0 min-h-0">
-        @switch (activeBreakdownIndex()) {
-            @case (0) {
-                <app-security-type-chart [data]="securityTypeBreakdown()" (previous)="previousBreakdown()" (next)="nextBreakdown()"></app-security-type-chart>
+        <app-breakdown-carousel #carousel [titles]="breakdownTitles">
+            @switch (carousel.activeIndex()) {
+                @case (0) {
+                    <app-security-type-chart [data]="securityTypeBreakdown()"></app-security-type-chart>
+                }
+                @case (1) {
+                    <app-account-type-chart [data]="accountTypeBreakdown()"></app-account-type-chart>
+                }
+                @case (2) {
+                    <app-security-sector-chart [data]="securitySectorBreakdown()"></app-security-sector-chart>
+                }
             }
-            @case (1) {
-                <app-account-type-chart [data]="accountTypeBreakdown()" (previous)="previousBreakdown()" (next)="nextBreakdown()"></app-account-type-chart>
-            }
-            @case (2) {
-                <app-security-sector-chart [data]="securitySectorBreakdown()" (previous)="previousBreakdown()" (next)="nextBreakdown()"></app-security-sector-chart>
-            }
-        }
+        </app-breakdown-carousel>
     </div>
 
     <!-- Bottom-right: recent accounts / top securities -->

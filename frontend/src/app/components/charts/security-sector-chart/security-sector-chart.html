@@ -1,23 +1,5 @@
-<p-card [header]="title()" styleClass="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-zinc-800">
-  <div class="flex flex-col gap-2">
-    <div class="min-w-0">
-      @if (chartData().labels.length > 0) {
-        <p-chart type="pie" [data]="chartData()" [options]="chartOptions()" [style]="{ width: '100%', height: '260px' }" />
-      } @else {
-        <p class="text-sm text-500 dark:text-gray-400 text-center py-8">No securities to display.</p>
-      }
-    </div>
-
-    <div class="flex align-items-center justify-content-center gap-4">
-      <button type="button" (click)="previous.emit()" aria-label="Previous breakdown"
-        class="rounded-full w-8 h-8 flex items-center justify-center shrink-0 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors">
-        <i class="pi pi-chevron-left"></i>
-      </button>
-
-      <button type="button" (click)="next.emit()" aria-label="Next breakdown"
-        class="rounded-full w-8 h-8 flex items-center justify-center shrink-0 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors">
-        <i class="pi pi-chevron-right"></i>
-      </button>
-    </div>
-  </div>
-</p-card>
+@if (chartData().labels.length > 0) {
+  <p-chart type="pie" [data]="chartData()" [options]="chartOptions()" [style]="{ width: '100%', height: '260px' }" />
+} @else {
+  <p class="text-sm text-500 dark:text-gray-400 text-center py-8">No securities to display.</p>
+}

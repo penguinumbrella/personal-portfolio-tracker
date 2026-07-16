@@ -1,0 +1,17 @@
+<p-card [header]="activeTitle" styleClass="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-zinc-800">
+  <div class="flex flex-row items-center gap-4">
+    <button type="button" (click)="previous()" aria-label="Previous breakdown"
+      class="rounded-full w-8 h-8 flex items-center justify-center shrink-0 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <div class="flex-1 min-w-0">
+      <ng-content />
+    </div>
+
+    <button type="button" (click)="next()" aria-label="Next breakdown"
+      class="rounded-full w-8 h-8 flex items-center justify-center shrink-0 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+  </div>
+</p-card>

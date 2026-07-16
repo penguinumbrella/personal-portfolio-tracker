@@ -15,11 +15,15 @@ import Stonks from '../assets/themes/stonks-preset';
 const MyCustomTheme = definePreset(Aura, {
     fontFamily: 'Montserrat, sans-serif',
     semantic: {
-        primary: {
-            50: '{zinc.50}',
-            100: '{zinc.100}',
-            500: '{zinc.500}',
-            // Add other shades as needed
+primary: {
+            50: '#FFFDF0',  // Very soft cream
+            100: '#FFF9D6', // Light pastel yellow
+            200: '#FFF5B0', 
+            300: '#FFF08A', 
+            400: '#FDE68A', 
+            500: '#FCD34D', // Your main "Soft Yellow"
+            600: '#F59E0B', // Slightly darker for hover
+            // ... add higher shades for contrast if needed
         }
     }
 });

@@ -1,9 +1,13 @@
-<div class="card flex-1 justify-content-center p-4 flex flex-col h-full rounded-l-lg">
-  <div class="flex align-items-center gap-3 mb-5 text-yellow-100">
-    <i class="pi pi-briefcase text-xl"></i>
-    <h2 class="text-xl font-semibold m-0">Portfolio</h2>
+<div class="card flex-1 p-4 flex flex-col h-full rounded-l-lg">
+  <div class="flex flex-row items-center gap-4 mb-10 text-yellow-100">
+    <img src="/cat.jpg" alt="Portfolio logo" class="w-10 h-10" />
+    <h2 class="text-2xl m-0">Maneki</h2>
   </div>
-  <p-panelmenu [model]="items()"></p-panelmenu>
+  
+  <div class="flex flex-col gap-2">
+    <p-panelmenu [model]="items()"></p-panelmenu>
+  </div>
+  
   <div class="mt-auto rounded-lg bg-gray-100 dark:bg-zinc-800 px-3 py-2">
     <app-user-handle></app-user-handle>
   </div>

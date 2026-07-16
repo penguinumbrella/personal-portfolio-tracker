@@ -1,8 +1,8 @@
-import { Component, computed, inject, input, output } from '@angular/core';
-import { CardModule } from 'primeng/card';
+import { Component, computed, inject, input } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { InvestmentType } from '../../../types/InvestmentType';
 import { ThemeService } from '../../../services/ThemeService';
+import { CHART_INK_SECONDARY, filterPositive } from '../pie-chart.utils';
 
 export interface AccountTypeSlice {
   type: InvestmentType;
@@ -21,24 +21,18 @@ const ACCOUNT_TYPE_COLORS: Record<InvestmentType, { light: string; dark: string 
   [InvestmentType.HSA]: { light: '#7a5cd6', dark: '#8f74e0' },
 };
 
-const SURFACE = { light: '#ffffff', dark: '#27272a' };
-const INK_SECONDARY = { light: '#52514e', dark: '#c3c2b7' };
-
 @Component({
   selector: 'app-account-type-chart',
-  imports: [CardModule, ChartModule],
+  imports: [ChartModule],
   templateUrl: './account-type-chart.html',
   styleUrl: './account-type-chart.css',
 })
 export class AccountTypeChart {
   private themeService = inject(ThemeService);
 
-  title = input<string>('Accounts by Type');
   data = input<AccountTypeSlice[]>([]);
-  previous = output<void>();
-  next = output<void>();
 
-  private slices = computed(() => this.data().filter((slice) => slice.count > 0));
+  private slices = computed(() => filterPositive(this.data()));
 
   chartData = computed(() => {
     const mode = this.themeService.theme();
@@ -49,9 +43,11 @@ export class AccountTypeChart {
         {
           data: slices.map((slice) => slice.count),
           backgroundColor: slices.map((slice) => ACCOUNT_TYPE_COLORS[slice.type][mode]),
-          borderColor: SURFACE[mode],
-          borderWidth: 2,
-          hoverOffset: 4,
+          borderColor: 'transparent',
+          borderWidth: 0,
+          hoverOffset: 15,
+          spacing: 5,     // Adds the gap between segments
+          borderRadius: 10 // Rounds the edges
         },
       ],
     };
@@ -62,10 +58,21 @@ export class AccountTypeChart {
     return {
       responsive: true,
       maintainAspectRatio: false,
+      cutout: '40%',
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: { color: INK_SECONDARY[mode] },
+          position: 'bottom', // Sets the legend to the bottom
+          align: 'center',
+          labels: {
+            color: CHART_INK_SECONDARY[mode],
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 25,
+            font: {
+                size: 14,
+                family: "'Inter', sans-serif"
+            }
+          },
         },
       },
     };
