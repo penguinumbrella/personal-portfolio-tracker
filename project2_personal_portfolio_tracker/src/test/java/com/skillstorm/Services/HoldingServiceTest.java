@@ -124,14 +124,14 @@ public class HoldingServiceTest {
         }
 
         @Test
-        @DisplayName("403 FORBIDDEN holding already exists")
+        @DisplayName("409 CONFLICT holding already exists")
         void addHoldingAlreadyExists() {
             when(repo.existsById(testPk1)).thenReturn(true);
 
             ResponseStatusException except = assertThrows(ResponseStatusException.class,
                     () -> service.addHolding(testHDto1));
 
-            assertEquals(HttpStatus.FORBIDDEN, except.getStatusCode());
+            assertEquals(HttpStatus.CONFLICT, except.getStatusCode());
             verify(repo, never()).save(any(Holding.class));
         }
 
