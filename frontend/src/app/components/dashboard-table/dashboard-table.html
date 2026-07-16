@@ -1,5 +1,5 @@
 <a [routerLink]="link()" class="block cursor-pointer hover:shadow-lg transition-shadow duration-200">
-  <p-card [header]="title" styleClass="border border-gray-200 dark:border-gray-700 rounded-lg">
+  <p-card [header]="title()" styleClass="border border-gray-200 dark:border-gray-700 rounded-lg">
     <p-table [value]="data()">
       <ng-template pTemplate="header">
         <tr>
@@ -13,9 +13,9 @@
           @for (col of columns(); track col.field) {
           <td class="text-gray-500 dark:text-gray-400">
             @if (col.field === 'value') {
-              {{ row[col.field] | currency }}
+            {{ row[col.field] | currency }}
             } @else {
-              {{ row[col.field] }}
+            {{ row[col.field] }}
             }
           </td>
           }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterPositive, buildPieChartDataset, buildPieChartOptions } from './pie-chart.utils';
+import { filterPositive, buildPieChartDataset, buildPieChartOptions, CHART_PALETTE } from './pie-chart.utils';
 
 describe('pie-chart.utils', () => {
   describe('filterPositive()', () => {
@@ -19,20 +19,35 @@ describe('pie-chart.utils', () => {
   });
 
   describe('buildPieChartDataset()', () => {
-    it('builds a dataset with the given values and colors for light mode', () => {
-      const dataset = buildPieChartDataset([1, 2], ['#fff', '#000'], 'light');
+    it('builds a dataset colored positionally from the shared palette', () => {
+      const dataset = buildPieChartDataset([1, 2], 'light');
       expect(dataset).toEqual({
         data: [1, 2],
-        backgroundColor: ['#fff', '#000'],
-        borderColor: '#ffffff',
-        borderWidth: 2,
-        hoverOffset: 4,
+        backgroundColor: CHART_PALETTE.slice(0, 2),
+        borderColor: 'transparent',
+        borderWidth: 0,
+        hoverOffset: 15,
+        spacing: 5,
+        borderRadius: 10,
       });
     });
 
-    it('uses the dark surface color for dark mode', () => {
-      const dataset = buildPieChartDataset([1], ['#fff'], 'dark');
-      expect(dataset.borderColor).toBe('#27272a');
+    it('colors are the same regardless of theme (palette is not theme-dependent)', () => {
+      const light = buildPieChartDataset([1, 2, 3], 'light');
+      const dark = buildPieChartDataset([1, 2, 3], 'dark');
+      expect(dark.backgroundColor).toEqual(light.backgroundColor);
+    });
+
+    it('only uses as many colors as there are values, in palette order', () => {
+      const dataset = buildPieChartDataset([1, 2, 3], 'light');
+      expect(dataset.backgroundColor).toEqual([CHART_PALETTE[0], CHART_PALETTE[1], CHART_PALETTE[2]]);
+    });
+
+    it('does not exceed the palette length when there are more slices than colors', () => {
+      const values = Array.from({ length: CHART_PALETTE.length + 2 }, (_, i) => i + 1);
+      const dataset = buildPieChartDataset(values, 'light');
+      expect(dataset.backgroundColor).toEqual(CHART_PALETTE);
+      expect(dataset.backgroundColor.length).toBe(CHART_PALETTE.length);
     });
   });
 

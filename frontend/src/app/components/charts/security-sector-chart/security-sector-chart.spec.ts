@@ -3,6 +3,7 @@ import { signal } from '@angular/core';
 import { SecuritySectorChart } from './security-sector-chart';
 import { ThemeService } from '../../../services/ThemeService';
 import { Sector } from '../../../types/Sector';
+import { CHART_PALETTE } from '../pie-chart.utils';
 import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('SecuritySectorChart', () => {
@@ -31,14 +32,15 @@ describe('SecuritySectorChart', () => {
     expect(component.chartData().datasets[0].data).toEqual([4, 1]);
   });
 
-  it('uses the light-mode color for each sector', () => {
+  it('colors slices positionally from the shared palette', () => {
     const colors = component.chartData().datasets[0].backgroundColor;
-    expect(colors).toEqual(['#2a78d6', '#2b9b9b']);
+    expect(colors).toEqual(CHART_PALETTE.slice(0, 2));
   });
 
-  it('switches to dark-mode colors when the theme changes', () => {
+  it('keeps the same colors when the theme changes (palette is not theme-dependent)', () => {
+    const lightColors = component.chartData().datasets[0].backgroundColor;
     mockThemeService.theme.set('dark');
-    const colors = component.chartData().datasets[0].backgroundColor;
-    expect(colors).toEqual(['#3987e5', '#3bb5b5']);
+    const darkColors = component.chartData().datasets[0].backgroundColor;
+    expect(darkColors).toEqual(lightColors);
   });
 });
