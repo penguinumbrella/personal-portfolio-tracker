@@ -192,6 +192,4 @@ export abstract class BaseDetailDirective<T> {
       },
     });
   }
-
-  
 }

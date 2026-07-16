@@ -20,7 +20,6 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { extractErrorMessage } from '../../shared/http.util';
 
-
 @Component({
   selector: 'app-account-detail',
   imports: [
@@ -82,18 +81,16 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
-      this.checkRouteForId();
+      // allows selections from menu bar
+      this.actRoute.paramMap.subscribe((params) => {
+        const idParam = params.get('id');
+        if (idParam) {
+          this.viewAccount(Number(idParam));
+          // fixes url from menu bar selection (that passes account id)
+          this.location.replaceState('/account');
+        }
+      });
     });
-  }
-
-  // work around to allow selection from menu bar
-  checkRouteForId(): void {
-    const idParam = this.actRoute.snapshot.paramMap.get('id');
-    if (idParam) {
-      const accountId = Number(idParam);
-      this.viewAccount(accountId);
-      this.location.replaceState('/account');
-    }
   }
 
   loadAccounts() {
@@ -176,7 +173,6 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     // show loading spinner while request to backend is being made
     this.loading.set(true);
 
-    //TODO make this paginated?? is it already?????
     this.holdingService.getAllHoldingsPerAccount(accountId).subscribe({
       next: (data) => {
         this.holdings.set(data);
@@ -258,9 +254,9 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
   onAccountModalConfirm(formData: any) {
     if (this.accountForm().invalid) {
       this.messageService.add({
-        severity: 'warn', 
-        summary: 'Incomplete Form', 
-        detail: 'Please fill out all required fields correctly.'
+        severity: 'warn',
+        summary: 'Incomplete Form',
+        detail: 'Please fill out all required fields correctly.',
       });
       return;
     }
@@ -281,7 +277,11 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
             this.buildAccountFields();
           }
           this.isAccountModalVisible.set(false);
-          this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Account updated successfully.' });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Account updated successfully.',
+          });
         },
         error: (err) => {
           this.messageService.add({
@@ -296,7 +296,11 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
         next: (newAccount) => {
           this.loadAccounts();
           this.isAccountModalVisible.set(false);
-          this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Account created successfully.' });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: 'Account created successfully.',
+          });
         },
         error: (err) => {
           this.messageService.add({
