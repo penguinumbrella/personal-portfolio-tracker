@@ -67,9 +67,7 @@ export class AccountTypeChart {
             color: CHART_INK_SECONDARY[mode],
             usePointStyle: true,
             pointStyle: 'circle',
-            padding: 25,
             font: {
-                size: 14,
                 family: "'Inter', sans-serif"
             }
           },

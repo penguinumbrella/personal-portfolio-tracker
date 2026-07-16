@@ -52,5 +52,7 @@ export class SecuritySectorChart {
     };
   });
 
+  
+
   chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

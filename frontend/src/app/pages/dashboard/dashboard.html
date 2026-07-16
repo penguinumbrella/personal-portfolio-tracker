@@ -1,7 +1,7 @@
 <div class="dashboard grid grid-cols-[1fr_2fr] grid-rows-2 gap-4 min-h-full p-4 bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-gray-100">
 
     <!-- Top-left: metric cards -->
-    <div class="grid grid-cols-[1fr_2fr] gap-4 min-w-0 min-h-0">
+    <div class="grid grid-cols-2 gap-4 min-w-0 min-h-0">
         <div class="grid grid-rows-2 gap-4 min-w-0 min-h-0">
             <app-metric-card class="min-w-0" title="Total Accounts" [data]="totalAccounts()" icon="pi pi-user">
             </app-metric-card>
@@ -25,8 +25,8 @@
     </div>
 
     <!-- Bottom-left: breakdown pie chart carousel -->
-    <div class="min-w-0 min-h-0">
-        <app-breakdown-carousel #carousel [titles]="breakdownTitles">
+    <div class="flex flex-col min-w-0 min-h-0">
+        <app-breakdown-carousel class="flex-1 min-h-0" #carousel [titles]="breakdownTitles">
             @switch (carousel.activeIndex()) {
                 @case (0) {
                     <app-security-type-chart [data]="securityTypeBreakdown()"></app-security-type-chart>
