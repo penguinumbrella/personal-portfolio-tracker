@@ -23,7 +23,12 @@ public interface InvestmentAccountRepo extends JpaRepository<InvestmentAccount, 
 
     List<InvestmentAccount> findTop5ByUserIdOrderByDateOpenedDesc(Long userId);
 
-    // Count of a user's investment accounts grouped by account type, for the type-breakdown pie chart
+    /**
+     * Counts a user's investment accounts grouped by account type, for the type-breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return one entry per account type the user holds, with its count
+     */
     @Query("""
             SELECT new com.skillstorm.DTOs.AccountTypeBreakdownDto(a.accountType, COUNT(a))
             FROM InvestmentAccount a

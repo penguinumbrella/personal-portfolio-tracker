@@ -20,10 +20,8 @@ import com.skillstorm.Services.HoldingService;
 import java.util.List;
 
 /**
- * Retrieves POJOs from Service class
- * Convert to ResponseEntity and return
+ * Retrieves POJOs from the service layer, wraps them in a {@link ResponseEntity}, and returns them.
  */
-
 @RestController
 @RequestMapping("/v1/holdings")
 public class HoldingController {
@@ -33,51 +31,92 @@ public class HoldingController {
         this.service = service;
     }
 
-    // ----- POST/CREATE METHODS -----
+    /**
+     * Creates a new holding.
+     *
+     * @param dto the holding to create
+     * @return the created holding with HTTP 201
+     */
     @PostMapping
     public ResponseEntity<Holding> addHolding(@RequestBody HoldingDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addHolding(dto));
     }
 
-    // ----- GET/READ METHODS -----
-    // Read all
+    /**
+     * Returns every holding across all accounts and securities.
+     *
+     * @return all holdings
+     */
     @GetMapping
     public ResponseEntity<Iterable<Holding>> getAllHoldings() {
         return ResponseEntity.ok(service.getAllHoldings());
     }
 
-    // Read all for one account
+    /**
+     * Returns all holdings for one investment account.
+     *
+     * @param accountId the investment account's id
+     * @return the account's holdings
+     */
     @GetMapping("/a/{accountId}")
     public ResponseEntity<Iterable<Holding>> getAllHoldingsPerAccount(@PathVariable int accountId) {
         return ResponseEntity.ok(service.getAllHoldingsPerAccount(accountId));
     }
 
-    // Read all for one security
+    /**
+     * Returns all holdings of one security, across accounts.
+     *
+     * @param securityId the security's id
+     * @return the holdings of that security
+     */
     @GetMapping("/s/{securityId}")
     public ResponseEntity<Iterable<Holding>> getAllHoldingsPerSecurity(@PathVariable int securityId) {
         return ResponseEntity.ok(service.getAllHoldingsPerSecurity(securityId));
     }
 
-    // Read one
+    /**
+     * Returns a single holding by its account/security composite key.
+     *
+     * @param accountId the investment account's id
+     * @param securityId the security's id
+     * @return the matching holding
+     */
     @GetMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> getHolding(@PathVariable int accountId,
             @PathVariable int securityId) {
         return ResponseEntity.ok(service.getHolding(accountId, securityId));
     }
 
-    // Helpers to retrieve aggregate data
-
+    /**
+     * Returns the total number of holdings a user has across all their accounts.
+     *
+     * @param userId the user's id
+     * @return the user's total holding count
+     */
     @GetMapping("total")
     public ResponseEntity<Long> getUserHoldingTotal(@RequestParam(required = true) Long userId) {
         return ResponseEntity.status(200).body(service.getUserHoldingTotal(userId));
     }
 
+    /**
+     * Returns the total cost basis (shares &times; cost per share) invested by a user across all holdings.
+     *
+     * @param userId the user's id
+     * @return the user's total invested cost
+     */
     @GetMapping("totalInvestedCost")
     public ResponseEntity<Long> totalInvestedCost(@RequestParam(required = true) Long userId) {
         return ResponseEntity.status(200).body(service.totalInvestedCost(userId));
     }
 
-    // ----- PUT/UPDATE METHODS -----
+    /**
+     * Updates an existing holding.
+     *
+     * @param accountId the investment account's id
+     * @param securityId the security's id
+     * @param dto the updated holding data
+     * @return the updated holding
+     */
     @PutMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Holding> updateHolding(
             @PathVariable int accountId,
@@ -86,9 +125,14 @@ public class HoldingController {
         return ResponseEntity.ok(service.updateHolding(accountId, securityId, dto));
     }
 
-    // ----- DELETE METHODS -----
-    // Delete one
-    // Service either returns true or throws, so no need to check bool returned
+    /**
+     * Deletes a holding. The service either returns successfully or throws, so there's no
+     * boolean result to check here.
+     *
+     * @param accountId the investment account's id
+     * @param securityId the security's id
+     * @return HTTP 204 No Content
+     */
     @DeleteMapping("/a/{accountId}/s/{securityId}")
     public ResponseEntity<Void> deleteHolding(@PathVariable int accountId,
             @PathVariable int securityId) {
@@ -96,6 +140,12 @@ public class HoldingController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Returns a user's cumulative portfolio value over time, for the portfolio value chart.
+     *
+     * @param userId the user's id
+     * @return the user's portfolio value history, ordered by date
+     */
     @GetMapping("valueHistory")
     public ResponseEntity<List<PortfolioValuePointDto>> getPortfolioValueHistory(
             @RequestParam(required = true) Long userId) {

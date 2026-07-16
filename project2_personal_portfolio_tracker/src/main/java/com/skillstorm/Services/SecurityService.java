@@ -16,6 +16,7 @@ import com.skillstorm.Repositories.SecurityRepo;
 import com.skillstorm.Repositories.UserRepo;
 import com.skillstorm.Util.RepoUtils;
 
+/** Business logic for creating, reading, updating, and deleting securities, plus aggregate/breakdown queries. */
 @Service
 public class SecurityService {
 
@@ -27,7 +28,13 @@ public class SecurityService {
         this.userRepo = userRepo;
     }
 
-    // ----- POST/CREATE METHODS -----
+    /**
+     * Creates a new security.
+     *
+     * @param dto the security to create
+     * @return the created security
+     * @throws ResponseStatusException with status 403 if the assigned user doesn't exist
+     */
     public Security addSecurity(SecurityDto dto) {
         User linkedUser = userRepo.findById(dto.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -39,49 +46,103 @@ public class SecurityService {
         return created;
     }
 
-    // ----- GET/READ METHODS -----
-    // Read all
+    /**
+     * Returns every security across all users.
+     *
+     * @return all securities
+     */
     public Iterable<Security> getAllSecurities() {
         return repo.findAll();
     }
 
-    // Read all per User
+    /**
+     * Returns all securities belonging to one user.
+     *
+     * @param userId the user's id
+     * @return the user's securities
+     */
     public Iterable<Security> getAllSecuritiesPerUser(int userId) {
         return repo.findByUser_Id(userId);
     }
 
-    // Read all per User, paginated and searchable by name
+    /**
+     * Returns a user's securities, paginated and optionally filtered by name search.
+     *
+     * @param userId the user's id
+     * @param search a name search term, or {@code null} for no filtering
+     * @param pageable the requested page and sort
+     * @return the requested page of securities
+     */
     public Page<Security> getSecuritiesPerUserPaged(int userId, String search, Pageable pageable) {
         return repo.findByUser_IdAndNameContainingIgnoreCase(userId, search == null ? "" : search, pageable);
     }
 
-    // Read one
+    /**
+     * Returns a single security by id.
+     *
+     * @param id the security's id
+     * @return the matching security
+     * @throws ResponseStatusException with status 404 if no such security exists
+     */
     public Security getSecurity(int id) {
         return RepoUtils.findOrThrow(repo, id, "Security");
     }
 
-    // Aggregate helpers
-
+    /**
+     * Returns the total number of securities a user has.
+     *
+     * @param userId the user's id
+     * @return the user's total security count
+     * @throws ResponseStatusException with status 404 if the user doesn't exist
+     */
     public Long getUserSecurityAccountTotal(int userId) {
         User user = RepoUtils.findOrThrow(userRepo, userId, "User");
         return repo.countByUser(user);
     }
 
+    /**
+     * Returns a user's top 5 securities by total value, for the dashboard.
+     *
+     * @param userId the user's id
+     * @return the user's top securities
+     */
     public Iterable<TopSecurityDto> getTop5SecurityValues(int userId) {
         return repo.findTop5SecurityValues(userId);
     }
 
+    /**
+     * Returns a count of a user's securities grouped by security type, for the
+     * security-type breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return the user's security type breakdown
+     * @throws ResponseStatusException with status 404 if the user doesn't exist
+     */
     public Iterable<SecurityTypeBreakdownDto> getSecurityTypeBreakdown(int userId) {
         RepoUtils.findOrThrow(userRepo, userId, "User");
         return repo.countByTypeForUser(userId);
     }
 
+    /**
+     * Returns a count of a user's securities grouped by sector, for the sector breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return the user's sector breakdown
+     * @throws ResponseStatusException with status 404 if the user doesn't exist
+     */
     public Iterable<SectorBreakdownDto> getSectorBreakdown(int userId) {
         RepoUtils.findOrThrow(userRepo, userId, "User");
         return repo.countBySectorForUser(userId);
     }
 
-    // ----- PUT/UPDATE METHODS -----
+    /**
+     * Updates an existing security.
+     *
+     * @param id the security's id
+     * @param dto the updated security data
+     * @return the updated security
+     * @throws ResponseStatusException with status 404 if the security doesn't exist, or 403 if the assigned user doesn't exist
+     */
     public Security updateSecurity(int id, SecurityDto dto) {
         RepoUtils.requireExists(repo, id, "Security");
 
@@ -94,7 +155,13 @@ public class SecurityService {
         return updated;
     }
 
-    // ---- DELETE METHODS -----
+    /**
+     * Deletes a security.
+     *
+     * @param id the security's id
+     * @return {@code true} once the security has been deleted
+     * @throws ResponseStatusException with status 404 if no such security exists
+     */
     public boolean deleteSecurity(int id) {
         RepoUtils.requireExists(repo, id, "Security");
         repo.deleteById(id);

@@ -22,6 +22,7 @@ import com.skillstorm.DTOs.TopSecurityDto;
 import com.skillstorm.Services.SecurityService;
 import com.skillstorm.Models.Security;
 
+/** Manages securities and their aggregate/breakdown data. */
 @RestController
 @RequestMapping("/v1/securities")
 public class SecurityController {
@@ -32,27 +33,48 @@ public class SecurityController {
         this.service = service;
     }
 
-    // ----- POST/CREATE METHODS -----
+    /**
+     * Creates a new security.
+     *
+     * @param dto the security to create
+     * @return the created security with HTTP 201
+     */
     @PostMapping
     public ResponseEntity<Security> addSecurity(@RequestBody SecurityDto dto) {
         Security newSec = service.addSecurity(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSec);
     }
 
-    // ----- GET/READ METHODS -----
-    // Read all
+    /**
+     * Returns every security across all users.
+     *
+     * @return all securities
+     */
     @GetMapping
     public ResponseEntity<Iterable<Security>> getAllSecurities() {
         return ResponseEntity.ok(service.getAllSecurities());
     }
 
-    // Read all per User
+    /**
+     * Returns all securities belonging to one user.
+     *
+     * @param userId the user's id
+     * @return the user's securities
+     */
     @GetMapping("/u/{userId}")
     public ResponseEntity<Iterable<Security>> getAllSecuritiesPerUser(@PathVariable int userId) {
         return ResponseEntity.ok(service.getAllSecuritiesPerUser(userId));
     }
 
-    // Read all per User, paginated and searchable by name
+    /**
+     * Returns a user's securities, paginated and optionally filtered by name search.
+     *
+     * @param userId the user's id
+     * @param page the zero-based page number
+     * @param size the page size
+     * @param search a name search term, or {@code null} for no filtering
+     * @return the requested page of securities, sorted by name
+     */
     @GetMapping("/u/{userId}/page")
     public ResponseEntity<Page<Security>> getSecuritiesPerUserPaged(
             @PathVariable int userId,
@@ -64,38 +86,72 @@ public class SecurityController {
         return ResponseEntity.ok(result);
     }
 
-    // Aggregate helpers
-
+    /**
+     * Returns the total number of securities a user has.
+     *
+     * @param userId the user's id
+     * @return the user's total security count
+     */
     @GetMapping("total")
     public ResponseEntity<Long> getUserSecurityAccountTotal(@RequestParam(required = true) int userId) {
         return ResponseEntity.status(200).body(service.getUserSecurityAccountTotal(userId));
     }
 
+    /**
+     * Returns a user's top 5 securities by total value, for the dashboard.
+     *
+     * @param userId the user's id
+     * @return the user's top securities
+     */
     @GetMapping("top")
     public ResponseEntity<Iterable<TopSecurityDto>> getTopSecurities(
             @RequestParam(required = true) int userId) {
         return ResponseEntity.status(200).body(service.getTop5SecurityValues((int) userId));
     }
 
+    /**
+     * Returns a count of a user's securities grouped by security type, for the
+     * security-type breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return the user's security type breakdown
+     */
     @GetMapping("breakdown/type")
     public ResponseEntity<Iterable<SecurityTypeBreakdownDto>> getSecurityTypeBreakdown(
             @RequestParam(required = true) int userId) {
         return ResponseEntity.ok(service.getSecurityTypeBreakdown(userId));
     }
 
+    /**
+     * Returns a count of a user's securities grouped by sector, for the sector breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return the user's sector breakdown
+     */
     @GetMapping("breakdown/sector")
     public ResponseEntity<Iterable<SectorBreakdownDto>> getSectorBreakdown(
             @RequestParam(required = true) int userId) {
         return ResponseEntity.ok(service.getSectorBreakdown(userId));
     }
 
-    // Read one
+    /**
+     * Returns a single security by id.
+     *
+     * @param id the security's id
+     * @return the matching security
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Security> getSecurity(@PathVariable int id) {
         return ResponseEntity.ok(service.getSecurity(id));
     }
 
-    // ----- PUT/UPDATE METHODS -----
+    /**
+     * Updates an existing security.
+     *
+     * @param id the security's id
+     * @param dto the updated security data
+     * @return the updated security
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Security> updateSecurity(
             @PathVariable int id,
@@ -103,9 +159,13 @@ public class SecurityController {
         return ResponseEntity.ok(service.updateSecurity(id, dto));
     }
 
-    // ----- DELETE METHODS -----
-    // Delete one
-    // Service either returns true or throws, so no need to check bool returned
+    /**
+     * Deletes a security. The service either returns successfully or throws, so there's no
+     * boolean result to check here.
+     *
+     * @param id the security's id
+     * @return HTTP 204 No Content
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSecurity(@PathVariable int id) {
         service.deleteSecurity(id);

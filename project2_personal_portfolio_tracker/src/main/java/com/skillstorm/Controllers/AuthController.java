@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/** Handles registration, session-based login/logout, and the current user's own profile. */
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthController {
@@ -68,6 +69,12 @@ public class AuthController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * Registers a new user account.
+     *
+     * @param registeringUser the new user's details
+     * @return the created user with HTTP 201, or HTTP 409 if the username is already taken
+     */
     @PostMapping("/register")
     public ResponseEntity<User> registerNewUser(@Valid @RequestBody UserDto registeringUser) {
 
@@ -81,17 +88,17 @@ public class AuthController {
     }
 
     /**
-    * Authenticates a user and creates a session-based login.
-    *
-    * If auth succeeds, the authenticated SecurityContext
-    * is stored in the HTTP session so future requests can be recognized as
-    * authenticated without resending credentials
-    *
-    * @param credentials username and password supplied by client
-    * @param request the current HTTP request
-    * @param response the current HTTP response
-    * @return the authenticated user's profile, or HTTP 401 if auth fails
-    */
+     * Authenticates a user and creates a session-based login.
+     *
+     * If auth succeeds, the authenticated SecurityContext
+     * is stored in the HTTP session so future requests can be recognized as
+     * authenticated without resending credentials.
+     *
+     * @param credentials username and password supplied by client
+     * @param request the current HTTP request
+     * @param response the current HTTP response
+     * @return the authenticated user's profile, or HTTP 401 if auth fails
+     */
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody LoginRequest credentials, HttpServletRequest request,
             HttpServletResponse response) {
@@ -103,10 +110,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        /**
-         * persist the authenticated context into the session so later requests (carrying the
-         * session cookie) are recognized as logged in without needing to resend credentials
-         */
+        // persist the authenticated context into the session so later requests (carrying the
+        // session cookie) are recognized as logged in without needing to resend credentials
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
@@ -116,12 +121,28 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Returns the signed-in user's own profile.
+     *
+     * @param authentication the current request's authentication, supplied by Spring Security
+     * @return the signed-in user's profile
+     */
     @GetMapping("/me")
     public ResponseEntity<User> getCurrentUser(Authentication authentication) {
         User user = userService.viewProfileByUsername(authentication.getName());
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Updates the signed-in user's own profile, then refreshes the session so subsequent
+     * requests recognize the (possibly changed) username.
+     *
+     * @param authentication the current request's authentication, supplied by Spring Security
+     * @param dto the updated profile details
+     * @param request the current HTTP request
+     * @param response the current HTTP response
+     * @return the updated user profile
+     */
     @PutMapping("/me")
     public ResponseEntity<User> updateCurrentUser(Authentication authentication, @Valid @RequestBody UserDto dto,
             HttpServletRequest request, HttpServletResponse response) {

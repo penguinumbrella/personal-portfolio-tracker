@@ -15,12 +15,13 @@ import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+/** Entity representing a row in the {@code holding} table: a position in a security held by an investment account. */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "holding", schema = "portfolio")
 public class Holding {
 
-    // composite keys must be sorted in public serialized class
+    /** Composite key pairing the account and security this holding belongs to. */
     @EmbeddedId
     private HoldingPK id;
 
@@ -34,13 +35,15 @@ public class Holding {
     private Date purchaseDate;
 
     // --- Mappings ---
-    @MapsId("accountId") // connects to accountId field in HoldingPK
+    /** The account this holding belongs to; maps to {@link HoldingPK#getAccountId()}. */
+    @MapsId("accountId")
     @ManyToOne
     @JsonIgnoreProperties(value = { "holdings" })
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private InvestmentAccount account;
 
-    @MapsId("securityId") // connects to securityId field in HoldingPK
+    /** The security this holding is a position in; maps to {@link HoldingPK#getSecurityId()}. */
+    @MapsId("securityId")
     @ManyToOne
     @JoinColumn(name = "security_id", referencedColumnName = "id")
     @JsonIgnoreProperties(value = { "holdings" })

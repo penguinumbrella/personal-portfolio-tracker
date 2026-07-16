@@ -1,12 +1,3 @@
-/**
- * Spring JPA requires composite primary keys to be stored in public serialized class
- * requires @Embeddable here and @EmbeddedId in the respective model/entity
- * requires empty and full constructors
- * requires @MapsId("fieldName") along with the @ManytoOne
- * requires equals() and hashCode() to be overridden
- * could use a record instead, but that isn't supported in older versions of java
- */
-
 package com.skillstorm.Models;
 
 import java.io.Serializable;
@@ -15,6 +6,18 @@ import java.util.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+/**
+ * Composite primary key for {@link Holding}, pairing an investment account with a security.
+ *
+ * <p>Spring JPA requires composite primary keys to be stored in a public serializable class that:
+ * <ul>
+ *   <li>is annotated {@code @Embeddable} here and referenced via {@code @EmbeddedId} on the entity</li>
+ *   <li>declares both an empty and a full constructor</li>
+ *   <li>maps each field with {@code @MapsId("fieldName")} alongside the corresponding {@code @ManyToOne}</li>
+ *   <li>overrides {@link #equals(Object)} and {@link #hashCode()}</li>
+ * </ul>
+ * A record would fit this role, but isn't supported by older versions of Java.
+ */
 @Embeddable
 public class HoldingPK implements Serializable {
 
@@ -49,7 +52,11 @@ public class HoldingPK implements Serializable {
     }
 
     /**
-     * JPA uses equals and hashCode to find entity in the context
+     * Compares this key to another by account id and security id. JPA relies on this to
+     * locate entities within the persistence context.
+     *
+     * @param obj the object to compare against
+     * @return {@code true} if {@code obj} is a {@link HoldingPK} with the same account and security ids
      */
     @Override
     public boolean equals(Object obj) {
@@ -65,7 +72,9 @@ public class HoldingPK implements Serializable {
     }
 
     /**
-     * Create Hash of combined accountId and securityId
+     * Combines the account id and security id into a single hash.
+     *
+     * @return the hash code for this key
      */
     @Override
     public int hashCode() {

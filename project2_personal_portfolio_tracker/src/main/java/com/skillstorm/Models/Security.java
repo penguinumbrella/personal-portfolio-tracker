@@ -1,7 +1,3 @@
-/**
- * Entity to represent rows in Security table as Java objects
- */
-
 package com.skillstorm.Models;
 
 import java.util.ArrayList;
@@ -28,6 +24,7 @@ import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+/** Entity representing a row in the {@code security} table. */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "security", schema = "portfolio")
@@ -64,9 +61,8 @@ public class Security {
 
     // --- Mappings ---
     /**
-     * Security is many-to-many with Accounts
-     * Join table via Holding
-     * One Security has many Holdings
+     * The holdings referencing this security. Security and {@link InvestmentAccount} are
+     * many-to-many via the {@link Holding} join table; one security has many holdings.
      */
     @OneToMany(mappedBy = "security", fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "security" })

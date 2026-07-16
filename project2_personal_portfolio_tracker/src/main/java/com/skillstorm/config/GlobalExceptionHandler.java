@@ -16,12 +16,19 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.ConstraintViolationException;
 
+/** Centralizes translation of exceptions thrown anywhere in the request pipeline into JSON error responses. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // anytime exception is thrown due to bad input, usually
+    /**
+     * Handles exceptions thrown deliberately by the service layer due to bad input, usually
+     * a 404 (not found) or 409 (conflict).
+     *
+     * @param e the exception carrying the intended HTTP status and reason
+     * @return a body containing that status and reason
+     */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleErrorResponse(ResponseStatusException e) {
 
@@ -33,7 +40,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getStatusCode()).body(errorObject);
     }
 
-    // spring framework validation exceptions
+    /**
+     * Handles Spring's {@code @Valid} bean-validation failures on request bodies.
+     *
+     * @param e the exception carrying the field errors that failed validation
+     * @return a 400 body listing each invalid field and its validation message
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationError(MethodArgumentNotValidException e) {
 
@@ -52,7 +64,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(response);
     }
 
-    // jakarta constraint validation exceptions
+    /**
+     * Handles Jakarta Bean Validation constraint violations (e.g. from validating method arguments directly).
+     *
+     * @param e the exception carrying the constraint violations
+     * @return a 400 body listing each invalid property and its validation message
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleValidationError(ConstraintViolationException e) {
 
@@ -70,7 +87,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(response);
     }
 
-    // malformed JSON or invalid enum/field values in the request body
+    /**
+     * Handles malformed JSON or invalid enum/field values in the request body.
+     *
+     * @param e the exception thrown while deserializing the request body
+     * @return a 400 body with a generic malformed-request reason
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleMessageNotReadable(HttpMessageNotReadableException e) {
         Map<String, Object> response = new HashMap<>();
@@ -80,7 +102,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // DB-level unique constraint violations that slip past service-layer duplicate checks
+    /**
+     * Handles DB-level unique constraint violations that slip past service-layer duplicate checks.
+     *
+     * @param e the exception thrown by the persistence layer
+     * @return a 409 body with a generic duplicate-record reason
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
         log.warn("Data integrity violation", e);
@@ -92,7 +119,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
-    // generic handler for any other exception
+    /**
+     * Catch-all handler for any exception not covered above.
+     *
+     * @param e the unhandled exception
+     * @return a generic 500 response
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception e) {
         log.error("Unhandled exception", e);

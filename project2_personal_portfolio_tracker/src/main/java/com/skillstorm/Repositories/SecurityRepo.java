@@ -17,7 +17,12 @@ public interface SecurityRepo extends JpaRepository<Security, Integer> {
 
     long countByUser(User user);
 
-    // Custom query to find the top 5 securities by total value for a given user
+    /**
+     * Finds a user's top 5 securities by total value (shares &times; cost per share, summed across holdings).
+     *
+     * @param userId the user's id
+     * @return up to 5 securities, ordered by total value descending
+     */
     @Query("""
             SELECT new com.skillstorm.DTOs.TopSecurityDto(h.security.id, h.security.name, SUM(h.shares * h.costPerShare))
             FROM Holding h
@@ -32,7 +37,12 @@ public interface SecurityRepo extends JpaRepository<Security, Integer> {
 
     Page<Security> findByUser_IdAndNameContainingIgnoreCase(int userId, String search, Pageable pageable);
 
-    // Count of a user's securities grouped by security type, for the type-breakdown pie chart
+    /**
+     * Counts a user's securities grouped by security type, for the type-breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return one entry per security type the user holds, with its count
+     */
     @Query("""
             SELECT new com.skillstorm.DTOs.SecurityTypeBreakdownDto(s.type, COUNT(s))
             FROM Security s
@@ -41,7 +51,12 @@ public interface SecurityRepo extends JpaRepository<Security, Integer> {
             """)
     Iterable<SecurityTypeBreakdownDto> countByTypeForUser(int userId);
 
-    // Count of a user's securities grouped by sector, for the sector-breakdown pie chart
+    /**
+     * Counts a user's securities grouped by sector, for the sector-breakdown pie chart.
+     *
+     * @param userId the user's id
+     * @return one entry per sector the user holds, with its count
+     */
     @Query("""
             SELECT new com.skillstorm.DTOs.SectorBreakdownDto(s.sector, COUNT(s))
             FROM Security s

@@ -16,13 +16,16 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
+/** Configures authentication, password hashing, session-backed security context storage, and endpoint authorization. */
 @Configuration
 public class SecurityConfig {
 
     /**
      * BCrypt is the password encoder. It auto generates a unique
-     * salt for each password and stores it as part of the resulting hash. 
-     * Used strength 12 to balance security with speed
+     * salt for each password and stores it as part of the resulting hash.
+     * Used strength 12 to balance security with speed.
+     *
+     * @return a BCrypt password encoder with strength 12
      */
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -33,6 +36,10 @@ public class SecurityConfig {
      * Uses Spring Security's DaoAuthenticationProvider to authenticate users
      * against the application's UserDetailsService and verify passwords using
      * the configured PasswordEncoder.
+     *
+     * @param userDetailsService loads users by username for authentication
+     * @param passwordEncoder verifies a submitted password against the stored hash
+     * @return an authentication manager backed by the given user details service and password encoder
      */
     @Bean
     AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
@@ -46,15 +53,21 @@ public class SecurityConfig {
      * Stores the authenticated SecurityContext in the user's HTTP session.
      *
      * This allows users to remain authenticated across multiple requests
-     * without needing to reauth
-     * */
+     * without needing to reauth.
+     *
+     * @return a session-backed security context repository
+     */
     @Bean
     SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
 
     /**
-     * Allows for specified endpoint permissions 
+     * Allows for specified endpoint permissions.
+     *
+     * @param http the HttpSecurity builder to configure
+     * @return the configured security filter chain
+     * @throws Exception if the security configuration cannot be built
      */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
