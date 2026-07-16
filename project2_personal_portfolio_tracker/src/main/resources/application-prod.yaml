@@ -16,4 +16,6 @@ spring:
             ddl-auto: update
 
 server:
-    port: 8080
+    # Elastic Beanstalk's Java SE platform proxies nginx to 127.0.0.1:5000, not the app's
+    # local-dev port - binding to 8080 here means nginx can never reach the app.
+    port: 5000
