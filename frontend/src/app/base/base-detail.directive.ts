@@ -8,17 +8,30 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { extractErrorMessage } from '../shared/http.util';
 
+/**
+ * Base class for the account-detail and security-detail pages, sharing the holdings list, the
+ * add/edit holding modal, and holding create/update/delete logic. Subclasses provide the
+ * counterpart-specific form and id resolution (security for an account page, account for a
+ * security page).
+ */
 @Directive()
 export abstract class BaseDetailDirective<T> {
+  /** The currently loaded holdings for the viewed account or security. */
   holdings = signal<Holding[]>([]);
+
+  /** Whether a data request is in flight, for showing a loading spinner. */
   loading = signal<boolean>(false);
+
+  /** Whether the add/edit holding modal is visible. */
   isHoldingModalVisible = signal<boolean>(false);
+
+  /** The holding currently being edited, or `null` when the modal is in "create" mode. */
   editingHolding = signal<Holding | null>(null);
 
   /** The signed-in user's id, resolved once via resolveCurrentUserId() before any data loads. */
   currentUserId = signal<number | null>(null);
 
-  // Derived total cost basis across all currently loaded holdings.
+  /** Derived total cost basis across all currently loaded holdings. */
   totalInvestedCost = computed(() =>
     this.holdings().reduce((acc, h) => acc + h.shares * h.costPerShare, 0),
   );
@@ -34,6 +47,8 @@ export abstract class BaseDetailDirective<T> {
    * Resolves the signed-in user's id, then runs the callback (call from ngOnInit before loading any data).
    * Always re-verifies with the server rather than trusting a cached value, so switching accounts
    * never leaves a page showing the previous session's data.
+   *
+   * @param onResolved called once `currentUserId` has been set
    */
   protected resolveCurrentUserId(onResolved: () => void): void {
     this.authService.getCurrentUser().subscribe({
@@ -51,10 +66,22 @@ export abstract class BaseDetailDirective<T> {
   /** Which form control on modalForm holds the "other side" of the holding (security for an account page, account for a security page). */
   protected abstract readonly counterpartyFormKey: 'security' | 'account';
 
-  /** Resolve the account/security ids for a holding create/update payload from the modal's raw form value. */
+  /**
+   * Resolve the account/security ids for a holding create/update payload from the modal's raw form value.
+   *
+   * @param formData the modal form's raw value
+   * @returns the account id and security id for the holding payload
+   */
   protected abstract resolveHoldingIds(formData: any): { a_id: number; s_id: number };
 
-  /** Filter a list of candidates down to ones not already held, keyed by the holding id field the caller cares about. */
+  /**
+   * Filter a list of candidates down to ones not already held, keyed by the holding id field the
+   * caller cares about.
+   *
+   * @param all the candidate items to filter
+   * @param heldIdSelector selects the relevant id (account id or security id) off a holding
+   * @returns the candidates not already represented among the current holdings
+   */
   protected excludeHeld<I extends { id?: number }>(
     all: I[],
     heldIdSelector: (h: Holding) => number | undefined,
@@ -63,8 +90,8 @@ export abstract class BaseDetailDirective<T> {
     return all.filter((item) => !heldIds.has(item.id));
   }
 
+  /** Opens the add/edit holding modal in "create" mode, with the form reset to blank defaults. */
   addHolding(): void {
-    // No editingHolding means the modal is in "create" mode; reset form to blank defaults.
     this.editingHolding.set(null);
     this.modalForm().reset({
       [this.counterpartyFormKey]: null,
@@ -83,8 +110,12 @@ export abstract class BaseDetailDirective<T> {
     return `${now.getFullYear()}-${month}-${day}`;
   }
 
+  /**
+   * Opens the add/edit holding modal in "edit" mode, prefilled with the given holding's values.
+   *
+   * @param holding the holding to edit
+   */
   editHolding(holding: Holding): void {
-    // Presence of editingHolding puts the modal in "edit" mode.
     this.editingHolding.set(holding);
 
     // purchaseDate may arrive as an epoch number (from the backend) or already a Date; normalize to Date.
@@ -103,8 +134,14 @@ export abstract class BaseDetailDirective<T> {
     this.isHoldingModalVisible.set(true);
   }
 
+  /**
+   * Creates or updates a holding from the modal's form value, depending on whether one is
+   * currently being edited. Bails out silently if the form isn't valid; PrimeNG form validation
+   * messages handle the UI feedback.
+   *
+   * @param formData the modal form's raw value
+   */
   onHoldingModalConfirm(formData: any): void {
-    // Bail out silently if the form isn't valid; PrimeNG form validation messages handle the UI feedback.
     if (this.modalForm().invalid) return;
 
     // Subclasses know which raw form fields map to account/security ids.
@@ -164,8 +201,14 @@ export abstract class BaseDetailDirective<T> {
     }
   }
 
+  /**
+   * Shows a PrimeNG confirm popup anchored to the triggering element; only deletes the holding
+   * on accept.
+   *
+   * @param holding the holding to delete if confirmed
+   * @param event the triggering click event, used to anchor the popup
+   */
   confirmDeleteHolding(holding: Holding, event: Event): void {
-    // Show a PrimeNG confirm popup anchored to the triggering element; only deletes on accept.
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Are you sure you want to delete this holding?',
@@ -178,6 +221,11 @@ export abstract class BaseDetailDirective<T> {
     });
   }
 
+  /**
+   * Deletes a holding and removes it from local state by its composite (account, security) id.
+   *
+   * @param holding the holding to delete
+   */
   private executeDeleteHolding(holding: Holding): void {
     this.holdingService.deleteHolding(holding.id!).subscribe({
       next: () => {

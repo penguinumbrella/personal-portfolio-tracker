@@ -18,6 +18,7 @@ import { SecurityType } from '../../types/SecurityType';
 import { InvestmentType } from '../../types/InvestmentType';
 import { Sector } from '../../types/Sector';
 
+/** The dashboard page: summary metrics, recent activity, and breakdown charts for the signed-in user. */
 @Component({
   selector: 'app-dashboard',
   imports: [MetricCard, DashboardTable, SecurityTypeChart, AccountTypeChart, SecuritySectorChart, PortfolioValueChart, BreakdownCarousel],
@@ -31,8 +32,10 @@ export class Dashboard {
   private securityService = inject(SecurityService);
   private dashboardStateService = inject(DashboardStateService);
 
-  // Mirror shared dashboard state (kept in a service so it can survive navigation/reuse) as local computed signals.
+  /** Mirrors the shared dashboard state's recent accounts (kept in a service so it survives navigation/reuse). */
   recentAccounts = computed<InvestmentAccount[]>(() => this.dashboardStateService.recentAccounts());
+
+  /** Mirrors the shared dashboard state's top securities. */
   topSecurities = computed<TopSecurity[]>(() => this.dashboardStateService.topSecurities());
   totalAccounts = signal<number>(0);
   totalSecurities = signal<number>(0);
@@ -62,9 +65,12 @@ export class Dashboard {
     },
   ];
 
+  /**
+   * Loads all dashboard data for the signed-in user. Always re-verifies the current user with
+   * the server rather than trusting a cached value, so switching accounts never leaves the
+   * dashboard showing the previous session's data.
+   */
   ngOnInit(): void {
-    // Always re-verify with the server rather than trusting a cached value, so switching
-    // accounts never leaves the dashboard showing the previous session's data.
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.loadTotals(user.id!);
@@ -78,7 +84,11 @@ export class Dashboard {
     });
   }
 
-  // Fetches the four top-line metric card totals independently (each is its own request/subscription).
+  /**
+   * Fetches the four top-line metric card totals independently (each is its own request/subscription).
+   *
+   * @param userId the signed-in user's id
+   */
   loadTotals(userId: number): void {
     this.investmentAccountService.getUserInvestmentAccountTotal(userId).subscribe({
       next: (data) => {
@@ -117,8 +127,12 @@ export class Dashboard {
     });
   }
 
-  // Loads the recent-accounts list, then fires a separate request per account to fill in its
-  // current cost/value, updating the shared state signal incrementally as each cost resolves.
+  /**
+   * Loads the recent-accounts list, then fires a separate request per account to fill in its
+   * current cost/value, updating the shared state signal incrementally as each cost resolves.
+   *
+   * @param userId the signed-in user's id
+   */
   loadRecentAccounts(userId: number): void {
     this.investmentAccountService.getRecentAccounts(userId).subscribe({
       next: (data) => {
@@ -148,6 +162,11 @@ export class Dashboard {
     });
   }
 
+  /**
+   * Loads the user's top securities by value into the shared dashboard state.
+   *
+   * @param userId the signed-in user's id
+   */
   loadTopSecurities(userId: number): void {
     this.securityService.getTopSecurities(userId).subscribe({
       next: (data) => {
@@ -159,8 +178,12 @@ export class Dashboard {
     });
   }
 
-  // Loads security type/sector breakdowns and normalizes them against the full enum so every
-  // type/sector is represented in the chart (count 0 if the backend returned no slice for it).
+  /**
+   * Loads security type/sector breakdowns and normalizes them against the full enum so every
+   * type/sector is represented in the chart (count 0 if the backend returned no slice for it).
+   *
+   * @param userId the signed-in user's id
+   */
   loadSecurityBreakdowns(userId: number): void {
     this.securityService.getSecurityTypeBreakdown(userId).subscribe({
       next: (breakdown) => {
@@ -187,8 +210,12 @@ export class Dashboard {
     });
   }
 
-  // Loads account type breakdown (same enum-normalization approach as security breakdowns above),
-  // then separately fetches all accounts to build the portfolio value history chart.
+  /**
+   * Loads the account type breakdown, using the same enum-normalization approach as
+   * {@link loadSecurityBreakdowns}.
+   *
+   * @param userId the signed-in user's id
+   */
   loadAccountTypeBreakdown(userId: number): void {
     this.investmentAccountService.getAccountTypeBreakdown(userId).subscribe({
       next: (breakdown) => {
@@ -203,6 +230,11 @@ export class Dashboard {
     });
   }
 
+  /**
+   * Loads the user's cumulative portfolio value history for the portfolio value chart.
+   *
+   * @param userId the signed-in user's id
+   */
   loadPortfolioValueHistory(userId: number): void {
     this.holdingService.getPortfolioValueHistory(userId).subscribe({
       next: (data) => {

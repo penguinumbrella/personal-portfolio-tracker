@@ -6,6 +6,7 @@ import { MenuItem } from 'primeng/api';
 import { DashboardStateService } from '../../services/DashboardStateService';
 import { UserHandle } from '../user-handle/user-handle';
 
+/** Side navigation: dashboard/accounts/securities links, submenus fed by dashboard state, and the user handle. */
 @Component({
   selector: 'app-menu',
   imports: [PanelMenuModule, RouterModule, UserHandle],
@@ -15,16 +16,21 @@ import { UserHandle } from '../user-handle/user-handle';
 export class Menu {
   private dashboardStateService = inject(DashboardStateService);
 
-  // Recomputes the whole nav tree whenever the underlying dashboard state (recent accounts /
-  // top securities) changes, since those feed the submenu builders below
+  /**
+   * The full nav tree, recomputed whenever the underlying dashboard state (recent accounts /
+   * top securities) changes, since those feed the submenu builders below.
+   */
   items = computed<MenuItem[]>(() => [
     { label: 'Dashboard', icon: 'pi pi-home', routerLink: '/dashboard' },
     { label: 'Accounts', icon: 'pi pi-user', items: this.buildAccountSubMenu() },
     { label: 'Securities', icon: 'pi pi-lock', items: this.buildSecuritySubMenu() },
   ]);
 
-  // ... is spreader operater. takes array and spreads it to indiv items in array
-  // Builds the "Accounts" submenu: static links plus a dynamic list of recently viewed accounts
+  /**
+   * Builds the "Accounts" submenu: static links plus a dynamic list of recently viewed accounts.
+   *
+   * @returns the accounts submenu items
+   */
   buildAccountSubMenu(): MenuItem[] {
     const recentAccounts = this.dashboardStateService.recentAccounts();
     return [
@@ -46,7 +52,11 @@ export class Menu {
     ];
   }
 
-  // Builds the "Securities" submenu: static links plus the top securities by value
+  /**
+   * Builds the "Securities" submenu: static links plus the top securities by value.
+   *
+   * @returns the securities submenu items
+   */
   buildSecuritySubMenu(): MenuItem[] {
     const securities = this.dashboardStateService.topSecurities();
     return [

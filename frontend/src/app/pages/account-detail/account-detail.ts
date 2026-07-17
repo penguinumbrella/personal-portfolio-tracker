@@ -20,6 +20,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { extractErrorMessage } from '../../shared/http.util';
 
+/** Investment account detail page: account fields, holdings, and the add/edit account and holding modals. */
 @Component({
   selector: 'app-account-detail',
   imports: [
@@ -72,29 +73,35 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
 
   protected override readonly counterpartyFormKey = 'security' as const;
 
-  // Maps the holding modal's raw form data to the account/security id pair the API expects.
+  /**
+   * Maps the holding modal's raw form data to the account/security id pair the API expects.
+   *
+   * @param formData the holding modal form's raw value
+   * @returns the account id (the account currently being viewed) and the selected security id
+   */
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: this.account()!.id!, s_id: formData.security.id };
   }
 
-  // page loads all accounts on the side and waits for one to be selected
+  /**
+   * Loads the account sidebar and security list, then honors an `id` route param (set when the
+   * account was selected from the menu bar) by viewing that account and cleaning up the URL.
+   */
   ngOnInit() {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
-      // allows selections from menu bar
       this.actRoute.paramMap.subscribe((params) => {
         const idParam = params.get('id');
         if (idParam) {
           this.viewAccount(Number(idParam));
-          // fixes url from menu bar selection (that passes account id)
           this.location.replaceState('/account');
         }
       });
     });
   }
 
-  // Fetch a page of accounts (search + pagination aware) and map them into sidebar list items.
+  /** Fetches a page of accounts (search + pagination aware) and maps them into sidebar list items. */
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -118,19 +125,28 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       });
   }
 
-  // Reset back to page 0 whenever the search term changes, then reload.
+  /**
+   * Resets back to page 0 whenever the search term changes, then reloads.
+   *
+   * @param term the new sidebar search term
+   */
   onSidebarSearch(term: string): void {
     this.sidebarSearch.set(term);
     this.sidebarPage.set(0);
     this.loadAccounts();
   }
 
+  /**
+   * Switches the sidebar to a different page, then reloads.
+   *
+   * @param page the zero-based page number to switch to
+   */
   onSidebarPageChange(page: number): void {
     this.sidebarPage.set(page);
     this.loadAccounts();
   }
 
-  // Load all securities for the user, used as candidates for the "add holding" modal.
+  /** Loads all securities for the user, used as candidates for the "add holding" modal. */
   loadSecurities() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -145,17 +161,25 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
-  // Securities not yet held in this account, so the add-holding dropdown only offers valid choices.
+  /** Securities not yet held in this account, so the add-holding dropdown only offers valid choices. */
   filteredSecurities = computed(() =>
     this.excludeHeld(this.allSecurities(), (h) => h.id?.securityId),
   );
 
-  // when an account is selected from the sidebar, load the holdings for that account
+  /**
+   * Loads the holdings for an account selected from the sidebar.
+   *
+   * @param item the selected sidebar item
+   */
   onAccountSelect(item: SidebarItem): void {
     this.viewAccount(item.id);
   }
 
-  // Fetch a single account by id, then rebuild its detail-card fields and load its holdings.
+  /**
+   * Fetches a single account by id, then rebuilds its detail-card fields and loads its holdings.
+   *
+   * @param id the investment account's id
+   */
   viewAccount(id: number) {
     this.investmentAccountService.getInvestmentAccountById(id).subscribe({
       next: (data) => {
@@ -169,15 +193,19 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
-  // Clear any editing state and open the account modal in "create" mode.
+  /** Clears any editing state and opens the account modal in "create" mode. */
   onOpenAddAccountModal(): void {
     this.editingAccount.set(null);
     this.accountForm().reset();
     this.isAccountModalVisible.set(true);
   }
 
+  /**
+   * Fetches the holdings for an account, showing a loading spinner while the request is in flight.
+   *
+   * @param accountId the investment account's id
+   */
   loadHoldings(accountId: number) {
-    // show loading spinner while request to backend is being made
     this.loading.set(true);
 
     this.holdingService.getAllHoldingsPerAccount(accountId).subscribe({
@@ -192,7 +220,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
-  // build the fields for the detail card
+  /** Builds the label/value fields shown on the account's detail card. */
   buildAccountFields(): void {
     const a = this.account();
     if (!a) return;
@@ -204,7 +232,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     ]);
   }
 
-  // Populate the account modal with the currently viewed account's data and open it in "edit" mode.
+  /** Populates the account modal with the currently viewed account's data and opens it in "edit" mode. */
   editAccount() {
     this.editingAccount.set(this.account());
     const currentAccount = this.account();
@@ -223,7 +251,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     this.isAccountModalVisible.set(true);
   }
 
-  // Ask for confirmation before deleting, since it cascades to the account's holdings.
+  /** Asks for confirmation before deleting the account, since it cascades to the account's holdings. */
   confirmDeleteAccount(): void {
     this.confirmationService.confirm({
       message:
@@ -237,6 +265,7 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
+  /** Deletes the currently viewed account and refreshes the sidebar list. */
   private executeDeleteAccount(): void {
     const account = this.account();
     if (!account?.id) return;
@@ -263,7 +292,11 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
     });
   }
 
-  // Handles both create and update submissions from the account modal.
+  /**
+   * Handles both create and update submissions from the account modal.
+   *
+   * @param formData the account modal form's raw value
+   */
   onAccountModalConfirm(formData: any) {
     if (this.accountForm().invalid) {
       this.messageService.add({

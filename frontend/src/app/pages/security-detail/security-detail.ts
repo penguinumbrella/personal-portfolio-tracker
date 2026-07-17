@@ -19,6 +19,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { extractErrorMessage } from '../../shared/http.util';
 
+/** Security detail page: security fields, holdings, and the add/edit security and holding modals. */
 @Component({
   selector: 'app-security-detail',
   imports: [
@@ -73,29 +74,35 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
 
   protected override readonly counterpartyFormKey = 'account' as const;
 
-  // Maps the holding modal's raw form data to the account/security id pair the API expects.
+  /**
+   * Maps the holding modal's raw form data to the account/security id pair the API expects.
+   *
+   * @param formData the holding modal form's raw value
+   * @returns the selected account id and the security id (the security currently being viewed)
+   */
   protected resolveHoldingIds(formData: any): { a_id: number; s_id: number } {
     return { a_id: formData.account.id, s_id: this.security()!.id! };
   }
 
-  // get the list of securities on page load
+  /**
+   * Loads the security sidebar and account list, then honors an `id` route param (set when the
+   * security was selected from the menu bar) by viewing that security and cleaning up the URL.
+   */
   ngOnInit() {
     this.resolveCurrentUserId(() => {
       this.loadAccounts();
       this.loadSecurities();
-      // allows selections from menu bar
       this.actRoute.paramMap.subscribe((params) => {
         const idParam = params.get('id');
         if (idParam) {
           this.viewSecurity(Number(idParam));
-          // fixes url from menu bar selection (that passes account id)
           this.location.replaceState('/security');
         }
       });
     });
   }
 
-  // Load all accounts for the user, used as candidates for the "add holding" modal.
+  /** Loads all accounts for the user, used as candidates for the "add holding" modal. */
   loadAccounts() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -110,7 +117,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
-  // load the list of securities for the user and populate the sidebar
+  /** Loads a page of securities for the user (search + pagination aware) and populates the sidebar. */
   loadSecurities() {
     const userId = this.currentUserId();
     if (userId == null) return;
@@ -139,27 +146,44 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
       });
   }
 
-  // Reset back to page 0 whenever the search term changes, then reload.
+  /**
+   * Resets back to page 0 whenever the search term changes, then reloads.
+   *
+   * @param term the new sidebar search term
+   */
   onSidebarSearch(term: string): void {
     this.sidebarSearch.set(term);
     this.sidebarPage.set(0);
     this.loadSecurities();
   }
 
+  /**
+   * Switches the sidebar to a different page, then reloads.
+   *
+   * @param page the zero-based page number to switch to
+   */
   onSidebarPageChange(page: number): void {
     this.sidebarPage.set(page);
     this.loadSecurities();
   }
 
-  // Accounts not yet holding this security, so the add-holding dropdown only offers valid choices.
+  /** Accounts not yet holding this security, so the add-holding dropdown only offers valid choices. */
   filteredAccounts = computed(() => this.excludeHeld(this.allAccounts(), (h) => h.id?.accountId));
 
-  // when a security is selected from sidebar, get security and load details, holdings
+  /**
+   * Loads the details and holdings for a security selected from the sidebar.
+   *
+   * @param item the selected sidebar item
+   */
   onSecuritySelect(item: SidebarItem): void {
     this.viewSecurity(item.id);
   }
 
-  // Fetch a single security by id, then rebuild its detail-card fields and load its holdings.
+  /**
+   * Fetches a single security by id, then rebuilds its detail-card fields and loads its holdings.
+   *
+   * @param id the security's id
+   */
   viewSecurity(id: number) {
     this.securityService.getSecurityById(id).subscribe({
       next: (data) => {
@@ -173,16 +197,19 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
-  // Clear any editing state and open the security modal in "create" mode.
+  /** Clears any editing state and opens the security modal in "create" mode. */
   onOpenAddSecurityModal(): void {
     this.editingSecurity.set(null);
     this.securityForm().reset();
     this.isSecurityModalVisible.set(true);
   }
 
-  // load holdings for the selected security
+  /**
+   * Fetches the holdings for a security, showing a loading spinner while the request is in flight.
+   *
+   * @param securityId the security's id
+   */
   loadHoldings(securityId: number) {
-    // show loading spinner while request to backend is being made
     this.loading.set(true);
 
     this.holdingService.getAllHoldingsPerSecurity(securityId).subscribe({
@@ -197,7 +224,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
-  // build the fields for the detail card
+  /** Builds the label/value fields shown on the security's detail card. */
   buildSecurityFields(): void {
     const s = this.security();
     if (!s) return;
@@ -209,9 +236,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     ]);
   }
 
-  // CRUDS BELOW
-
-  // Populate the security modal with the currently viewed security's data and open it in "edit" mode.
+  /** Populates the security modal with the currently viewed security's data and opens it in "edit" mode. */
   editSecurity() {
     this.editingSecurity.set(this.security());
     const currentSecurity = this.security();
@@ -227,7 +252,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     this.isSecurityModalVisible.set(true);
   }
 
-  // Ask for confirmation before deleting, since it cascades to the security's holdings.
+  /** Asks for confirmation before deleting the security, since it cascades to the security's holdings. */
   confirmDeleteSecurity(): void {
     this.confirmationService.confirm({
       message:
@@ -241,6 +266,7 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
+  /** Deletes the currently viewed security and refreshes the sidebar list. */
   private executeDeleteSecurity(): void {
     const security = this.security();
     if (!security?.id) return;
@@ -267,7 +293,11 @@ export class SecurityDetail extends BaseDetailDirective<Security> {
     });
   }
 
-  // Handles both create and update submissions from the security modal.
+  /**
+   * Handles both create and update submissions from the security modal.
+   *
+   * @param formData the security modal form's raw value
+   */
   onSecurityModalConfirm(formData: any) {
     if (this.securityForm().invalid) {
       this.messageService.add({

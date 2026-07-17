@@ -33,13 +33,19 @@ const CURRENCY_FORMATTER_COMPACT = new Intl.NumberFormat('en-US', {
 
 const DAY_FORMATTER = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
-// "2024-01-15" parsed via `new Date()` is read as UTC midnight, which can roll back
-// a day once formatted in a west-of-UTC timezone. Build the date from local parts instead.
+/**
+ * Parses an ISO `yyyy-MM-dd` date string using local date parts. `new Date(dateStr)` reads the
+ * string as UTC midnight, which can roll back a day once formatted in a west-of-UTC timezone.
+ *
+ * @param dateStr the date string, in `yyyy-MM-dd` format
+ * @returns the parsed date, at local midnight
+ */
 function parseISODate(dateStr: string): Date {
   const [year, month, day] = dateStr.split('-').map(Number);
   return new Date(year, month - 1, day);
 }
 
+/** Line chart of a user's cumulative portfolio value over time, with selectable date ranges. */
 @Component({
   selector: 'app-portfolio-value-chart',
   imports: [CardModule, ChartModule],
@@ -49,21 +55,37 @@ function parseISODate(dateStr: string): Date {
 export class PortfolioValueChart {
   private themeService = inject(ThemeService);
 
+  /** The chart's card title. */
   title = input<string>('Portfolio Value Over Time');
+
+  /** The full, unfiltered portfolio value history to chart. */
   data = input<PortfolioValuePoint[]>([]);
 
+  /** The selectable date range options rendered as buttons. */
   rangeOptions = RANGE_OPTIONS;
+
+  /** The currently selected date range filter. */
   activeRange = signal<RangeKey>('ALL');
 
-  // Switches the active time-range filter (1W/1M/1Y/All) applied to the series.
+  /**
+   * Switches the active time-range filter (1W/1M/1Y/All) applied to the series.
+   *
+   * @param range the range to switch to
+   */
   setRange(range: RangeKey): void {
     this.activeRange.set(range);
   }
 
-  // Refactored to include gradient creation
-  // Builds a top-to-bottom fade (theme-tinted color -> transparent) used as the
-  // area fill under the line; must run inside a Chart.js backgroundColor callback
-  // because it needs the live canvas ctx/chartArea.
+  /**
+   * Builds a top-to-bottom fade (theme-tinted color -> transparent) used as the area fill under
+   * the line. Must run inside a Chart.js `backgroundColor` callback because it needs the live
+   * canvas ctx/chartArea.
+   *
+   * @param ctx the chart's canvas rendering context
+   * @param chartArea the chart's plotted area, used to size the gradient
+   * @param mode the current theme, used to tint the gradient
+   * @returns a linear gradient fading from the theme-tinted color to transparent
+   */
   private createGradient(ctx: CanvasRenderingContext2D, chartArea: any, mode: 'light' | 'dark') {
     const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
     const color = mode === 'light' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(253, 224, 71, 0.3)';
@@ -72,8 +94,10 @@ export class PortfolioValueChart {
     return gradient;
   }
 
-  // Builds the line dataset from the range-filtered points, with a gradient
-  // fill recomputed per-render (backgroundColor callback) and per theme.
+  /**
+   * The line dataset built from the range-filtered points, with a gradient fill recomputed
+   * per-render (`backgroundColor` callback) and per theme.
+   */
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const points = this.filteredPoints();
@@ -103,8 +127,10 @@ export class PortfolioValueChart {
     };
   });
 
-  // Chart.js display options: hides the legend (single series), formats
-  // tooltips/axis ticks as currency, and styles axes/gridlines per theme.
+  /**
+   * The Chart.js display options: hides the legend (single series), formats tooltips/axis ticks
+   * as currency, and styles axes/gridlines per theme.
+   */
   chartOptions = computed(() => {
     const mode = this.themeService.theme();
     const points = this.filteredPoints();
@@ -149,9 +175,12 @@ export class PortfolioValueChart {
     };
   });
 
-  // The underlying series only has a point on dates a purchase happened, so a range
-  // window is anchored to the most recent point and carries the prior cumulative
-  // value forward to the cutoff, otherwise the line would falsely dip to zero.
+  /**
+   * The portfolio value points within {@link activeRange}. The underlying series only has a
+   * point on dates a purchase happened, so a range window is anchored to the most recent point
+   * and carries the prior cumulative value forward to the cutoff, otherwise the line would
+   * falsely dip to zero.
+   */
   private filteredPoints = computed(() => {
     const points = this.data();
     const range = this.activeRange();

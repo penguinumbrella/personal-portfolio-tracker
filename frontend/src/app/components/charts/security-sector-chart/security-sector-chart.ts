@@ -24,6 +24,7 @@ const SECTOR_COLORS: Record<Sector, { light: string; dark: string }> = {
   [Sector.REAL_ESTATE]: { light: '#8a8a29', dark: '#a3a334' },
 };
 
+/** Pie chart breaking down a user's securities by sector. */
 @Component({
   selector: 'app-security-sector-chart',
   imports: [ChartModule],
@@ -33,13 +34,13 @@ const SECTOR_COLORS: Record<Sector, { light: string; dark: string }> = {
 export class SecuritySectorChart {
   private themeService = inject(ThemeService);
 
+  /** The sector breakdown to chart. */
   data = input<SectorSlice[]>([]);
 
-  // Drop zero-count sectors before charting/legend rendering.
+  /** The sectors with a positive count, dropping empty categories before charting/legend rendering. */
   private slices = computed(() => filterPositive(this.data()));
 
-  // Builds the pie dataset: one slice per sector, colored by the fixed
-  // per-sector palette (re-evaluated when the theme changes).
+  /** The pie dataset: one slice per sector, re-evaluated when the theme changes. */
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();
@@ -54,7 +55,6 @@ export class SecuritySectorChart {
     };
   });
 
-  
-
+  /** The Chart.js display options for this chart. */
   chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

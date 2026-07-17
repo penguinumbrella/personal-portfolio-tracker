@@ -21,6 +21,7 @@ const ACCOUNT_TYPE_COLORS: Record<InvestmentType, { light: string; dark: string 
   [InvestmentType.HSA]: { light: '#7a5cd6', dark: '#8f74e0' },
 };
 
+/** Doughnut chart breaking down a user's investment accounts by account type. */
 @Component({
   selector: 'app-account-type-chart',
   imports: [ChartModule],
@@ -30,13 +31,13 @@ const ACCOUNT_TYPE_COLORS: Record<InvestmentType, { light: string; dark: string 
 export class AccountTypeChart {
   private themeService = inject(ThemeService);
 
+  /** The account-type breakdown to chart. */
   data = input<AccountTypeSlice[]>([]);
 
-  // Drop zero-count account types before charting/legend rendering.
+  /** The account types with a positive count, dropping empty categories before charting/legend rendering. */
   private slices = computed(() => filterPositive(this.data()));
 
-  // Builds the doughnut dataset: one slice per account type, colored by the
-  // fixed per-type palette (re-evaluated when the theme changes).
+  /** The doughnut dataset: one slice per account type, re-evaluated when the theme changes. */
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();
@@ -51,6 +52,6 @@ export class AccountTypeChart {
     };
   });
 
-
+  /** The Chart.js display options for this chart. */
   chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

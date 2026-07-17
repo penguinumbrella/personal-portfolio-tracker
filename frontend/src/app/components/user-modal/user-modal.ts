@@ -4,6 +4,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 
+/** Edit-profile modal shown from the user handle. */
 @Component({
   selector: 'app-user-modal',
   imports: [DialogModule, ButtonModule, ReactiveFormsModule, InputTextModule],
@@ -12,16 +13,26 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 })
 export class UserModal {
 
+  /** Whether the modal is visible. */
   visible = model.required<boolean>();
+
+  /** The display name shown in the modal title. */
   recordName = input.required<string>();
+
+  /** The reactive form backing the modal's fields. */
   form = input.required<FormGroup>();
 
+  /** Emits the form's value when confirmed and valid; the parent owns persistence. */
   confirmed = output<any>();
+
+  /** Emits when the modal is cancelled/closed without confirming. */
   cancelled = output<void>();
+
+  /** Emits when the user logs out from within the modal. */
   loggedOut = output<void>();
 
+  /** Emits the form's value if it passes validation; the parent owns persistence. */
   onUpdate() {
-    // Only emit if the form passes validation; parent owns persistence
     if (this.form().valid) {
       this.confirmed.emit(this.form().value);
     }

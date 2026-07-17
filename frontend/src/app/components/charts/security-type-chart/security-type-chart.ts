@@ -20,6 +20,7 @@ const SECURITY_TYPE_COLORS: Record<SecurityType, { light: string; dark: string }
   [SecurityType.BOND]: { light: '#eda100', dark: '#c98500' },
 };
 
+/** Pie chart breaking down a user's securities by security type. */
 @Component({
   selector: 'app-security-type-chart',
   imports: [ChartModule],
@@ -29,13 +30,13 @@ const SECURITY_TYPE_COLORS: Record<SecurityType, { light: string; dark: string }
 export class SecurityTypeChart {
   private themeService = inject(ThemeService);
 
+  /** The security-type breakdown to chart. */
   data = input<SecurityTypeSlice[]>([]);
 
-  // Drop zero-count security types before charting/legend rendering.
+  /** The security types with a positive count, dropping empty categories before charting/legend rendering. */
   private slices = computed(() => filterPositive(this.data()));
 
-  // Builds the pie dataset: one slice per security type, colored by the fixed
-  // per-type palette (re-evaluated when the theme changes).
+  /** The pie dataset: one slice per security type, re-evaluated when the theme changes. */
   chartData = computed(() => {
     const mode = this.themeService.theme();
     const slices = this.slices();
@@ -50,5 +51,6 @@ export class SecurityTypeChart {
     };
   });
 
+  /** The Chart.js display options for this chart. */
   chartOptions = computed(() => buildPieChartOptions(this.themeService.theme()));
 }

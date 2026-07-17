@@ -12,6 +12,7 @@ import { credentialsInterceptor } from './shared/credentials.interceptor';
 
 import Stonks from '../assets/themes/stonks-preset';
 
+/** PrimeNG Aura theme preset, customized with the app's soft-yellow primary color scale. */
 const MyCustomTheme = definePreset(Aura, {
     fontFamily: 'Montserrat, sans-serif',
     semantic: {
@@ -27,6 +28,7 @@ primary: {
         }
     }
 });
+/** Root application providers: routing, hydration, HTTP (with the credentials interceptor), and PrimeNG theming. */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

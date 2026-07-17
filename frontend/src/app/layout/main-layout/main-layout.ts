@@ -9,6 +9,7 @@ import { ToastModule } from 'primeng/toast';
 import { Menu } from '../../components/menu/menu';
 import { ThemeService } from '../../services/ThemeService';
 
+/** App shell: sidenav with the menu, header (page title + theme toggle), and the routed page content. */
 @Component({
   selector: 'app-main-layout',
   imports: [RouterOutlet, Menu, MatSidenavModule, MatButtonModule, MatIconModule, ToastModule],
@@ -19,9 +20,11 @@ export class MainLayout {
   themeService = inject(ThemeService);
   private router = inject(Router);
 
-  // Toast and Dialog fight over the same dynamic z-index layer and mat-sidenav-container forms
-  // its own stacking context around any dialog rendered inside it, so a toast can end up trapped
-  // behind an open modal. Moving the toast to be a direct child of <body> sidesteps both issues.
+  /**
+   * Toast and Dialog fight over the same dynamic z-index layer, and mat-sidenav-container forms
+   * its own stacking context around any dialog rendered inside it, so a toast can end up trapped
+   * behind an open modal. Moving the toast to be a direct child of `<body>` sidesteps both issues.
+   */
   private toastHost = viewChild.required('toastHost', { read: ElementRef });
 
   constructor() {
@@ -30,6 +33,7 @@ export class MainLayout {
     });
   }
 
+  /** The current page's title, derived from the deepest activated route's `data.title`. */
   title = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -39,6 +43,12 @@ export class MainLayout {
     { initialValue: '' }
   );
 
+  /**
+   * Walks down to the deepest activated route to find its `data.title`.
+   *
+   * @param route the root activated route snapshot
+   * @returns the deepest route's title, or an empty string if none set one
+   */
   private getTitle(route: ActivatedRouteSnapshot): string {
     let current = route;
     let title = '';

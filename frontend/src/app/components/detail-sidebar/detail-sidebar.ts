@@ -8,13 +8,18 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
-// Layout for the sidebar cards
+/** Layout for the sidebar cards shown on the account-detail and security-detail pages. */
 export interface SidebarItem {
   id: number;
   label: string;
   subtitle: string;
 }
 
+/**
+ * Searchable, paginated sidebar list used on the account-detail and security-detail pages.
+ * The parent page owns data fetching; this component just renders items and emits selection,
+ * search, paging, and "add" events.
+ */
 @Component({
   selector: 'app-detail-sidebar',
   imports: [NgClass, ScrollPanelModule, SidebarCard, ButtonModule, IconFieldModule, InputIconModule, InputTextModule],
@@ -22,17 +27,23 @@ export interface SidebarItem {
   styleUrl: './detail-sidebar.css',
 })
 export class DetailSidebar implements OnDestroy {
+  /** The items to list. */
   items = input<SidebarItem[]>([]);
 
+  /** Label for the "add" button. */
   addLabel = input<string>('Add Item');
 
   /** Current page index (0-based) and total page count, for the pager footer. */
   page = input<number>(0);
   totalPages = input<number>(1);
 
+  /** The locally-selected item's id, for styling the active row. */
   selectedId = signal<number | null>(null);
 
+  /** Emits the selected item when a row is clicked. */
   selected = output<SidebarItem>();
+
+  /** Emits when the "add" button is clicked. */
   onAddItem = output<void>();
 
   /** Debounced (300ms) search text as the user types. */
@@ -50,35 +61,44 @@ export class DetailSidebar implements OnDestroy {
     });
   }
 
+  /** Cleans up the search subject's subscription when the component is destroyed. */
   ngOnDestroy(): void {
-    // Clean up the subject's subscription when the component is destroyed
     this.searchInput$.complete();
   }
 
+  /**
+   * Tracks the locally-selected item for styling, and notifies the parent of the selection.
+   *
+   * @param item the selected sidebar item
+   */
   onSelect(item: SidebarItem): void {
-    // Track locally-selected item for styling, and notify parent of the selection
     this.selectedId.set(item.id);
     this.selected.emit(item);
   }
 
+  /** Notifies the parent that the "add" button was clicked. */
   onAddClick(): void {
     this.onAddItem.emit();
   }
 
+  /**
+   * Pushes raw search input into the debounce pipeline set up in the constructor.
+   *
+   * @param value the raw search input value
+   */
   onSearchInput(value: string): void {
-    // Push raw input into the debounce pipeline set up in the constructor
     this.searchInput$.next(value);
   }
 
+  /** Goes to the previous page, guarding against paging before the first page. */
   onPrevPage(): void {
-    // Guard against paging before the first page
     if (this.page() > 0) {
       this.pageChange.emit(this.page() - 1);
     }
   }
 
+  /** Goes to the next page, guarding against paging past the last page. */
   onNextPage(): void {
-    // Guard against paging past the last page
     if (this.page() < this.totalPages() - 1) {
       this.pageChange.emit(this.page() + 1);
     }

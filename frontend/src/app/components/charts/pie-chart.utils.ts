@@ -10,12 +10,25 @@ export const CHART_PALETTE = [
   '#9B72E1'  // Saturated Lavender
 ];
 
-/** Drops zero-count slices so the legend/chart never shows empty categories. */
+/**
+ * Drops zero-count slices so the legend/chart never shows empty categories.
+ *
+ * @param slices the slices to filter
+ * @returns only the slices with a positive count
+ */
 export function filterPositive<T extends { count: number }>(slices: T[]): T[] {
   return slices.filter((slice) => slice.count > 0);
 }
 
-/** Dataset/legend styling shared by the pie charts. */
+/**
+ * Builds the dataset/legend styling shared by the pie charts, coloring slices positionally from
+ * {@link CHART_PALETTE}.
+ *
+ * @param values the value for each slice
+ * @param mode the current theme (accepted for a consistent signature with other chart builders;
+ *        the palette itself isn't theme-dependent)
+ * @returns a Chart.js dataset object
+ */
 export function buildPieChartDataset(values: number[], mode: Theme) {
   return {
     data: values,
@@ -31,6 +44,12 @@ export function buildPieChartDataset(values: number[], mode: Theme) {
 /** Fixed pixel radius so the arc stays a consistent size regardless of how many legend rows wrap. */
 const PIE_CHART_RADIUS = 120;
 
+/**
+ * Builds the Chart.js display options shared by the pie charts.
+ *
+ * @param mode the current theme, used to color the legend labels
+ * @returns a Chart.js options object
+ */
 export function buildPieChartOptions(mode: Theme) {
   return {
     responsive: true,

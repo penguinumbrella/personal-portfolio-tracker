@@ -5,10 +5,12 @@ export type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'theme';
 
+/** Resolves, persists, and toggles the app's light/dark theme, syncing it to the DOM. */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
     private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+    /** The current theme, initially resolved from localStorage or the OS color-scheme preference. */
     theme = signal<Theme>(this.resolveInitialTheme());
 
     constructor() {
@@ -18,32 +20,46 @@ export class ThemeService {
         }
     }
 
+    /** Switches between light and dark, persisting the choice. */
     toggle(): void {
         this.setTheme(this.theme() === 'dark' ? 'light' : 'dark');
     }
 
+    /**
+     * Sets an explicit theme, persisting it to localStorage and reflecting it in the DOM immediately.
+     *
+     * @param theme the theme to switch to
+     */
     setTheme(theme: Theme): void {
         this.theme.set(theme);
         if (this.isBrowser) {
-            // Persist the choice so it survives reloads, then reflect it in the DOM immediately.
             localStorage.setItem(STORAGE_KEY, theme);
             this.applyTheme(theme);
         }
     }
 
+    /**
+     * Resolves the theme to use on startup: a previously saved user choice if one exists,
+     * otherwise the OS/browser color-scheme preference. Defaults to dark during SSR, since
+     * there's no DOM/localStorage to read from.
+     *
+     * @returns the resolved initial theme
+     */
     private resolveInitialTheme(): Theme {
-        // No DOM/localStorage during SSR; default to dark.
         if (!this.isBrowser) return 'dark';
 
-        // Prefer a previously saved user choice...
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored === 'light' || stored === 'dark') return stored;
 
-        // ...otherwise fall back to the OS/browser color-scheme preference.
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
-    /** Toggles both Tailwind's class strategy and PrimeNG's darkModeSelector, which use different class names. Both go on <html> since it's an ancestor of everything PrimeNG themes. */
+    /**
+     * Toggles both Tailwind's class strategy and PrimeNG's darkModeSelector, which use different
+     * class names. Both go on `<html>` since it's an ancestor of everything PrimeNG themes.
+     *
+     * @param theme the theme to apply
+     */
     private applyTheme(theme: Theme): void {
         const isDark = theme === 'dark';
         document.documentElement.classList.toggle('dark', isDark);

@@ -7,6 +7,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Holding } from '../../types/Holding';
 
+/**
+ * Shared table used on both the account-detail and security-detail pages; the parent page owns
+ * the data fetching (and loading state) and just tells this component which mode it's displaying.
+ */
 @Component({
   selector: 'app-holding-table',
   imports: [
@@ -21,17 +25,19 @@ import { Holding } from '../../types/Holding';
   templateUrl: './holding-table.html',
   styleUrl: './holding-table.css',
 })
-// Shared table used on both the account-detail and security-detail pages; the parent
-// page owns the data fetching and just tells this component which mode it's displaying
 export class HoldingTable {
+  /** The holdings to display. */
   holdings = input<Holding[]>([]);
-  // Controls which columns/labels are shown (grouped by account vs. by security)
+
+  /** Controls which columns/labels are shown (grouped by account vs. by security). */
   tableMode = input<'byAccount' | 'bySecurity'>('byAccount');
 
+  /** Emits when the "add holding" action is triggered. */
   onAdd = output<void>();
-  onEdit = output<Holding>();
-  // originalEvent is passed through so the parent can anchor a confirm popup to the click target
-  onDelete = output<{ holding: Holding; originalEvent: Event }>();
 
-  // Used by two pages to load different data, so they handle loading
+  /** Emits the holding to edit. */
+  onEdit = output<Holding>();
+
+  /** Emits the holding to delete; `originalEvent` lets the parent anchor a confirm popup to the click target. */
+  onDelete = output<{ holding: Holding; originalEvent: Event }>();
 }

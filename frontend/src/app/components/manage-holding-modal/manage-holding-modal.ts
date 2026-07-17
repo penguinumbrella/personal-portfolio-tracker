@@ -16,6 +16,7 @@ import { Security } from '../../types/Security';
 import { Holding } from '../../types/Holding';
 import { InvestmentAccount } from '../../types/InvestmentAccounts';
 
+/** Add/edit holding modal shared by the account-detail and security-detail pages. */
 @Component({
   selector: 'app-manage-holding-modal',
   imports: [
@@ -33,31 +34,44 @@ import { InvestmentAccount } from '../../types/InvestmentAccounts';
   styleUrl: './manage-holding-modal.css',
 })
 export class ManageHoldingModal {
-  // Build dropdown options from the InvestmentType enum values
+  /** Dropdown options built from the InvestmentType enum values. */
   readonly accountOptions = Object.values(InvestmentType).map((value) => ({
     name: value,
     value: value,
   }));
 
-  // creating values that need to be passed in by the parent
-
-  // Determines whether the modal is being used from the account-detail or security-detail page,
-  // which changes which dropdown (security vs. account) is editable
+  /**
+   * Determines whether the modal is being used from the account-detail or security-detail page,
+   * which changes which dropdown (security vs. account) is editable.
+   */
   viewMode = input.required<'byAccount' | 'bySecurity'>();
 
+  /** Securities not yet held, offered as counterpart choices when adding a holding by account. */
   filteredSecurities = input<Security[]>();
+
+  /** Accounts not yet holding this security, offered as counterpart choices when adding a holding by security. */
   filteredAccounts = input<InvestmentAccount[]>([]);
+
+  /** The holding currently being edited, or `null` when the modal is in "create" mode. */
   editingHolding = input<Holding | null>(null);
+
+  /** Whether the modal is visible. */
   visible = model.required<boolean>();
+
+  /** The display name (account nickname or security name) shown in the modal title. */
   recordName = input.required<string>();
+
+  /** The reactive form backing the modal's fields. */
   form = input.required<FormGroup>();
 
-  // creating events for when the deletion is confirmed or cancelled - needs to be handled by parent
+  /** Emits the form's value when confirmed and valid; the parent owns persistence. */
   confirmed = output<any>();
+
+  /** Emits when the modal is cancelled/closed without confirming. */
   cancelled = output<void>();
 
+  /** Emits the form's value if it passes validation; the parent owns persistence. */
   onUpdate() {
-    // Only emit if the form passes validation; parent owns persistence
     if (this.form().valid) {
       this.confirmed.emit(this.form().value);
     }
