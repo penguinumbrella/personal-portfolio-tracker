@@ -1,5 +1,6 @@
 {
     "configurations": [
+
         {
             "type": "java",
             "name": "Spring Boot-Project2PersonalPortfolioTrackerApplication<project2_personal_portfolio_tracker>",
@@ -7,6 +8,26 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.skillstorm.Project2PersonalPortfolioTrackerApplication",
             "projectName": "project2_personal_portfolio_tracker",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaServiceApplication<eureka-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.skillstorm.eureka_service.EurekaServiceApplication",
+            "projectName": "eureka-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-UserServiceApplication<user-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.skillstorm.user_service.UserServiceApplication",
+            "projectName": "user-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

@@ -1,0 +1,42 @@
+spring:
+    application:
+        name: api-gateway
+
+server:
+    port: 8125
+
+    spring:
+        gateway:
+            server:
+                webflux:
+                    routes:
+                        - id: user-service
+                          uri: lb://user-service
+                          predicates:
+                            -Path=/users/**
+                          filters:
+                            - name: CircuitBreaker      # creates the circuit breaker filter on requests to /accounts
+                              args:                     # specify where to navigate to when the circuit breaker pops
+                                  name: fallbackController              
+                                  fallbackUri: forward:/cache/users
+
+                        - id: accounts-service
+                          uri: lb://accounts-service
+                          predicates:
+                            -Path=/accounts/**
+                          filters:
+                            - name: CircuitBreaker      # creates the circuit breaker filter on requests to /accounts
+                              args:                     # specify where to navigate to when the circuit breaker pops
+                                  name: fallbackController              
+                                  fallbackUri: forward:/cache/accounts
+
+                    globalcors:
+                        cors-configurations:
+                            '[/**]':        # matches every endpoint
+                                allowedOrigins: "http://localhost:4200"
+                                allowwedMethods:
+                                    - GET
+                                    - POST
+                                    - PUT
+                                    - DELETE
+                                    - OPTIONS       # allows pre-flight cors requests to come through

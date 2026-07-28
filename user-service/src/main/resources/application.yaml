@@ -1,0 +1,13 @@
+spring:
+    application:
+        name: user-service
+
+server:
+    port: 8081
+
+eureka:
+    client:
+        service-url:
+            default-zone: http://localhost:8671
+    instance:
+        leaseRenewalIntervalInSeconds: 30
