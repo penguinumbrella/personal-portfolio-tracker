@@ -2,6 +2,7 @@ package com.skillstorm.Models;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -31,6 +32,7 @@ public class Holding {
     @Column(name = "cost_per_share", nullable = false)
     private int costPerShare;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "purchase_date", nullable = false)
     private Date purchaseDate;
 

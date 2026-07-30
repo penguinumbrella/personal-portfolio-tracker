@@ -3,11 +3,17 @@ import { Theme } from '../../services/ThemeService';
 export const CHART_INK_SECONDARY: Record<Theme, string> = { light: '#52514e', dark: '#c3c2b7' };
 
 export const CHART_PALETTE = [
-  '#FF5256', // Saturated Red
-  '#FFD433', // Saturated Yellow
-  '#7ED957', // Saturated Green
-  '#359BE3', // Saturated Blue
-  '#9B72E1'  // Saturated Lavender
+                        "#0ea5e9",
+                        "#38bdf8",
+                        "#818cf8",
+                        "#c084fc",
+                        "#e879f9",
+                        "#f472b6",
+                        "#fb7185",
+                        "#fdba74",
+                        "#fde047",
+                        "#bef264",
+                        "#4ade80"
 ];
 
 /**

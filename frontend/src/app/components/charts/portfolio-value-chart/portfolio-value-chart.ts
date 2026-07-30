@@ -34,6 +34,43 @@ const CURRENCY_FORMATTER_COMPACT = new Intl.NumberFormat('en-US', {
 const DAY_FORMATTER = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
 /**
+ * Normalizes API date values to `yyyy-MM-dd`. Jackson may serialize `java.sql.Date` as a full
+ * ISO timestamp (e.g. `2026-01-15T00:00:00.000+00:00`); the chart expects a date-only key.
+ *
+ * @param date a `yyyy-MM-dd` string, ISO datetime, epoch millis, or Date from the API
+ * @returns the date portion as `yyyy-MM-dd`
+ */
+function toDateKey(date: string | number | Date): string {
+  if (date instanceof Date) {
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+    return [
+      date.getUTCFullYear(),
+      String(date.getUTCMonth() + 1).padStart(2, '0'),
+      String(date.getUTCDate()).padStart(2, '0'),
+    ].join('-');
+  }
+
+  if (typeof date === 'number') {
+    return toDateKey(new Date(date));
+  }
+
+  const raw = String(date);
+  // Prefer slicing the leading calendar date so ISO timestamps don't need Date parsing.
+  const leading = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (leading) {
+    return leading[1];
+  }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return raw;
+  }
+  return toDateKey(parsed);
+}
+
+/**
  * Parses an ISO `yyyy-MM-dd` date string using local date parts. `new Date(dateStr)` reads the
  * string as UTC midnight, which can roll back a day once formatted in a west-of-UTC timezone.
  *
@@ -41,8 +78,13 @@ const DAY_FORMATTER = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'n
  * @returns the parsed date, at local midnight
  */
 function parseISODate(dateStr: string): Date {
-  const [year, month, day] = dateStr.split('-').map(Number);
+  const [year, month, day] = toDateKey(dateStr).split('-').map(Number);
   return new Date(year, month - 1, day);
+}
+
+/** Formats a date key for chart axis/tooltip display (e.g. `Jan 15`). */
+function formatDayLabel(dateStr: string): string {
+  return DAY_FORMATTER.format(parseISODate(dateStr));
 }
 
 /** Line chart of a user's cumulative portfolio value over time, with selectable date ranges. */
@@ -102,7 +144,8 @@ export class PortfolioValueChart {
     const mode = this.themeService.theme();
     const points = this.filteredPoints();
     return {
-      labels: points.map((point) => point.date),
+      // Short labels go on the chart itself so axis ticks and tooltips never show ISO timestamps.
+      labels: points.map((point) => formatDayLabel(point.date)),
       datasets: [
         {
           label: 'Total Invested',
@@ -133,7 +176,6 @@ export class PortfolioValueChart {
    */
   chartOptions = computed(() => {
     const mode = this.themeService.theme();
-    const points = this.filteredPoints();
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -156,10 +198,6 @@ export class PortfolioValueChart {
             autoSkip: true,
             maxTicksLimit: 8,
             maxRotation: 0,
-            callback: (value: number, index: number) => {
-              const point = points[index];
-              return point ? DAY_FORMATTER.format(parseISODate(point.date)) : '';
-            },
           },
           grid: { display: false },
         },
@@ -182,7 +220,11 @@ export class PortfolioValueChart {
    * falsely dip to zero.
    */
   private filteredPoints = computed(() => {
-    const points = this.data();
+    // Normalize dates so range filters and tick labels always use yyyy-MM-dd keys.
+    const points = this.data().map((point) => ({
+      ...point,
+      date: toDateKey(point.date),
+    }));
     const range = this.activeRange();
     const days = RANGE_DAYS[range];
     // 'ALL' (no day count) or no data: show everything, unfiltered.
@@ -191,9 +233,13 @@ export class PortfolioValueChart {
     }
 
     // Cutoff date = N days back from the latest data point (not from "today").
-    const cutoff = new Date(points[points.length - 1].date);
+    const cutoff = parseISODate(points[points.length - 1].date);
     cutoff.setDate(cutoff.getDate() - days);
-    const cutoffKey = cutoff.toISOString().slice(0, 10);
+    const cutoffKey = [
+      cutoff.getFullYear(),
+      String(cutoff.getMonth() + 1).padStart(2, '0'),
+      String(cutoff.getDate()).padStart(2, '0'),
+    ].join('-');
 
     const before = points.filter((point) => point.date < cutoffKey);
     const within = points.filter((point) => point.date >= cutoffKey);

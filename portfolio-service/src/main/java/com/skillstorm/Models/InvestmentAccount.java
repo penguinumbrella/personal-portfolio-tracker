@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -44,6 +45,7 @@ public class InvestmentAccount {
     @Column(name = "account_type", nullable = false, unique = true)
     private InvestmentType accountType;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "date_opened", nullable = false)
     private Date dateOpened;
 

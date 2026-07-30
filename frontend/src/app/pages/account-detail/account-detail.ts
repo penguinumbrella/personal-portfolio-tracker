@@ -228,8 +228,30 @@ export class AccountDetail extends BaseDetailDirective<InvestmentAccount> {
       { label: 'Institution', value: a.institutionName },
       { label: 'Account Type', value: a.accountType },
       { label: 'Nickname', value: a.nickname },
-      { label: 'Opened', value: a.dateOpened },
+      { label: 'Opened', value: this.formatOpenedDate(a.dateOpened) },
     ]);
+  }
+
+  /**
+   * Formats an account opened date for display. API values may arrive as `yyyy-MM-dd` or a full
+   * ISO timestamp; either way we show a medium date like `Jan 15, 2026`.
+   */
+  private formatOpenedDate(value: string | Date | number): string {
+    const raw = String(value);
+    const leading = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const date = leading
+      ? new Date(Number(leading[1]), Number(leading[2]) - 1, Number(leading[3]))
+      : value instanceof Date
+        ? value
+        : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return raw;
+    }
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   }
 
   /** Populates the account modal with the currently viewed account's data and opens it in "edit" mode. */

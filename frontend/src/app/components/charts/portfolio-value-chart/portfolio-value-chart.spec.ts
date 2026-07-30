@@ -27,9 +27,9 @@ describe('PortfolioValueChart', () => {
     fixture.componentRef.setInput('data', points);
   });
 
-  it('defaults to the ALL range, showing every point unmodified', () => {
+  it('defaults to the ALL range, showing every point with short day labels', () => {
     expect(component.activeRange()).toBe('ALL');
-    expect(component.chartData().labels).toEqual(['2026-01-01', '2026-01-05', '2026-01-10']);
+    expect(component.chartData().labels).toEqual(['Jan 1', 'Jan 5', 'Jan 10']);
     expect(component.chartData().datasets[0].data).toEqual([100, 150, 300]);
   });
 
@@ -45,7 +45,7 @@ describe('PortfolioValueChart', () => {
     expect(component.activeRange()).toBe('1W');
     // cutoff = last date (01-10) minus 7 days = 01-03, which isn't an exact point,
     // so the last value before it (100, from 01-01) is carried forward to that date.
-    expect(component.chartData().labels).toEqual(['2026-01-03', '2026-01-05', '2026-01-10']);
+    expect(component.chartData().labels).toEqual(['Jan 3', 'Jan 5', 'Jan 10']);
     expect(component.chartData().datasets[0].data).toEqual([100, 150, 300]);
   });
 
@@ -58,7 +58,7 @@ describe('PortfolioValueChart', () => {
     fixture.componentInstance.setRange('1W');
 
     // cutoff (01-03) predates every point, so there's nothing to carry forward.
-    expect(fixture.componentInstance.chartData().labels).toEqual(['2026-01-09', '2026-01-10']);
+    expect(fixture.componentInstance.chartData().labels).toEqual(['Jan 9', 'Jan 10']);
   });
 
   it('formats tooltip values as currency', () => {
@@ -71,14 +71,14 @@ describe('PortfolioValueChart', () => {
     expect(formatted).toBe('$1,200');
   });
 
-  it('formats x-axis ticks as a short month/day label for the point at that index', () => {
-    const formatted = component.chartOptions().scales.x.ticks.callback(0, 0);
-    expect(formatted).toBe('Jan 1');
-  });
+  it('formats ISO timestamp dates from the API as short day labels', () => {
+    const fixture = TestBed.createComponent(PortfolioValueChart);
+    fixture.componentRef.setInput('data', [
+      { date: '2026-01-01T00:00:00.000+00:00', value: 100 },
+      { date: '2026-01-05T00:00:00.000+00:00', value: 150 },
+    ]);
 
-  it('formats x-axis ticks as an empty string when there is no point at that index', () => {
-    const formatted = component.chartOptions().scales.x.ticks.callback(0, 99);
-    expect(formatted).toBe('');
+    expect(fixture.componentInstance.chartData().labels).toEqual(['Jan 1', 'Jan 5']);
   });
 
   it('uses the theme-appropriate line color', () => {
