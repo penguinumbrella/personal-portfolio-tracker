@@ -109,6 +109,17 @@ public class SecurityConfig {
 
     }
 
+    /**
+     * Builds the cookie-based CSRF token repository used by the security filter chain.
+     *
+     * withHttpOnlyFalse() lets the frontend's JavaScript read the XSRF-TOKEN cookie
+     * so it can be copied into the X-XSRF-TOKEN header. The cookie is marked
+     * SameSite=None and Secure so it is still sent on cross-origin requests
+     * between the frontend and backend.
+     *
+     * @return a cookie CSRF token repository configured for cross-origin requests
+     */
+    
     private CookieCsrfTokenRepository csrfTokenRepository() {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         repository.setCookieCustomizer(cookie -> cookie.sameSite("None").secure(true));
