@@ -1,13 +1,33 @@
 spring:
     application:
         name: user-service
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: none
+    config:
+        import: optional:file:.env[.properties],optional:file:../.env[.properties],optional:file:../project2_personal_portfolio_tracker/.env[.properties]
 
 server:
     port: 8081
+    servlet:
+        session:
+            cookie:
+                same-site: none
+                secure: true
 
 eureka:
     client:
         service-url:
-            default-zone: http://localhost:8671
+            default-zone: http://localhost:8761/eureka/
+        registry-fetch-interval-seconds: 5
     instance:
-        leaseRenewalIntervalInSeconds: 30
+        hostname: localhost
+        ip-address: 127.0.0.1
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${server.port}
+        leaseRenewalIntervalInSeconds: 10

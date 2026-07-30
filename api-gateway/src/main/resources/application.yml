@@ -1,42 +1,67 @@
 spring:
     application:
         name: api-gateway
-
-server:
-    port: 8125
-
-    spring:
+    datasource:
+        url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+        username: ${DB_USERNAME:postgres}
+        password: ${DB_PASSWORD:postgres}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            ddl-auto: none
+    config:
+        import: optional:file:.env[.properties],optional:file:../.env[.properties]
+    cloud:
         gateway:
             server:
-                webflux:
+                webmvc:
                     routes:
-                        - id: user-service
-                          uri: lb://user-service
+                        - id: portfolio-investments
+                          uri: http://localhost:8082
                           predicates:
-                            -Path=/users/**
-                          filters:
-                            - name: CircuitBreaker      # creates the circuit breaker filter on requests to /accounts
-                              args:                     # specify where to navigate to when the circuit breaker pops
-                                  name: fallbackController              
-                                  fallbackUri: forward:/cache/users
+                            - Path=/v1/investments/**
 
-                        - id: accounts-service
-                          uri: lb://accounts-service
+                        - id: portfolio-securities
+                          uri: http://localhost:8082
                           predicates:
-                            -Path=/accounts/**
-                          filters:
-                            - name: CircuitBreaker      # creates the circuit breaker filter on requests to /accounts
-                              args:                     # specify where to navigate to when the circuit breaker pops
-                                  name: fallbackController              
-                                  fallbackUri: forward:/cache/accounts
+                            - Path=/v1/securities/**
+
+                        - id: portfolio-holdings
+                          uri: http://localhost:8082
+                          predicates:
+                            - Path=/v1/holdings/**
 
                     globalcors:
                         cors-configurations:
-                            '[/**]':        # matches every endpoint
+                            '[/**]':
                                 allowedOrigins: "http://localhost:4200"
-                                allowwedMethods:
+                                allowedMethods:
                                     - GET
                                     - POST
                                     - PUT
                                     - DELETE
-                                    - OPTIONS       # allows pre-flight cors requests to come through
+                                    - OPTIONS
+                                allowCredentials: true
+
+server:
+    port: 8125
+    servlet:
+        session:
+            cookie:
+                same-site: none
+                secure: true
+
+eureka:
+    client:
+        fetch-registry: true
+        register-with-eureka: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
+        registry-fetch-interval-seconds: 5
+    instance:
+        hostname: localhost
+        ip-address: 127.0.0.1
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${server.port}
+        leaseRenewalIntervalInSeconds: 10

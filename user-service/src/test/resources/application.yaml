@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: none
+  cloud:
+    compatibility-verifier:
+      enabled: false
+eureka:
+  client:
+    enabled: false

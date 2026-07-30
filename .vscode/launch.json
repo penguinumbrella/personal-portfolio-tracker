@@ -1,33 +1,32 @@
 {
     "configurations": [
-
         {
             "type": "java",
-            "name": "Spring Boot-Project2PersonalPortfolioTrackerApplication<project2_personal_portfolio_tracker>",
+            "name": "Spring Boot-EurekaServerApplication<eureka-server>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "com.skillstorm.Project2PersonalPortfolioTrackerApplication",
-            "projectName": "project2_personal_portfolio_tracker",
+            "mainClass": "com.skillstorm.eureka_server.EurekaServerApplication",
+            "projectName": "eureka-server",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
-            "name": "Spring Boot-EurekaServiceApplication<eureka-service>",
+            "name": "Spring Boot-PortfolioServiceApplication<portfolio-service>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "com.skillstorm.eureka_service.EurekaServiceApplication",
-            "projectName": "eureka-service",
+            "mainClass": "com.skillstorm.PortfolioServiceApplication",
+            "projectName": "portfolio-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
-            "name": "Spring Boot-UserServiceApplication<user-service>",
+            "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "com.skillstorm.user_service.UserServiceApplication",
-            "projectName": "user-service",
+            "mainClass": "com.skillstorm.ApiGatewayApplication",
+            "projectName": "api-gateway",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
