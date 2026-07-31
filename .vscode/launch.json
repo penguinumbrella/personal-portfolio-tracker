@@ -2,18 +2,17 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Spring Boot-EurekaServerApplication<eureka-server>",
+            "name": "eureka-server",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "com.skillstorm.eureka_server.EurekaServerApplication",
             "projectName": "eureka-server",
             "args": "",
-            "envFile": "${workspaceFolder}/.env",
-            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=57814 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=eureka-server"
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
-            "name": "Spring Boot-PortfolioServiceApplication<portfolio-service>",
+            "name": "portfolio-service",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "com.skillstorm.PortfolioServiceApplication",
@@ -23,31 +22,11 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
+            "name": "api-gateway",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "com.skillstorm.ApiGatewayApplication",
             "projectName": "api-gateway",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
-            "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.skillstorm.api_gateway.ApiGatewayApplication",
-            "projectName": "api-gateway",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
-            "name": "Spring Boot-PortfolioServiceApplication<portfolio-service>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.skillstorm.portfolio_service.PortfolioServiceApplication",
-            "projectName": "portfolio-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

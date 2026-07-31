@@ -12,6 +12,12 @@ spring:
             ddl-auto: none
     config:
         import: optional:file:.env[.properties],optional:file:../.env[.properties]
+    # Default local RabbitMQ (guest/guest on 5672). Start the broker before these apps.
+    rabbitmq:
+        host: ${RABBITMQ_HOST:localhost}
+        port: ${RABBITMQ_PORT:5672}
+        username: ${RABBITMQ_USERNAME:guest}
+        password: ${RABBITMQ_PASSWORD:guest}
 
 server:
     port: 8082

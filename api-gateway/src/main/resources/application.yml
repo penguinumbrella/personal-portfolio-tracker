@@ -12,6 +12,11 @@ spring:
             ddl-auto: none
     config:
         import: optional:file:.env[.properties],optional:file:../.env[.properties]
+    rabbitmq:
+        host: ${RABBITMQ_HOST:localhost}
+        port: ${RABBITMQ_PORT:5672}
+        username: ${RABBITMQ_USERNAME:guest}
+        password: ${RABBITMQ_PASSWORD:guest}
     cloud:
         gateway:
             server:

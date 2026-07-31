@@ -20,6 +20,8 @@ import com.skillstorm.DTOs.UserDto;
 import com.skillstorm.Models.RoleType;
 import com.skillstorm.Models.User;
 import com.skillstorm.Repositories.UserRepo;
+import com.skillstorm.messaging.UserRegisteredEvent;
+import com.skillstorm.messaging.UserRegisteredPublisher;
 
 /**
  * Business logic for user registration, profile management, and Spring Security's
@@ -30,10 +32,13 @@ public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
     private final PasswordEncoder passwordEncoder;
+    private final UserRegisteredPublisher userRegisteredPublisher;
 
-    public UserService(UserRepo repo, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo repo, PasswordEncoder passwordEncoder,
+            UserRegisteredPublisher userRegisteredPublisher) {
         this.repo = repo;
         this.passwordEncoder = passwordEncoder;
+        this.userRegisteredPublisher = userRegisteredPublisher;
     }
 
     /**
@@ -66,7 +71,10 @@ public class UserService implements UserDetailsService {
         // Hash the password before saving
         newUser.setPasswordHash(passwordEncoder.encode(dto.passwordHash()));
 
-        return repo.save(newUser);
+        User saved = repo.save(newUser);
+        userRegisteredPublisher.publish(
+                new UserRegisteredEvent(saved.getId(), saved.getUsername(), saved.getEmail()));
+        return saved;
     }
 
     /**
