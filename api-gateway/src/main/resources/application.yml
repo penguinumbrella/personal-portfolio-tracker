@@ -16,28 +16,6 @@ spring:
         gateway:
             server:
                 webmvc:
-                    routes:
-                        - id: portfolio-investments
-                          uri: http://localhost:8082
-                          predicates:
-                            - Path=/v1/investments/**
-                          filters:
-                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
-
-                        - id: portfolio-securities
-                          uri: http://localhost:8082
-                          predicates:
-                            - Path=/v1/securities/**
-                          filters:
-                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
-
-                        - id: portfolio-holdings
-                          uri: http://localhost:8082
-                          predicates:
-                            - Path=/v1/holdings/**
-                          filters:
-                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
-
                     globalcors:
                         cors-configurations:
                             '[/**]':
@@ -54,6 +32,20 @@ spring:
                                     - OPTIONS
                                 allowedHeaders: "*"
                                 allowCredentials: true
+
+# Open quickly when portfolio-service is down so demos don't need dozens of failed calls.
+resilience4j:
+    circuitbreaker:
+        configs:
+            default:
+                slidingWindowSize: 5
+                minimumNumberOfCalls: 3
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10s
+                permittedNumberOfCallsInHalfOpenState: 2
+        instances:
+            portfolioCircuitBreaker:
+                baseConfig: default
 
 server:
     port: 8125
