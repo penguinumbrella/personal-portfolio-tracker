@@ -16,6 +16,40 @@ spring:
         gateway:
             server:
                 webmvc:
+                    routes:
+                        - id: portfolio-investments
+                          uri: lb://portfolio-service
+                          predicates:
+                            - Path=/v1/investments/**
+                          filters:
+                            - name: CircuitBreaker
+                              args:
+                                  id: portfolioCircuitBreaker
+                                  fallbackUri: forward:/fallback/portfolio
+                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
+
+                        - id: portfolio-securities
+                          uri: lb://portfolio-service
+                          predicates:
+                            - Path=/v1/securities/**
+                          filters:
+                            - name: CircuitBreaker
+                              args:
+                                  id: portfolioCircuitBreaker
+                                  fallbackUri: forward:/fallback/portfolio
+                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
+
+                        - id: portfolio-holdings
+                          uri: lb://portfolio-service
+                          predicates:
+                            - Path=/v1/holdings/**
+                          filters:
+                            - name: CircuitBreaker
+                              args:
+                                  id: portfolioCircuitBreaker
+                                  fallbackUri: forward:/fallback/portfolio
+                            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers, RETAIN_FIRST
+
                     globalcors:
                         cors-configurations:
                             '[/**]':
